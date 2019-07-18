@@ -51,7 +51,7 @@ class Client(object):
         if movie_id is not None:
             data = {'movie_id': movie_id}
         elif image_id is not None:
-            data = {'movie_id': image_id}
+            data = {'image_id': image_id}
         else:
             raise Exception('Either "movie_id" or "image_id" is required.')
 
