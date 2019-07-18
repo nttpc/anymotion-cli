@@ -1,5 +1,6 @@
 import click
 
+from . import __version__
 from .client import Client
 
 
@@ -14,8 +15,9 @@ from .client import Client
               envvar='API_URL',
               show_default=True,
               help='URL of AnyMotion API.')
+@click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, token, base_url):
+def cli(ctx, token, base_url, version):
     """Command Line Interface for AnyMotion API."""
     ctx.ensure_object(dict)
     ctx.obj['client'] = Client(token, base_url)
@@ -88,10 +90,7 @@ def list(ctx):
 def extract(ctx, movie_id, image_id):
     """Extract keypoints from uploaded images or movies."""
     if movie_id is None and image_id is None:
-        click.echo(
-            'Error Missing option: Either "movie_id" or "image_id" is required.'
-        )
-        return
+        raise click.UsageError('Either "movie_id" or "image_id" is required.')
 
     c = ctx.obj['client']
     c.extract_keypoint(movie_id=movie_id, image_id=image_id)
