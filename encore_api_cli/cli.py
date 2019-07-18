@@ -2,36 +2,39 @@ import click
 
 from . import __version__
 from .client import Client
+from .config import Config
 
 
 @click.group()
-@click.option('--token',
-              required=True,
-              envvar='API_TOKEN',
-              help='Access token for authorization.')
-@click.option('--url',
-              'base_url',
-              default='https://dev.api.anymotion.jp/api/v1/',
-              envvar='API_URL',
-              show_default=True,
-              help='URL of AnyMotion API.')
 @click.version_option(version=__version__)
-@click.pass_context
-def cli(ctx, token, base_url, version):
+def cli():
     """Command Line Interface for AnyMotion API."""
-    ctx.ensure_object(dict)
-    ctx.obj['client'] = Client(token, base_url)
+    pass
+
+
+@cli.command()
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def configure(profile):
+    """Configure your AnyMotion Access Token."""
+    config = Config(profile)
+    config.url = click.prompt('AnyMotion API URL', default=config.url)
+    config.token = click.prompt('AnyMotion Access Token', default=config.token)
+    config.update()
 
 
 @cli.command()
 @click.argument('path', type=click.Path(exists=True))
-@click.pass_context
-def upload(ctx, path):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def upload(path, profile):
     """Upload a local movie or image to cloud storage."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     media_id, media_type = c.upload_to_s3(path)
     click.echo(
-        f'uploaded the {media_type} file to cloud storage ({media_type}_id: {media_id})'
+        f'Uploaded the {media_type} file to cloud storage ({media_type}_id: {media_id})'
     )
 
 
@@ -42,10 +45,12 @@ def movie():
 
 
 @movie.command()
-@click.pass_context
-def list(ctx):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def list(profile):
     """Show movie list."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     c.show_list('movies')
 
 
@@ -56,10 +61,12 @@ def image():
 
 
 @image.command()
-@click.pass_context
-def list(ctx):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def list(profile):
     """Show image list."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     c.show_list('images')
 
 
@@ -70,10 +77,12 @@ def keypoint():
 
 
 @keypoint.command()
-@click.pass_context
-def list(ctx):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def list(profile):
     """Show keypoint list."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     c.show_list('keypoints')
 
 
@@ -86,22 +95,26 @@ def list(ctx):
     '--image_id',
     type=int,
     help='ID of image to extrat, either movie_id or image_id is required.')
-@click.pass_context
-def extract(ctx, movie_id, image_id):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def extract(profile, movie_id, image_id):
     """Extract keypoints from uploaded images or movies."""
     if movie_id is None and image_id is None:
         raise click.UsageError('Either "movie_id" or "image_id" is required.')
 
-    c = ctx.obj['client']
+    c = get_client(profile)
     c.extract_keypoint(movie_id=movie_id, image_id=image_id)
 
 
 @keypoint.command()
 @click.argument('keypoint_id', type=int)
-@click.pass_context
-def show(ctx, keypoint_id):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def show(profile, keypoint_id):
     """Display extracted keypoint data in JSON format."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     keypoint = c.get_keypoint(keypoint_id)
     click.echo(keypoint)
 
@@ -119,10 +132,12 @@ def show(ctx, keypoint_id):
               type=click.Path(),
               show_default=True,
               help='Path of directory to output drawn file.')
-@click.pass_context
-def drawing(ctx, keypoint_id, rule_id, out_dir):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def drawing(profile, keypoint_id, rule_id, out_dir):
     """Draw keypoints on uploaded movie or image."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     url = c.draw_keypoint(keypoint_id, rule_id)
 
     if url is not None:
@@ -136,13 +151,26 @@ def drawing(ctx, keypoint_id, rule_id, out_dir):
               type=int,
               help='Rule ID that defines how to analyze.')
 @click.option('--show_result', is_flag=True)
-@click.pass_context
-def analysis(ctx, keypoint_id, rule_id, show_result):
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def analysis(profile, keypoint_id, rule_id, show_result):
     """Analyze keypoints data and get information such as angles."""
-    c = ctx.obj['client']
+    c = get_client(profile)
     result = c.analyze_keypoint(keypoint_id, rule_id)
     if show_result:
         click.echo(result)
+
+
+def get_client(profile):
+    config = Config(profile)
+    if not config.is_ok:
+        message = ' '.join([
+            'The access token is invalid or not set.',
+            'Run "encore configure" to set token.'
+        ])
+        raise click.ClickException(message)
+    return Client(config.token, config.url)
 
 
 def main():
