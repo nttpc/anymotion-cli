@@ -24,29 +24,40 @@ def upload(ctx, path):
         f'uploaded the {media_type} file to s3 ({media_type}_id: {media_id})')
 
 
-# @cli.group()
-# def movie():
-#     click.echo('movie')
+@cli.group()
+def movie():
+    pass
 
 
-# @movie.command()
-# def list():
-#     click.echo('movie list')
+@movie.command()
+@click.pass_context
+def list(ctx):
+    c = ctx.obj['client']
+    c.show_list('movies')
 
 
-# @cli.group()
-# def image():
-#     click.echo('image')
+@cli.group()
+def image():
+    pass
 
 
-# @image.command()
-# def list():
-#     click.echo('image list')
+@image.command()
+@click.pass_context
+def list(ctx):
+    c = ctx.obj['client']
+    c.show_list('images')
 
 
 @cli.group()
 def keypoint():
     pass
+
+
+@keypoint.command()
+@click.pass_context
+def list(ctx):
+    c = ctx.obj['client']
+    c.show_list('keypoints')
 
 
 @keypoint.command()
@@ -84,6 +95,18 @@ def drawing(ctx, keypoint_id, rule_id, out_dir):
 
     if url is not None:
         c.download(url, out_dir)
+
+
+@cli.command()
+@click.argument('keypoint_id', type=int)
+@click.option('--rule_id', required=True, type=int)
+@click.option('--show_result', is_flag=True)
+@click.pass_context
+def analysis(ctx, keypoint_id, rule_id, show_result):
+    c = ctx.obj['client']
+    result = c.analyze_keypoint(keypoint_id, rule_id)
+    if show_result:
+        click.echo(result)
 
 
 def main():

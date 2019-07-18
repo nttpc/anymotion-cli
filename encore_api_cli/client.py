@@ -17,6 +17,7 @@ class Client(object):
             'Authorization': f'Token {token}'
         }
         self.interval = 10
+        self.max_steps = 60
 
     def upload_to_s3(self, path):
         if isinstance(path, str):
@@ -38,7 +39,13 @@ class Client(object):
 
         return media_id, media_type
 
-    def extract_keypoint(self, movie_id=None, image_id=None, max_step=60):
+    def show_list(self, endpoint):
+        api_url = urljoin(self.base_url, f'{endpoint}/')
+        response = self._requests(requests.get, api_url)
+        response = json.dumps(response.json(), indent=4)
+        print(response)
+
+    def extract_keypoint(self, movie_id=None, image_id=None):
         api_url = urljoin(self.base_url, 'keypoints/')
 
         if movie_id is not None:
@@ -53,17 +60,7 @@ class Client(object):
 
         print(f'Extract keypoint (keypoint_id: {keypoint_id})')
         api_url = urljoin(self.base_url, f'keypoints/{keypoint_id}/')
-        for _ in range(max_step):
-            response = self._requests(requests.get, api_url)
-            status, = self._parse_response(response, ('exec_status',))
-            if status in ['SUCCESS', 'FAILURE']:
-                break
-
-            time.sleep(self.interval)
-            print('.', end='', flush=True)
-        else:
-            status = 'TIME_OUT'
-        print()
+        status = self._wait_for_done(api_url)
 
         if status == 'SUCCESS':
             print('Keypoint extraction is complete.')
@@ -82,7 +79,7 @@ class Client(object):
         else:
             raise
 
-    def draw_keypoint(self, keypoint_id, rule_id=0, max_step=60):
+    def draw_keypoint(self, keypoint_id, rule_id=0):
         api_url = urljoin(self.base_url, f'drawings/')
         data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
         response = self._requests(requests.post, api_url, data=data)
@@ -90,22 +87,12 @@ class Client(object):
 
         print(f'Draw keypoint (drawing_id: {drawing_id})')
         api_url = urljoin(self.base_url, f'drawings/{drawing_id}/')
-        drawing_url = None
-        for _ in range(max_step):
-            response = self._requests(requests.get, api_url)
-            status, = self._parse_response(response, ('exec_status',))
-            if status == 'SUCCESS':
-                drawing_url, = self._parse_response(response, ('drawing_url',))
-                break
-            if status == 'FAILURE':
-                break
-            time.sleep(self.interval)
-            print('.', end='', flush=True)
-        else:
-            status = 'TIME_OUT'
-        print()
+        status = self._wait_for_done(api_url)
 
+        drawing_url = None
         if status == 'SUCCESS':
+            response = self._requests(requests.get, api_url)
+            drawing_url, = self._parse_response(response, ('drawing_url',))
             print('Keypoint drawing is complete.')
         elif status == 'FAILURE':
             print('Keypoint drawing failed.')
@@ -113,6 +100,28 @@ class Client(object):
             print('Keypoint drawing is timed out.')
 
         return drawing_url
+
+    def analyze_keypoint(self, keypoint_id, rule_id):
+        api_url = urljoin(self.base_url, f'analyses/')
+        data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
+        response = self._requests(requests.post, api_url, data=data)
+        analysis_id, = self._parse_response(response, ('id',))
+
+        print(f'Analyze keypoint (analysis_id: {analysis_id})')
+        api_url = urljoin(self.base_url, f'analyses/{analysis_id}/')
+        status = self._wait_for_done(api_url)
+
+        result = None
+        if status == 'SUCCESS':
+            response = self._requests(requests.get, api_url)
+            result, = self._parse_response(response, ('result',))
+            print('Keypoint analysis is complete.')
+        elif status == 'FAILURE':
+            print('Keypoint analysis failed.')
+        else:
+            print('Keypoint analysis is timed out.')
+
+        return result
 
     def download(self, url, out_dir):
         out_dir = Path(out_dir)
@@ -159,7 +168,7 @@ class Client(object):
         elif self._is_image(path):
             return 'image'
         else:
-            raise
+            raise Exception('Invalid file type')
 
     def _is_movie(self, path):
         movie_suffixs = ['.mp4', '.mov']
@@ -168,3 +177,18 @@ class Client(object):
     def _is_image(self, path):
         image_suffixs = ['.jpg', '.jpeg', '.png']
         return True if path.suffix in image_suffixs else False
+
+    def _wait_for_done(self, api_url):
+        for _ in range(self.max_steps):
+            response = self._requests(requests.get, api_url)
+            status, = self._parse_response(response, ('exec_status',))
+            if status in ['SUCCESS', 'FAILURE']:
+                break
+
+            time.sleep(self.interval)
+            print('.', end='', flush=True)
+        else:
+            status = 'TIME_OUT'
+        print()
+
+        return status
