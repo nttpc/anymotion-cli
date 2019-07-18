@@ -1,9 +1,9 @@
 # Encore API CLI
 
-## インストール
+## インストール方法
 
 ``` sh
-pip install -e git@bitbucket.org:nttpc-datascience/encore-api-cli.git
+pip install git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.git
 ```
 
 ## 使い方
