@@ -1,5 +1,7 @@
 # Encore API CLI
 
+Command Line Interface for AnyMotion API.
+
 ## インストール方法
 
 ``` sh
