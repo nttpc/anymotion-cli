@@ -3,7 +3,7 @@ import hashlib
 import json
 import time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlencode
 
 import requests
 
@@ -40,10 +40,21 @@ class Client(object):
         return media_id, media_type
 
     def show_list(self, endpoint):
-        api_url = urljoin(self.base_url, f'{endpoint}/')
+        data = []
+
+        api_url = urljoin(self.base_url, f'{endpoint}/?page=1')
         response = self._requests(requests.get, api_url)
-        response = json.dumps(response.json(), indent=4)
-        print(response)
+        max_page, = self._parse_response(response, ('max_page',))
+        data += response.json()['data']
+
+        for page in range(2, max_page + 1):
+            params = urlencode({'page': page})
+            api_url = urljoin(self.base_url, f'{endpoint}/?' + params)
+            response = self._requests(requests.get, api_url)
+            data += response.json()['data']
+
+        data = json.dumps(data, indent=4)
+        print(data)
 
     def extract_keypoint(self, movie_id=None, image_id=None):
         api_url = urljoin(self.base_url, 'keypoints/')

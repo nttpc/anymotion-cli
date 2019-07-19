@@ -40,8 +40,8 @@ You can use [jq](https://stedolan.github.io/jq/) to filter according to conditio
 
 ``` sh
 # Get a list of keypoints whose exec_status is SUCCESS
-encore keypoint list | jq '.data[] | select(.exec_status == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
+encore keypoint list | jq '.[] | select(.exec_status == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
 
 # Get a list of keypoit_id for only movie
-encore keypoint list | jq '.data[] | select(.movie != null) | .id'
+encore keypoint list | jq '.[] | select(.movie != null) | .id'
 ```
