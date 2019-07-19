@@ -33,3 +33,12 @@ class Config(object):
         self.config_dir.mkdir(exist_ok=True)
         with self.config_file.open('w') as f:
             self.config.write(f)
+
+    def show(self):
+        for section in self.config.sections():
+            print(f'[{section}]')
+            print('anymotion_api_url', '=',
+                  self.config[section].get('anymotion_api_url'))
+            print('anymotion_access_token', '=',
+                  self.config[section].get('anymotion_access_token'))
+            print()

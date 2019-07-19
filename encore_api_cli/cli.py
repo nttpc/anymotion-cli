@@ -12,16 +12,24 @@ def cli():
     pass
 
 
-@cli.command()
+@cli.group(invoke_without_command=True)
 @click.option('--profile',
               default='default',
               help='Name of a named profile that you can configure.')
-def configure(profile):
+@click.pass_context
+def configure(ctx, profile):
     """Configure your AnyMotion Access Token."""
-    config = Config(profile)
-    config.url = click.prompt('AnyMotion API URL', default=config.url)
-    config.token = click.prompt('AnyMotion Access Token', default=config.token)
-    config.update()
+    if ctx.invoked_subcommand is None:
+        config = Config(profile)
+        config.url = click.prompt('AnyMotion API URL', default=config.url)
+        config.token = click.prompt('AnyMotion Access Token', default=config.token)
+        config.update()
+
+
+@configure.command()
+def list():
+    config = Config()
+    config.show()
 
 
 @cli.command()
