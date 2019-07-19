@@ -75,9 +75,23 @@ class Client(object):
         status, keypoint = self._parse_response(response,
                                                 ('exec_status', 'keypoint'))
         if status == 'SUCCESS':
+            keypoint = json.loads(keypoint)
+            keypoint = json.dumps(keypoint, indent=4)
             return keypoint
         else:
-            raise
+            return 'Status is not SUCCESS.'
+
+    def get_analysis(self, analysis_id):
+        api_url = urljoin(self.base_url, f'analyses/{analysis_id}/')
+        response = self._requests(requests.get, api_url)
+        status, result = self._parse_response(response,
+                                              ('exec_status', 'result'))
+        if status == 'SUCCESS':
+            result = json.loads(result)
+            result = json.dumps(result, indent=4)
+            return result
+        else:
+            return 'Status is not SUCCESS.'
 
     def draw_keypoint(self, keypoint_id, rule_id=0):
         api_url = urljoin(self.base_url, f'drawings/')

@@ -24,9 +24,10 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  analysis   Analyze keypoints data and get information such as angles.
+  analysis   Manege analyses.
+  analyze    Analyze keypoints data and get information such as angles.
   configure  Configure your AnyMotion Access Token.
-  drawing    Draw keypoints on uploaded movie or image.
+  draw       Draw keypoints on uploaded movie or image.
   image      Manege images.
   keypoint   Extract keypoints and show the list.
   movie      Manege movies.

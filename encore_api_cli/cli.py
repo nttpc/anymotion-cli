@@ -28,6 +28,7 @@ def configure(ctx, profile):
 
 @configure.command()
 def list():
+    """Show the configuration you set."""
     config = Config()
     config.show()
 
@@ -143,7 +144,7 @@ def show(profile, keypoint_id):
 @click.option('--profile',
               default='default',
               help='Name of a named profile that you can configure.')
-def drawing(profile, keypoint_id, rule_id, out_dir):
+def draw(profile, keypoint_id, rule_id, out_dir):
     """Draw keypoints on uploaded movie or image."""
     c = get_client(profile)
     url = c.draw_keypoint(keypoint_id, rule_id)
@@ -162,12 +163,40 @@ def drawing(profile, keypoint_id, rule_id, out_dir):
 @click.option('--profile',
               default='default',
               help='Name of a named profile that you can configure.')
-def analysis(profile, keypoint_id, rule_id, show_result):
+def analyze(profile, keypoint_id, rule_id, show_result):
     """Analyze keypoints data and get information such as angles."""
     c = get_client(profile)
     result = c.analyze_keypoint(keypoint_id, rule_id)
     if show_result:
         click.echo(result)
+
+
+@cli.group()
+def analysis():
+    """Manege analyses."""
+    pass
+
+
+@analysis.command()
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def list(profile):
+    """Show analysis list."""
+    c = get_client(profile)
+    c.show_list('analyses')
+
+
+@analysis.command()
+@click.argument('analysis_id', type=int)
+@click.option('--profile',
+              default='default',
+              help='Name of a named profile that you can configure.')
+def show(profile, analysis_id):
+    """Display analysis result in JSON format."""
+    c = get_client(profile)
+    result = c.get_analysis(analysis_id)
+    click.echo(result)
 
 
 def get_client(profile):
