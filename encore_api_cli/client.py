@@ -3,13 +3,12 @@ import hashlib
 import json
 import time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, urlencode
+from urllib.parse import urljoin, urlparse
 
 import requests
 
 
 class Client(object):
-
     def __init__(self, token, base_url):
         self.base_url = base_url
         self.headers = {
@@ -41,18 +40,11 @@ class Client(object):
 
     def show_list(self, endpoint):
         data = []
-
-        api_url = urljoin(self.base_url, f'{endpoint}/?page=1')
-        response = self._requests(requests.get, api_url)
-        max_page, = self._parse_response(response, ('max_page',))
-        data += response.json()['data']
-
-        for page in range(2, max_page + 1):
-            params = urlencode({'page': page})
-            api_url = urljoin(self.base_url, f'{endpoint}/?' + params)
+        api_url = urljoin(self.base_url, f'{endpoint}/')
+        while api_url:
             response = self._requests(requests.get, api_url)
-            data += response.json()['data']
-
+            d, api_url = self._parse_response(response, ('data', 'next'))
+            data += d
         data = json.dumps(data, indent=4)
         print(data)
 
@@ -67,7 +59,7 @@ class Client(object):
             raise Exception('Either "movie_id" or "image_id" is required.')
 
         response = self._requests(requests.post, api_url, data)
-        keypoint_id, = self._parse_response(response, ('id',))
+        keypoint_id, = self._parse_response(response, ('id', ))
 
         print(f'Extract keypoint (keypoint_id: {keypoint_id})')
         api_url = urljoin(self.base_url, f'keypoints/{keypoint_id}/')
@@ -108,7 +100,7 @@ class Client(object):
         api_url = urljoin(self.base_url, f'drawings/')
         data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
         response = self._requests(requests.post, api_url, data=data)
-        drawing_id, = self._parse_response(response, ('id',))
+        drawing_id, = self._parse_response(response, ('id', ))
 
         print(f'Draw keypoint (drawing_id: {drawing_id})')
         api_url = urljoin(self.base_url, f'drawings/{drawing_id}/')
@@ -117,7 +109,7 @@ class Client(object):
         drawing_url = None
         if status == 'SUCCESS':
             response = self._requests(requests.get, api_url)
-            drawing_url, = self._parse_response(response, ('drawing_url',))
+            drawing_url, = self._parse_response(response, ('drawing_url', ))
             print('Keypoint drawing is complete.')
         elif status == 'FAILURE':
             print('Keypoint drawing failed.')
@@ -130,7 +122,7 @@ class Client(object):
         api_url = urljoin(self.base_url, f'analyses/')
         data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
         response = self._requests(requests.post, api_url, data=data)
-        analysis_id, = self._parse_response(response, ('id',))
+        analysis_id, = self._parse_response(response, ('id', ))
 
         print(f'Analyze keypoint (analysis_id: {analysis_id})')
         api_url = urljoin(self.base_url, f'analyses/{analysis_id}/')
@@ -139,7 +131,7 @@ class Client(object):
         result = None
         if status == 'SUCCESS':
             response = self._requests(requests.get, api_url)
-            result, = self._parse_response(response, ('result',))
+            result, = self._parse_response(response, ('result', ))
             print('Keypoint analysis is complete.')
         elif status == 'FAILURE':
             print('Keypoint analysis failed.')
@@ -206,7 +198,7 @@ class Client(object):
     def _wait_for_done(self, api_url):
         for _ in range(self.max_steps):
             response = self._requests(requests.get, api_url)
-            status, = self._parse_response(response, ('exec_status',))
+            status, = self._parse_response(response, ('exec_status', ))
             if status in ['SUCCESS', 'FAILURE']:
                 break
 
