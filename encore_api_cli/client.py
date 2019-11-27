@@ -25,7 +25,7 @@ class Client(object):
         media_type = self._get_media_type(path)
         content_md5 = self._create_md5(path)
 
-        # POST movie
+        # POST movie or image
         data = {'origin_key': path.name, 'content_md5': content_md5}
         api_url = urljoin(self.base_url, f'{media_type}s/')
         response = self._requests(requests.post, api_url, data)
