@@ -5,6 +5,8 @@ executors:
       - image: circleci/python:3.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
+orbs:
+  codecov: codecov/codecov@1.0.5
 commands:
   restore_python:
     steps:
@@ -46,10 +48,9 @@ jobs:
       - restore_python
       - run:
           name: Unit test
-          command: pipenv run pytest -v --cov=encore_api_cli
-      - run:
-          name: Upload reports to codecov
-          command: pipenv run codecov
+          command: pipenv run pytest -v --cov=encore_api_cli --cov-report=xml
+      - codecov/upload:
+          flags: unittest
 
 workflows:
   build-and-test:
