@@ -1,5 +1,7 @@
 # Encore API CLI
 
+[![CircleCI](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=svg&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84)](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master)
+
 Command Line Interface for AnyMotion API.
 
 ## How to install
