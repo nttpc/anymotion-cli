@@ -46,10 +46,10 @@ jobs:
       - restore_python
       - run:
           name: Unit test
-          command: pipenv run pytest -v --cov=encore_api_cli --cov-report=html
-      - store_artifacts:
-          path: htmlcov
-          destination: pytest
+          command: pipenv run pytest -v --cov=encore_api_cli
+      - run:
+          name: Upload reports to codecov
+          command: pipenv run codecov
 
 workflows:
   build-and-test:

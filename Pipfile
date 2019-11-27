@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+codecov = "*"
 encore-api-cli = {editable = true,path = "."}
 flake8 = "*"
 pytest = "*"
