@@ -1,3 +1,6 @@
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
 import pytest
 
 from encore_api_cli.client import Client
@@ -112,3 +115,21 @@ def test_キーポイントの解析ができること(requests_mock):
     result = c.analyze_keypoint(keypoint_id, rule_id)
 
     assert result == expected_result
+
+
+def test_ファイルをダウンロードできること(mocker, requests_mock):
+    with TemporaryDirectory(prefix='pytest_') as tmp_dir:
+        url = 'http://download.example.com/image.jpg'
+        path = Path(tmp_dir) / 'image.jpg'
+
+        requests_mock.get(url, content=b'image data')
+
+        mkdir_mock = mocker.MagicMock()
+        mocker.patch('pathlib.Path.mkdir', mkdir_mock)
+
+        assert not path.exists()
+
+        c = Client('token', base_url)
+        c.download(url, tmp_dir)
+
+        assert path.exists()
