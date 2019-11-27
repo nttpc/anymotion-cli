@@ -1,0 +1,63 @@
+version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/python:3.7
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+commands:
+  restore_python:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "Pipfile.lock" }}
+            - v1-dependencies-
+
+jobs:
+  build:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_python
+      - run:
+          name: Install python packages
+          command: |
+            sudo pip install pipenv
+            pipenv sync --dev
+      - save_cache:
+          paths:
+            - .venv
+          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+  check-syntax:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_python
+      - run:
+          name: Check syntax with flake8
+          command: pipenv run flake8
+  unit-test:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_python
+      - run:
+          name: Unit test
+          command: pipenv run pytest -v --cov=encore_api_cli --cov-report=html
+      - store_artifacts:
+          path: htmlcov
+          destination: pytest
+
+workflows:
+  build-and-test:
+    jobs:
+      - build
+      - check-syntax:
+          requires:
+            - build
+      - unit-test:
+          requires:
+            - build
