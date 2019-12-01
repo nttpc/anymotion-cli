@@ -208,11 +208,3 @@ def get_client(profile):
         ])
         raise click.ClickException(message)
     return Client(config.token, config.url)
-
-
-def main():
-    cli()
-
-
-if __name__ == "__main__":
-    main()
