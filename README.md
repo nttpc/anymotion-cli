@@ -4,6 +4,10 @@
 
 Command Line Interface for AnyMotion API.
 
+## Requirements
+
+- Python 3.6+
+
 ## How to install
 
 ``` sh
@@ -44,6 +48,6 @@ You can use [jq](https://stedolan.github.io/jq/) to filter according to conditio
 # Get a list of keypoints whose exec_status is SUCCESS
 encore keypoint list | jq '.[] | select(.exec_status == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
 
-# Get a list of keypoit_id for only movie
+# Get a list of keypoint_id for only movie
 encore keypoint list | jq '.[] | select(.movie != null) | .id'
 ```

@@ -2,7 +2,7 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
         environment:
           PIPENV_VENV_IN_PROJECT: true
 orbs:
@@ -47,7 +47,7 @@ jobs:
       - checkout
       - restore_python
       - run:
-          name: Unit test
+          name: Run unit test with pytest
           command: pipenv run pytest -v --cov=encore_api_cli --cov-report=xml
       - codecov/upload:
           flags: unittest
