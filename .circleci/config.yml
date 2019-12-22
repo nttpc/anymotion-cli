@@ -40,6 +40,15 @@ jobs:
       - run:
           name: Check syntax with flake8
           command: pipenv run flake8
+  check-security:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_python
+      - run:
+          name: Check security with bandit
+          command: pipenv run bandit -r encore_api_cli -s B303
   unit-test:
     executor:
       name: default
@@ -57,6 +66,9 @@ workflows:
     jobs:
       - build
       - check-syntax:
+          requires:
+            - build
+      - check-security:
           requires:
             - build
       - unit-test:

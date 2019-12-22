@@ -14,6 +14,7 @@ pytest-mock = "*"
 pytest-watch = "*"
 requests-mock = "*"
 yapf = "*"
+bandit = "*"
 
 [packages]
 click = "*"
