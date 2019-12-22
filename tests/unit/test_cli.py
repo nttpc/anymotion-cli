@@ -6,9 +6,11 @@ import pytest
 from encore_api_cli.cli import cli
 
 
-@pytest.mark.parametrize(
-    'command', ['analysis', 'configure', 'draw', 'image', 'keypoint', 'movie'])
-def test_commands(command):
+@pytest.mark.parametrize('command', [
+    'analysis', 'analyze', 'configure', 'draw', 'image', 'keypoint', 'movie',
+    'upload'
+])
+def test_コマンドが実行できること(command):
     runner = CliRunner()
     result = runner.invoke(cli, [command, '--help'])
 
@@ -16,7 +18,7 @@ def test_commands(command):
     assert re.match(rf'^Usage: \w+ {command}', result.output)
 
 
-def test_help():
+def test_helpが表示されること():
     runner = CliRunner()
     result = runner.invoke(cli, ['--help'])
 
@@ -24,7 +26,7 @@ def test_help():
     assert re.match(r'^Usage:', result.output)
 
 
-def test_version():
+def test_versionが表示されること():
     runner = CliRunner()
     result = runner.invoke(cli, ['--version'])
 
