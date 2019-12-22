@@ -1,5 +1,6 @@
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
+
 from click.testing import CliRunner
 
 from encore_api_cli.commands.configure import cli

@@ -1,4 +1,5 @@
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 import encore_api_cli
 

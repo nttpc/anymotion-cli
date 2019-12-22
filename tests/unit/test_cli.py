@@ -1,9 +1,9 @@
+import re
+
 from click.testing import CliRunner
+import pytest
 
 from encore_api_cli.cli import cli
-
-import re
-import pytest
 
 
 @pytest.mark.parametrize(

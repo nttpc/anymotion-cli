@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 encore-api-cli = {editable = true,path = "."}
 flake8 = "*"
+hacking = "*"
+isort = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"

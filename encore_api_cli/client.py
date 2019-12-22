@@ -1,9 +1,10 @@
 import base64
 import hashlib
 import json
-import time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+import time
+from urllib.parse import urljoin
+from urllib.parse import urlparse
 
 import requests
 
