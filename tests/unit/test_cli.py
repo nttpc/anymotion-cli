@@ -1,146 +1,32 @@
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
 from click.testing import CliRunner
 
 from encore_api_cli.cli import cli
 
-base_url = 'http://api.example.com'
+import re
+import pytest
 
 
-def test_configure(mocker):
-    with TemporaryDirectory(prefix='pytest_') as tmp_dir:
-        home_mock = mocker.MagicMock(return_value=Path(tmp_dir))
-        mocker.patch('pathlib.Path.home', home_mock)
-
-        runner = CliRunner()
-        result = runner.invoke(cli, ['configure'],
-                               input=f'{base_url}\ntoken\n')
-
-        assert not result.exception
-        assert result.output == \
-            f'AnyMotion API URL [https://api.anymotion.jp/api/v1/]: {base_url}\n' \
-            'AnyMotion Access Token: token\n'
-
-
-def test_configure_list(mocker):
-    expected = ''
-
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.show.return_value = expected
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
+@pytest.mark.parametrize(
+    'command', ['analysis', 'configure', 'draw', 'image', 'keypoint', 'movie'])
+def test_commands(command):
     runner = CliRunner()
-    result = runner.invoke(cli, ['configure', 'list'])
+    result = runner.invoke(cli, [command, '--help'])
 
     assert result.exit_code == 0
-    assert result.output == expected
+    assert re.match(rf'^Usage: \w+ {command}', result.output)
 
 
-def test_image():
+def test_help():
     runner = CliRunner()
-    result = runner.invoke(cli, ['image'])
+    result = runner.invoke(cli, ['--help'])
 
     assert result.exit_code == 0
+    assert re.match(r'^Usage:', result.output)
 
 
-def test_image_list(mocker, requests_mock):
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.url = base_url
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
-    requests_mock.get(f'{base_url}/images/', json={'data': '', 'next': None})
-
+def test_version():
     runner = CliRunner()
-    result = runner.invoke(cli, ['image', 'list'])
+    result = runner.invoke(cli, ['--version'])
 
     assert result.exit_code == 0
-    assert result.output == '[]\n'
-
-
-def test_movie():
-    runner = CliRunner()
-    result = runner.invoke(cli, ['movie'])
-
-    assert result.exit_code == 0
-
-
-def test_movie_list(mocker, requests_mock):
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.url = base_url
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
-    requests_mock.get(f'{base_url}/movies/', json={'data': '', 'next': None})
-
-    runner = CliRunner()
-    result = runner.invoke(cli, ['movie', 'list'])
-
-    assert result.exit_code == 0
-    assert result.output == '[]\n'
-
-
-def test_movie():
-    runner = CliRunner()
-    result = runner.invoke(cli, ['movie'])
-
-    assert result.exit_code == 0
-
-
-def test_movie_list(mocker, requests_mock):
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.url = base_url
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
-    requests_mock.get(f'{base_url}/movies/', json={'data': '', 'next': None})
-
-    runner = CliRunner()
-    result = runner.invoke(cli, ['movie', 'list'])
-
-    assert result.exit_code == 0
-    assert result.output == '[]\n'
-
-
-def test_keypoint():
-    runner = CliRunner()
-    result = runner.invoke(cli, ['keypoint'])
-
-    assert result.exit_code == 0
-
-
-def test_keypoint_list(mocker, requests_mock):
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.url = base_url
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
-    requests_mock.get(f'{base_url}/keypoints/',
-                      json={
-                          'data': '',
-                          'next': None
-                      })
-
-    runner = CliRunner()
-    result = runner.invoke(cli, ['keypoint', 'list'])
-
-    assert result.exit_code == 0
-    assert result.output == '[]\n'
-
-
-def test_analysis():
-    runner = CliRunner()
-    result = runner.invoke(cli, ['analysis'])
-
-    assert result.exit_code == 0
-
-
-def test_analysis_list(mocker, requests_mock):
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.url = base_url
-    mocker.patch('encore_api_cli.cli.Config', config_mock)
-
-    requests_mock.get(f'{base_url}/analyses/', json={'data': '', 'next': None})
-
-    runner = CliRunner()
-    result = runner.invoke(cli, ['analysis', 'list'])
-
-    assert result.exit_code == 0
-    assert result.output == '[]\n'
+    assert re.match(r'^\w+, version \d+.\d+.\d+$', result.output)

@@ -15,7 +15,8 @@ class Config(object):
         self.token = None
         if profile in config.sections():
             self.url = config[profile].get('anymotion_api_url', self.url)
-            self.token = config[profile].get('anymotion_access_token', self.token)
+            self.token = config[profile].get('anymotion_access_token',
+                                             self.token)
 
         self.config = config
         self.profile = profile
