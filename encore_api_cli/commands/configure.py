@@ -1,6 +1,6 @@
 import click
 
-from ..config import Config
+from encore_api_cli.config import Config
 
 
 @click.group()

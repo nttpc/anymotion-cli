@@ -1,14 +1,14 @@
 import click
 
-from . import __version__
-from .commands.analysis import cli as analysis
-from .commands.analyze import cli as analyze
-from .commands.configure import cli as configure
-from .commands.draw import cli as draw
-from .commands.image import cli as image
-from .commands.keypoint import cli as keypoint
-from .commands.movie import cli as movie
-from .commands.upload import cli as upload
+from encore_api_cli import __version__
+from encore_api_cli.commands.analysis import cli as analysis
+from encore_api_cli.commands.analyze import cli as analyze
+from encore_api_cli.commands.configure import cli as configure
+from encore_api_cli.commands.draw import cli as draw
+from encore_api_cli.commands.image import cli as image
+from encore_api_cli.commands.keypoint import cli as keypoint
+from encore_api_cli.commands.movie import cli as movie
+from encore_api_cli.commands.upload import cli as upload
 
 
 @click.command(cls=click.CommandCollection,

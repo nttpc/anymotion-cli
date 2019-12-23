@@ -1,7 +1,7 @@
 import click
 
-from .client import Client
-from .config import Config
+from encore_api_cli.client import Client
+from encore_api_cli.config import Config
 
 
 def get_client(profile):

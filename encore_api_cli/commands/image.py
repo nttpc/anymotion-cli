@@ -1,6 +1,6 @@
 import click
 
-from ..utils import get_client
+from encore_api_cli.utils import get_client
 
 
 @click.group()
