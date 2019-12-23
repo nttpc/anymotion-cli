@@ -75,6 +75,8 @@ class Client(object):
         else:
             print('Keypoint extraction is timed out.')
 
+        return keypoint_id
+
     def get_keypoint(self, keypoint_id):
         url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
         response = self._requests(requests.get, url)

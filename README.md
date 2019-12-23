@@ -72,16 +72,10 @@ Uploaded the image file to cloud storage (image_id: 111)
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
 
 ``` sh
-$ encore keypoint extract --image_id 111
+$ encore keypoint extract --image_id 111 --with_drawing
 Extract keypoint (keypoint_id: 222)
 .
 Keypoint extraction is complete.
-```
-
-Finally draw using `keypoint_id`.
-
-``` sh
-$ encore draw 222
 Draw keypoint (drawing_id: 333)
 .
 Keypoint drawing is complete.
