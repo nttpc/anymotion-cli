@@ -189,12 +189,12 @@ class Client(object):
             raise Exception('Invalid file type')
 
     def _is_movie(self, path):
-        movie_suffixs = ['.mp4', '.mov']
-        return True if path.suffix in movie_suffixs else False
+        movie_suffix = ['.mp4', '.mov']
+        return True if path.suffix in movie_suffix else False
 
     def _is_image(self, path):
-        image_suffixs = ['.jpg', '.jpeg', '.png']
-        return True if path.suffix in image_suffixs else False
+        image_suffix = ['.jpg', '.jpeg', '.png']
+        return True if path.suffix in image_suffix else False
 
     def _wait_for_done(self, api_url):
         for _ in range(self.max_steps):
