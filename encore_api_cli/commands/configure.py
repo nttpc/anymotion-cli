@@ -20,7 +20,6 @@ def configure(ctx, profile):
         config.url = click.prompt('AnyMotion API URL', default=config.url)
         config.client_id = click.prompt('AnyMotion Client ID',
                                         default=config.client_id)
-        # TODO(y_kumiha): 入力を非表示する
         config.client_secret = click.prompt('AnyMotion Client Secret',
                                             default=config.client_secret)
         config.update()

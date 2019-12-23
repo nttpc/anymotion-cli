@@ -9,7 +9,7 @@ def test_analyze(mocker):
     mocker.patch('encore_api_cli.commands.analyze.get_client', client_mock)
 
     runner = CliRunner()
-    result = runner.invoke(cli, ['analyze', '--rule_id', '0', '1'])
+    result = runner.invoke(cli, ['analyze', '1'])
 
     assert client_mock.call_count == 1
 
@@ -24,7 +24,7 @@ def test_analyze_with_show(mocker):
 
     runner = CliRunner()
     result = runner.invoke(cli,
-                           ['analyze', '--rule_id', '0', '--show_result', '1'])
+                           ['analyze', '--show_result', '1'])
 
     assert client_mock.call_count == 1
 

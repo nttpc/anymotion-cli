@@ -108,7 +108,6 @@ def test_キーポイントを描画できること(requests_mock):
 
 def test_キーポイントの解析ができること(requests_mock):
     keypoint_id = 1
-    rule_id = 1
     analysis_id = 1
     expected_result = '[]'
 
@@ -121,7 +120,7 @@ def test_キーポイントの解析ができること(requests_mock):
                       })
 
     c = Client('client_id', 'client_secret', base_url)
-    result = c.analyze_keypoint(keypoint_id, rule_id)
+    result = c.analyze_keypoint(keypoint_id)
 
     assert result == expected_result
 

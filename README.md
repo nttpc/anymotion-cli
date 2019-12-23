@@ -81,7 +81,7 @@ Keypoint extraction is complete.
 Finally draw using `keypoint_id`.
 
 ``` sh
-$ encore draw 2222
+$ encore draw 222
 Draw keypoint (drawing_id: 333)
 .
 Keypoint drawing is complete.

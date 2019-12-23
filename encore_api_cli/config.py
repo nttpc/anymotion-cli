@@ -8,7 +8,6 @@ class Config(object):
     def __init__(self, profile='default'):
         config = configparser.ConfigParser()
 
-        # TODO(y_kumiha): 環境変数で設定ディレクトリを変更できるようにする
         self.config_dir = Path.home() / '.anymotion'
         self.config_file = self.config_dir / 'config'
         if self.config_file.exists():
@@ -32,7 +31,6 @@ class Config(object):
             self.is_ok = True
 
     def update(self):
-        # TODO(y_kumiha): self.url の最後に / がない場合の処理
         self.config[self.profile] = {
             'anymotion_api_url': self.url,
             'anymotion_client_id': self.client_id,

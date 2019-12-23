@@ -99,9 +99,9 @@ class Client(object):
         else:
             return 'Status is not SUCCESS.'
 
-    def draw_keypoint(self, keypoint_id, rule_id=0):
+    def draw_keypoint(self, keypoint_id):
         url = urljoin(self.api_url, f'drawings/')
-        data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
+        data = {'keypoint_id': keypoint_id}
         response = self._requests(requests.post, url, data=data)
         drawing_id, = self._parse_response(response, ('id',))
 
@@ -121,9 +121,9 @@ class Client(object):
 
         return drawing_url
 
-    def analyze_keypoint(self, keypoint_id, rule_id):
+    def analyze_keypoint(self, keypoint_id):
         url = urljoin(self.api_url, f'analyses/')
-        data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
+        data = {'keypoint_id': keypoint_id}
         response = self._requests(requests.post, url, data=data)
         analysis_id, = self._parse_response(response, ('id',))
 
