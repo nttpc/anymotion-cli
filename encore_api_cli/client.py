@@ -10,12 +10,14 @@ import requests
 
 
 class Client(object):
-    def __init__(self, token, base_url):
-        self.base_url = base_url
-        self.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Token {token}'
-        }
+
+    def __init__(self, client_id, client_secret, base_url):
+        self.client_id = client_id
+        self.client_secret = client_secret
+
+        self.oauth_url = urljoin(base_url, 'v1/oauth/accesstokens')
+        self.api_url = urljoin(base_url, 'anymotion/v1/')
+
         self.interval = 10
         self.max_steps = 60
 
@@ -28,8 +30,8 @@ class Client(object):
 
         # POST movie or image
         data = {'origin_key': path.name, 'content_md5': content_md5}
-        api_url = urljoin(self.base_url, f'{media_type}s/')
-        response = self._requests(requests.post, api_url, data)
+        url = urljoin(self.api_url, f'{media_type}s/')
+        response = self._requests(requests.post, url, data)
         media_id, upload_url = self._parse_response(response,
                                                     ('id', 'upload_url'))
         # PUT S3
@@ -41,16 +43,16 @@ class Client(object):
 
     def show_list(self, endpoint):
         data = []
-        api_url = urljoin(self.base_url, f'{endpoint}/')
-        while api_url:
-            response = self._requests(requests.get, api_url)
-            d, api_url = self._parse_response(response, ('data', 'next'))
+        url = urljoin(self.api_url, f'{endpoint}/')
+        while url:
+            response = self._requests(requests.get, url)
+            d, url = self._parse_response(response, ('data', 'next'))
             data += d
         data = json.dumps(data, indent=4)
         print(data)
 
     def extract_keypoint(self, movie_id=None, image_id=None):
-        api_url = urljoin(self.base_url, 'keypoints/')
+        url = urljoin(self.api_url, 'keypoints/')
 
         if movie_id is not None:
             data = {'movie_id': movie_id}
@@ -59,12 +61,12 @@ class Client(object):
         else:
             raise Exception('Either "movie_id" or "image_id" is required.')
 
-        response = self._requests(requests.post, api_url, data)
-        keypoint_id, = self._parse_response(response, ('id', ))
+        response = self._requests(requests.post, url, data)
+        keypoint_id, = self._parse_response(response, ('id',))
 
         print(f'Extract keypoint (keypoint_id: {keypoint_id})')
-        api_url = urljoin(self.base_url, f'keypoints/{keypoint_id}/')
-        status = self._wait_for_done(api_url)
+        url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
+        status = self._wait_for_done(url)
 
         if status == 'SUCCESS':
             print('Keypoint extraction is complete.')
@@ -74,8 +76,8 @@ class Client(object):
             print('Keypoint extraction is timed out.')
 
     def get_keypoint(self, keypoint_id):
-        api_url = urljoin(self.base_url, f'keypoints/{keypoint_id}/')
-        response = self._requests(requests.get, api_url)
+        url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
+        response = self._requests(requests.get, url)
         status, keypoint = self._parse_response(response,
                                                 ('exec_status', 'keypoint'))
         if status == 'SUCCESS':
@@ -86,8 +88,8 @@ class Client(object):
             return 'Status is not SUCCESS.'
 
     def get_analysis(self, analysis_id):
-        api_url = urljoin(self.base_url, f'analyses/{analysis_id}/')
-        response = self._requests(requests.get, api_url)
+        url = urljoin(self.api_url, f'analyses/{analysis_id}/')
+        response = self._requests(requests.get, url)
         status, result = self._parse_response(response,
                                               ('exec_status', 'result'))
         if status == 'SUCCESS':
@@ -98,19 +100,19 @@ class Client(object):
             return 'Status is not SUCCESS.'
 
     def draw_keypoint(self, keypoint_id, rule_id=0):
-        api_url = urljoin(self.base_url, f'drawings/')
+        url = urljoin(self.api_url, f'drawings/')
         data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
-        response = self._requests(requests.post, api_url, data=data)
-        drawing_id, = self._parse_response(response, ('id', ))
+        response = self._requests(requests.post, url, data=data)
+        drawing_id, = self._parse_response(response, ('id',))
 
         print(f'Draw keypoint (drawing_id: {drawing_id})')
-        api_url = urljoin(self.base_url, f'drawings/{drawing_id}/')
-        status = self._wait_for_done(api_url)
+        url = urljoin(self.api_url, f'drawings/{drawing_id}/')
+        status = self._wait_for_done(url)
 
         drawing_url = None
         if status == 'SUCCESS':
-            response = self._requests(requests.get, api_url)
-            drawing_url, = self._parse_response(response, ('drawing_url', ))
+            response = self._requests(requests.get, url)
+            drawing_url, = self._parse_response(response, ('drawing_url',))
             print('Keypoint drawing is complete.')
         elif status == 'FAILURE':
             print('Keypoint drawing failed.')
@@ -120,19 +122,19 @@ class Client(object):
         return drawing_url
 
     def analyze_keypoint(self, keypoint_id, rule_id):
-        api_url = urljoin(self.base_url, f'analyses/')
+        url = urljoin(self.api_url, f'analyses/')
         data = {'keypoint_id': keypoint_id, 'rule_id': rule_id}
-        response = self._requests(requests.post, api_url, data=data)
-        analysis_id, = self._parse_response(response, ('id', ))
+        response = self._requests(requests.post, url, data=data)
+        analysis_id, = self._parse_response(response, ('id',))
 
         print(f'Analyze keypoint (analysis_id: {analysis_id})')
-        api_url = urljoin(self.base_url, f'analyses/{analysis_id}/')
-        status = self._wait_for_done(api_url)
+        url = urljoin(self.api_url, f'analyses/{analysis_id}/')
+        status = self._wait_for_done(url)
 
         result = None
         if status == 'SUCCESS':
-            response = self._requests(requests.get, api_url)
-            result, = self._parse_response(response, ('result', ))
+            response = self._requests(requests.get, url)
+            result, = self._parse_response(response, ('result',))
             print('Keypoint analysis is complete.')
         elif status == 'FAILURE':
             print('Keypoint analysis failed.')
@@ -152,6 +154,20 @@ class Client(object):
 
         print(f'Downloaded the file to {path}.')
 
+    def get_token(self):
+        """Client IDとSecretを用いてトークンを取得する"""
+
+        data = {
+            'grantType': 'client_credentials',
+            'clientId': self.client_id,
+            'clientSecret': self.client_secret
+        }
+        headers = {'Content-Type': 'application/json'}
+        response = self._requests(requests.post, self.oauth_url, data, headers)
+        token, = self._parse_response(response, ('accessToken',))
+
+        return token
+
     def _create_md5(self, path):
         with path.open('rb') as f:
             md5 = hashlib.md5(f.read()).digest()
@@ -161,7 +177,15 @@ class Client(object):
 
     def _requests(self, requests_func, url, data=None, headers=None):
         if headers is None:
-            headers = self.headers
+            token = self.get_token()
+
+            if data is None:
+                headers = {'Authorization': f'Bearer {token}'}
+            else:
+                headers = {
+                    'Authorization': f'Bearer {token}',
+                    'Content-Type': 'application/json'
+                }
         data = json.dumps(data)
         response = requests_func(url, data=data, headers=headers)
         if response.status_code in [200, 201]:
@@ -196,10 +220,10 @@ class Client(object):
         image_suffix = ['.jpg', '.jpeg', '.png']
         return True if path.suffix in image_suffix else False
 
-    def _wait_for_done(self, api_url):
+    def _wait_for_done(self, url):
         for _ in range(self.max_steps):
-            response = self._requests(requests.get, api_url)
-            status, = self._parse_response(response, ('exec_status', ))
+            response = self._requests(requests.get, url)
+            status, = self._parse_response(response, ('exec_status',))
             if status in ['SUCCESS', 'FAILURE']:
                 break
 

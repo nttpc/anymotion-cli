@@ -10,6 +10,9 @@ def test_configのis_okがTrueの場合clientが取得できること(mocker):
 
     config_mock = mocker.MagicMock()
     config_mock.return_value.is_ok = True
+    config_mock.return_value.client_id = 'client_id'
+    config_mock.return_value.client_secret = 'client_secret'
+    config_mock.return_value.url = 'http://api.example.com/'
     mocker.patch('encore_api_cli.utils.Config', config_mock)
 
     client = get_client(profile)

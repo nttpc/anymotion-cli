@@ -12,6 +12,7 @@ def test_analyze(mocker):
     result = runner.invoke(cli, ['analyze', '--rule_id', '0', '1'])
 
     assert client_mock.call_count == 1
+
     assert result.exit_code == 0
     assert result.output == ''
 
@@ -26,5 +27,6 @@ def test_analyze_with_show(mocker):
                            ['analyze', '--rule_id', '0', '--show_result', '1'])
 
     assert client_mock.call_count == 1
+
     assert result.exit_code == 0
     assert result.output == 'result\n'

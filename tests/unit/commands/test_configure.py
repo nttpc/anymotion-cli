@@ -1,5 +1,5 @@
 from pathlib import Path
-from tempfile import TemporaryDirectory
+import textwrap
 
 from click.testing import CliRunner
 
@@ -8,21 +8,23 @@ from encore_api_cli.commands.configure import cli
 base_url = 'http://api.example.com'
 
 
-def test_configure(mocker):
-    with TemporaryDirectory(prefix='pytest_') as tmp_dir:
-        home_mock = mocker.MagicMock(return_value=Path(tmp_dir))
-        mocker.patch('pathlib.Path.home', home_mock)
+def test_configure(mocker, tmpdir):
+    default_url = 'https://api.customer.jp/'
+    expected = textwrap.dedent(f"""\
+        AnyMotion API URL [{default_url}]: {base_url}
+        AnyMotion Client ID: client id
+        AnyMotion Client Secret: client secret
+    """)
 
-        runner = CliRunner()
-        result = runner.invoke(cli, ['configure'],
-                               input=f'{base_url}\ntoken\n')
+    tmpdir = Path(tmpdir)
+    mocker.patch('pathlib.Path.home', mocker.MagicMock(return_value=tmpdir))
 
-        default_url = 'https://api.anymotion.jp/api/v1/'
+    runner = CliRunner()
+    result = runner.invoke(cli, ['configure'],
+                           input=f'{base_url}\nclient id\nclient secret\n')
 
-        assert not result.exception
-        assert result.output == \
-            f'AnyMotion API URL [{default_url}]: {base_url}\n' \
-            'AnyMotion Access Token: token\n'
+    assert not result.exception
+    assert result.output == expected
 
 
 def test_configure_list(mocker):
