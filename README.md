@@ -6,6 +6,7 @@ This package provides a command line interface to AnyMotion.
 
 The encore-api-cli package works on Python versions:
 
+- Python 3.5
 - Python 3.6
 - Python 3.7
 - Python 3.8
@@ -88,10 +89,14 @@ When the drawing is complete, the drawing file is downloaded (by default, to the
 
 You can use [jq](https://stedolan.github.io/jq/) to filter according to conditions.
 
-``` sh
-# Get a list of keypoints whose exec_status is SUCCESS
-$ encore keypoint list | jq '.[] | select(.exec_status == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
+Get a list of keypoints whose exec_status is SUCCESS:
 
-# Get a list of keypoint_id for only movie
+``` sh
+$ encore keypoint list | jq '.[] | select(.exec_status == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
+```
+
+Get a list of keypoint_id for only movie:
+
+``` sh
 $ encore keypoint list | jq '.[] | select(.movie != null) | .id'
 ```
