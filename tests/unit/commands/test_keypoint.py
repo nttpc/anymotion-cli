@@ -41,11 +41,12 @@ def test_keypoint_extract(mocker):
     runner = CliRunner()
     result = runner.invoke(cli, ['keypoint', 'extract', '--image_id', '1'])
 
-    kwargs = client_mock.return_value.extract_keypoint.call_args.kwargs
-
     assert client_mock.call_count == 1
     assert client_mock.return_value.extract_keypoint.call_count == 1
-    assert kwargs == {'image_id': 1, 'movie_id': None}
+    assert client_mock.return_value.extract_keypoint.call_args == ({
+        'image_id': 1,
+        'movie_id': None
+    },)
 
     assert result.exit_code == 0
 
@@ -78,13 +79,12 @@ def test_keypoint_extract_with_drawing(mocker):
 
     assert client_mock.call_count == 1
     assert client_mock.return_value.extract_keypoint.call_count == 1
-    assert client_mock.return_value.extract_keypoint.call_args.kwargs == {
-        'image_id': image_id,
+    assert client_mock.return_value.extract_keypoint.call_args == ({
+        'image_id': 1,
         'movie_id': None
-    }
+    },)
     assert client_mock.return_value.draw_keypoint.call_count == 1
-    assert client_mock.return_value.draw_keypoint.call_args.args == (
-        keypoint_id,)
+    assert client_mock.return_value.draw_keypoint.call_args == ((keypoint_id,),)
     assert client_mock.return_value.download.call_count == 1
 
     assert result.exit_code == 0
