@@ -21,8 +21,5 @@ tox = "*"
 click = "*"
 requests = "*"
 
-[requires]
-python_version = "3.8"
-
 [scripts]
 test = 'pytest tests/unit -v --cov=encore_api_cli --cov-report=html'
