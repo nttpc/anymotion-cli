@@ -1,5 +1,7 @@
 import click
 
+from encore_api_cli.options import common_options
+from encore_api_cli.state import pass_state
 from encore_api_cli.utils import get_client
 
 
@@ -15,10 +17,9 @@ def movie():
 
 
 @movie.command()
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def list(profile):
+@common_options
+@pass_state
+def list(state):
     """Show movie list."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     c.show_list('movies')

@@ -1,5 +1,7 @@
 import click
 
+from encore_api_cli.options import common_options
+from encore_api_cli.state import pass_state
 from encore_api_cli.utils import get_client
 
 
@@ -15,12 +17,11 @@ def keypoint():
 
 
 @keypoint.command()
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def list(profile):
+@common_options
+@pass_state
+def list(state):
     """Show keypoint list."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     c.show_list('keypoints')
 
 
@@ -43,15 +44,14 @@ def list(profile):
               type=click.Path(),
               show_default=True,
               help='Path of directory to output drawn file.')
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def extract(profile, movie_id, image_id, with_drawing, out_dir):
+@common_options
+@pass_state
+def extract(state, movie_id, image_id, with_drawing, out_dir):
     """Extract keypoints from uploaded images or movies."""
     if movie_id is None and image_id is None:
         raise click.UsageError('Either "movie_id" or "image_id" is required.')
 
-    c = get_client(profile)
+    c = get_client(state.profile)
     keypoint_id = c.extract_keypoint(movie_id=movie_id, image_id=image_id)
 
     if with_drawing:
@@ -62,11 +62,10 @@ def extract(profile, movie_id, image_id, with_drawing, out_dir):
 
 @keypoint.command()
 @click.argument('keypoint_id', type=int)
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def show(profile, keypoint_id):
+@common_options
+@pass_state
+def show(state, keypoint_id):
     """Display extracted keypoint data in JSON format."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     keypoint = c.get_keypoint(keypoint_id)
     click.echo(keypoint)

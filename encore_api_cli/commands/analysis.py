@@ -1,5 +1,7 @@
 import click
 
+from encore_api_cli.options import common_options
+from encore_api_cli.state import pass_state
 from encore_api_cli.utils import get_client
 
 
@@ -15,22 +17,20 @@ def analysis():
 
 
 @analysis.command()
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def list(profile):
+@common_options
+@pass_state
+def list(state):
     """Show analysis list."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     c.show_list('analyses')
 
 
 @analysis.command()
 @click.argument('analysis_id', type=int)
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def show(profile, analysis_id):
+@common_options
+@pass_state
+def show(state, analysis_id):
     """Display analysis result in JSON format."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     result = c.get_analysis(analysis_id)
     click.echo(result)

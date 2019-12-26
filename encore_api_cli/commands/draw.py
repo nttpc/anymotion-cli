@@ -1,5 +1,7 @@
 import click
 
+from encore_api_cli.options import common_options
+from encore_api_cli.state import pass_state
 from encore_api_cli.utils import get_client
 
 
@@ -16,12 +18,11 @@ def cli():
               type=click.Path(),
               show_default=True,
               help='Path of directory to output drawn file.')
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
-def draw(profile, keypoint_id, out_dir):
+@common_options
+@pass_state
+def draw(state, keypoint_id, out_dir):
     """Draw keypoints on uploaded movie or image."""
-    c = get_client(profile)
+    c = get_client(state.profile)
     url = c.draw_keypoint(keypoint_id)
 
     if url is not None:

@@ -1,6 +1,8 @@
 import click
 
 from encore_api_cli.config import Config
+from encore_api_cli.options import common_options
+from encore_api_cli.state import pass_state
 
 
 @click.group()
@@ -9,14 +11,13 @@ def cli():
 
 
 @cli.group(invoke_without_command=True)
-@click.option('--profile',
-              default='default',
-              help='Name of a named profile that you can configure.')
+@common_options
+@pass_state
 @click.pass_context
-def configure(ctx, profile):
+def configure(ctx, state):
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
-        config = Config(profile)
+        config = Config(state.profile)
         config.url = click.prompt('AnyMotion API URL', default=config.url)
         config.client_id = click.prompt('AnyMotion Client ID',
                                         default=config.client_id)
