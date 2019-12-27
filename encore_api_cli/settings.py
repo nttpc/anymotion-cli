@@ -9,7 +9,7 @@ TIMEOUT = 600
 
 
 class Settings(object):
-    def __init__(self, profile_name='default'):
+    def __init__(self, profile_name, use_env=True):
         self.profile_name = profile_name
 
         self.settings_dir = self._get_dir()
@@ -30,7 +30,8 @@ class Settings(object):
         self._set_default_values()
         self._set_config_from_file(profile_name)
         self._set_credentials_from_file(profile_name)
-        self._set_credentials_from_env()
+        if use_env:
+            self._set_credentials_from_env()
 
     def is_ok(self):
         return self.client_id is not None and self.client_secret is not None
