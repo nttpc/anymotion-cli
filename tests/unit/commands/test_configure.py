@@ -1,5 +1,5 @@
 from pathlib import Path
-import textwrap
+from textwrap import dedent
 
 from click.testing import CliRunner
 
@@ -9,7 +9,7 @@ from encore_api_cli.commands.configure import cli
 def test_configure(mocker, tmpdir):
     default_url = 'https://api.customer.jp/'
     base_url = 'http://api.example.com'
-    expected = textwrap.dedent(f"""\
+    expected = dedent(f"""\
         AnyMotion API URL [{default_url}]: {base_url}
         AnyMotion Client ID: client id
         AnyMotion Client Secret: client secret
@@ -27,7 +27,7 @@ def test_configure(mocker, tmpdir):
 
 
 def test_configure_list(mocker):
-    expected = textwrap.dedent("""\
+    expected = dedent("""\
         Name              Value
         ----------------  -----------------------
         profile           default

@@ -1,5 +1,5 @@
 from click.testing import CliRunner
-import textwrap
+from textwrap import dedent
 
 from encore_api_cli.client import Client
 from encore_api_cli.commands.keypoint import cli
@@ -56,7 +56,7 @@ def test_keypoint_extract_error(mocker):
     result = runner.invoke(cli, ['keypoint', 'extract'])
 
     assert result.exit_code == 2
-    assert result.output == textwrap.dedent("""\
+    assert result.output == dedent("""\
         Usage: cli keypoint extract [OPTIONS]
 
         Error: Either "movie_id" or "image_id" is required.

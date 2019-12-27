@@ -3,7 +3,8 @@
 ## 0.6.0
 
 - Added environment variables to the way to tell about credentials
-- Update `encore configure list` command
+- Added display of error message using the added error handler
+- Update `encore configure list` and `encore upload` command
 - Split the credentials file from the config file
 
 ## 0.5.3

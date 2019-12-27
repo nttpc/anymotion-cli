@@ -2,15 +2,21 @@ import base64
 import hashlib
 import json
 from pathlib import Path
+from textwrap import dedent
 import time
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
 import requests
 
+from encore_api_cli.exceptions import InvalidFileType
+from encore_api_cli.exceptions import RequestsError
+
+MOVIE_SUFFIXES = ['.mp4', '.mov']
+IMAGE_SUFFIXES = ['.jpg', '.jpeg', '.png']
+
 
 class Client(object):
-
     def __init__(self, client_id, client_secret, base_url):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -62,7 +68,7 @@ class Client(object):
             raise Exception('Either "movie_id" or "image_id" is required.')
 
         response = self._requests(requests.post, url, data)
-        keypoint_id, = self._parse_response(response, ('id',))
+        keypoint_id, = self._parse_response(response, ('id', ))
 
         print(f'Extract keypoint (keypoint_id: {keypoint_id})')
         url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
@@ -105,7 +111,7 @@ class Client(object):
         url = urljoin(self.api_url, f'drawings/')
         data = {'keypoint_id': keypoint_id}
         response = self._requests(requests.post, url, data=data)
-        drawing_id, = self._parse_response(response, ('id',))
+        drawing_id, = self._parse_response(response, ('id', ))
 
         print(f'Draw keypoint (drawing_id: {drawing_id})')
         url = urljoin(self.api_url, f'drawings/{drawing_id}/')
@@ -114,7 +120,7 @@ class Client(object):
         drawing_url = None
         if status == 'SUCCESS':
             response = self._requests(requests.get, url)
-            drawing_url, = self._parse_response(response, ('drawing_url',))
+            drawing_url, = self._parse_response(response, ('drawing_url', ))
             print('Keypoint drawing is complete.')
         elif status == 'FAILURE':
             print('Keypoint drawing failed.')
@@ -127,7 +133,7 @@ class Client(object):
         url = urljoin(self.api_url, f'analyses/')
         data = {'keypoint_id': keypoint_id}
         response = self._requests(requests.post, url, data=data)
-        analysis_id, = self._parse_response(response, ('id',))
+        analysis_id, = self._parse_response(response, ('id', ))
 
         print(f'Analyze keypoint (analysis_id: {analysis_id})')
         url = urljoin(self.api_url, f'analyses/{analysis_id}/')
@@ -136,7 +142,7 @@ class Client(object):
         result = None
         if status == 'SUCCESS':
             response = self._requests(requests.get, url)
-            result, = self._parse_response(response, ('result',))
+            result, = self._parse_response(response, ('result', ))
             print('Keypoint analysis is complete.')
         elif status == 'FAILURE':
             print('Keypoint analysis failed.')
@@ -166,7 +172,7 @@ class Client(object):
         }
         headers = {'Content-Type': 'application/json'}
         response = self._requests(requests.post, self.oauth_url, data, headers)
-        token, = self._parse_response(response, ('accessToken',))
+        token, = self._parse_response(response, ('accessToken', ))
 
         return token
 
@@ -189,14 +195,22 @@ class Client(object):
                     'Content-Type': 'application/json'
                 }
         data = json.dumps(data)
-        response = requests_func(url, data=data, headers=headers)
+
+        try:
+            response = requests_func(url, data=data, headers=headers)
+        except requests.exceptions.ConnectionError:
+            message = f'{requests_func.__name__.upper()} {url} is failed.'
+            raise RequestsError(message)
+
         if response.status_code in [200, 201]:
             return response
         else:
-            print(f'{requests_func.__name__.upper()} {url} is failed.')
-            print(f'status code: {response.status_code}')
-            print(f'content: {response.content.decode()}')
-            exit()
+            message = dedent(f"""\
+                {requests_func.__name__.upper()} {url} is failed.
+                status code: {response.status_code}
+                content: {response.content.decode()}
+            """)
+            raise RequestsError(message)
 
     def _parse_response(self, response, keys):
         response = response.json()
@@ -212,20 +226,21 @@ class Client(object):
         elif self._is_image(path):
             return 'image'
         else:
-            raise Exception('Invalid file type')
+            suffix = MOVIE_SUFFIXES + IMAGE_SUFFIXES
+            message = (f"File {path} must have a {', '.join(suffix[:-1])} "
+                       f"or {suffix[-1]} extension.")
+            raise InvalidFileType(message)
 
     def _is_movie(self, path):
-        movie_suffix = ['.mp4', '.mov']
-        return True if path.suffix in movie_suffix else False
+        return True if path.suffix in MOVIE_SUFFIXES else False
 
     def _is_image(self, path):
-        image_suffix = ['.jpg', '.jpeg', '.png']
-        return True if path.suffix in image_suffix else False
+        return True if path.suffix in IMAGE_SUFFIXES else False
 
     def _wait_for_done(self, url):
         for _ in range(self.max_steps):
             response = self._requests(requests.get, url)
-            status, = self._parse_response(response, ('exec_status',))
+            status, = self._parse_response(response, ('exec_status', ))
             if status in ['SUCCESS', 'FAILURE']:
                 break
 

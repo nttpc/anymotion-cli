@@ -1,5 +1,5 @@
 from pathlib import Path
-import textwrap
+from textwrap import dedent
 
 import pytest
 
@@ -87,7 +87,7 @@ class Test_設定ファイルが存在する場合(object):
         config_file_path = mocker_home / '.anymotion' / 'config'
         (mocker_home / '.anymotion').mkdir()
         config_file_path.write_text(
-            textwrap.dedent("""\
+            dedent("""\
                 [default]
                 anymotion_api_url = http://api.example.com/
                 polling_interval = 20
@@ -104,7 +104,7 @@ class Test_設定ファイルが存在する場合(object):
         credentials_file_path = mocker_home / '.anymotion' / 'credentials'
         (mocker_home / '.anymotion').mkdir()
         credentials_file_path.write_text(
-            textwrap.dedent("""\
+            dedent("""\
                 [default]
                 anymotion_client_id = client_id
                 anymotion_client_secret = client_secret
@@ -132,7 +132,7 @@ class Test_設定ファイルと環境変数の両方が存在する場合(objec
         credentials_file_path = mocker_home / '.anymotion' / 'credentials'
         (mocker_home / '.anymotion').mkdir()
         credentials_file_path.write_text(
-            textwrap.dedent("""\
+            dedent("""\
                 [default]
                 anymotion_client_id = client_id_from_file
                 anymotion_client_secret = client_secret_from_file
