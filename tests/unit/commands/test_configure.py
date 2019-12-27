@@ -2,6 +2,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from click.testing import CliRunner
+import pytest
 
 from encore_api_cli.commands.configure import cli
 
@@ -26,26 +27,27 @@ def test_configure(mocker, tmpdir):
     assert result.output == expected
 
 
-def test_configure_list(mocker):
-    expected = dedent("""\
+@pytest.mark.parametrize('client_id, expected_client_id',
+                         [('client_id', '****************t_id'),
+                          (None, 'None')])
+def test_configure_list(mocker, client_id, expected_client_id):
+    expected = dedent(f"""\
         Name              Value
         ----------------  -----------------------
         profile           default
         api_url           https://api.example.jp/
-        client_id         ****************t_id
+        client_id         {expected_client_id}
         client_secret     ****************cret
         polling_interval  10
         timeout           600
     """)
 
-    class SettingsMock(object):
-        url = 'https://api.example.jp/'
-        client_id = 'client_id'
-        client_secret = 'client_secret'
-        interval = 10
-        timeout = 600
-
-    settings_mock = mocker.MagicMock(return_value=SettingsMock())
+    settings_mock = mocker.MagicMock()
+    settings_mock.return_value.url = 'https://api.example.jp/'
+    settings_mock.return_value.client_id = client_id
+    settings_mock.return_value.client_secret = 'client_secret'
+    settings_mock.return_value.interval = 10
+    settings_mock.return_value.timeout = 600
     mocker.patch('encore_api_cli.commands.configure.Settings', settings_mock)
 
     runner = CliRunner()

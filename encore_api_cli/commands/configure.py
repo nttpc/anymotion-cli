@@ -33,8 +33,15 @@ def configure(ctx, state):
 def list(state):
     """Show the configuration you use."""
     settings = Settings(state.profile)
-    client_id = settings.client_id[-4:].rjust(20, '*')
-    client_secret = settings.client_secret[-4:].rjust(20, '*')
+
+    def hidden_credentials(string):
+        if string is None:
+            return 'None'
+        else:
+            return string[-4:].rjust(20, '*')
+
+    client_id = hidden_credentials(settings.client_id)
+    client_secret = hidden_credentials(settings.client_secret)
     table = tabulate(
         [['profile', state.profile], ['api_url', settings.url],
          ['client_id', client_id], ['client_secret', client_secret],
