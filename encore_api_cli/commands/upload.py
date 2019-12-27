@@ -31,4 +31,4 @@ def upload(state, path):
                f"Uploaded { click.style(path, fg='blue')} "
                'to the cloud storage. '
                f"({click.style(f'{media_type}_id: {media_id}', fg='cyan')})")
-    click.echo((message))
+    click.echo(message)

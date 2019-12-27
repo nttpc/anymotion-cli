@@ -1,10 +1,10 @@
-class ClientError(Exception):
+class ClientException(Exception):
     pass
 
 
-class InvalidFileType(ClientError):
+class InvalidFileType(ClientException):
     pass
 
 
-class RequestsError(ClientError):
+class RequestsError(ClientException):
     pass
