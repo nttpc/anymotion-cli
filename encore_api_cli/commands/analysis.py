@@ -22,11 +22,11 @@ def analysis():
 def list(state):
     """Show analysis list."""
     c = get_client(state.profile)
-    c.show_list('analyses')
+    c.show_list("analyses")
 
 
 @analysis.command()
-@click.argument('analysis_id', type=int)
+@click.argument("analysis_id", type=int)
 @common_options
 @pass_state
 def show(state, analysis_id):

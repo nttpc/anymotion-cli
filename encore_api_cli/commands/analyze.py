@@ -11,8 +11,8 @@ def cli():
 
 
 @cli.command()
-@click.argument('keypoint_id', type=int)
-@click.option('--show_result', is_flag=True)
+@click.argument("keypoint_id", type=int)
+@click.option("--show_result", is_flag=True)
 @common_options
 @pass_state
 def analyze(state, keypoint_id, show_result):

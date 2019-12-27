@@ -5,7 +5,7 @@ from pathlib import Path
 from encore_api_cli.exceptions import SettingsValueError
 
 # default values
-BASE_URL = 'https://api.customer.jp/'
+BASE_URL = "https://api.customer.jp/"
 POLLING_INTERVAL = 10
 TIMEOUT = 600
 
@@ -19,12 +19,12 @@ class Settings(object):
 
         # read config and credentials files
         self.config = configparser.ConfigParser()
-        self.config_file = self.settings_dir / 'config'
+        self.config_file = self.settings_dir / "config"
         if self.config_file.exists():
             self.config.read(self.config_file)
 
         self.credentials = configparser.ConfigParser()
-        self.credentials_file = self.settings_dir / 'credentials'
+        self.credentials_file = self.settings_dir / "credentials"
         if self.credentials_file.exists():
             self.credentials.read(self.credentials_file)
 
@@ -51,26 +51,26 @@ class Settings(object):
             return
 
         self.config[self.profile_name] = {
-            'anymotion_api_url': self.url,
+            "anymotion_api_url": self.url,
         }
-        with self.config_file.open('w') as f:
+        with self.config_file.open("w") as f:
             self.config.write(f)
 
     def write_credentials(self):
         """Update credentials file."""
         if not self.is_ok():
-            raise ValueError('client_id or client_secret is invald.')
+            raise ValueError("client_id or client_secret is invald.")
 
         self.credentials[self.profile_name] = {
-            'anymotion_client_id': self.client_id,
-            'anymotion_client_secret': self.client_secret
+            "anymotion_client_id": self.client_id,
+            "anymotion_client_secret": self.client_secret,
         }
-        with self.credentials_file.open('w') as f:
+        with self.credentials_file.open("w") as f:
             self.credentials.write(f)
 
     def _get_dir(self):
-        root_dir = os.getenv('ANYMOTION_ROOT', Path.home())
-        return Path(root_dir) / '.anymotion'
+        root_dir = os.getenv("ANYMOTION_ROOT", Path.home())
+        return Path(root_dir) / ".anymotion"
 
     def _set_default_values(self):
         self.url = BASE_URL
@@ -84,18 +84,17 @@ class Settings(object):
             return
         profile = self.config[profile_name]
 
-        url = profile.get('anymotion_api_url')
+        url = profile.get("anymotion_api_url")
         if url is not None:
             self.url = url
 
-        interval = profile.get('polling_interval')
+        interval = profile.get("polling_interval")
         if interval is not None:
-            self.interval = self._to_int_with_check(interval,
-                                                    'polling_interval', 1)
+            self.interval = self._to_int_with_check(interval, "polling_interval", 1)
 
-        timeout = profile.get('timeout')
+        timeout = profile.get("timeout")
         if timeout is not None:
-            self.timeout = self._to_int_with_check(timeout, 'timeout', 1)
+            self.timeout = self._to_int_with_check(timeout, "timeout", 1)
 
     def _to_int_with_check(self, value, name, min_value):
         """Convert value to int
@@ -118,11 +117,11 @@ class Settings(object):
         try:
             value = int(value)
         except ValueError:
-            message = f'The {name} value is invalid: {value}'
+            message = f"The {name} value is invalid: {value}"
             raise SettingsValueError(message)
         if value < min_value:
             th = min_value - 1
-            message = f'The {name} value must be greater than {th}: {value}'
+            message = f"The {name} value must be greater than {th}: {value}"
             raise SettingsValueError(message)
         return value
 
@@ -131,19 +130,19 @@ class Settings(object):
             return
         profile = self.credentials[profile_name]
 
-        client_id = profile.get('anymotion_client_id')
+        client_id = profile.get("anymotion_client_id")
         if client_id is not None:
             self.client_id = client_id
 
-        client_secret = profile.get('anymotion_client_secret')
+        client_secret = profile.get("anymotion_client_secret")
         if client_secret is not None:
             self.client_secret = client_secret
 
     def _set_credentials_from_env(self):
-        client_id = os.getenv('ANYMOTION_CLIENT_ID')
+        client_id = os.getenv("ANYMOTION_CLIENT_ID")
         if client_id is not None:
             self.client_id = client_id
 
-        client_secret = os.getenv('ANYMOTION_CLIENT_SECRET')
+        client_secret = os.getenv("ANYMOTION_CLIENT_SECRET")
         if client_secret is not None:
             self.client_secret = client_secret

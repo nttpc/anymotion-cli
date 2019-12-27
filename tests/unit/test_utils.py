@@ -6,16 +6,16 @@ from encore_api_cli.utils import get_client
 
 
 def test_is_okがTrueの場合clientが取得できること(mocker):
-    profile = 'default'
+    profile = "default"
 
     settings_mock = mocker.MagicMock()
     settings_mock.return_value.is_ok.return_value = True
-    settings_mock.return_value.client_id = 'client_id'
-    settings_mock.return_value.client_secret = 'client_secret'
-    settings_mock.return_value.url = 'http://api.example.com/'
+    settings_mock.return_value.client_id = "client_id"
+    settings_mock.return_value.client_secret = "client_secret"
+    settings_mock.return_value.url = "http://api.example.com/"
     settings_mock.return_value.interval = 10
     settings_mock.return_value.timeout = 600
-    mocker.patch('encore_api_cli.utils.Settings', settings_mock)
+    mocker.patch("encore_api_cli.utils.Settings", settings_mock)
 
     client = get_client(profile)
 
@@ -24,11 +24,11 @@ def test_is_okがTrueの場合clientが取得できること(mocker):
 
 
 def test_is_okがFalseの場合エラーが発生すること(mocker):
-    profile = 'default'
+    profile = "default"
 
     settings_mock = mocker.MagicMock()
     settings_mock.return_value.is_ok.return_value = False
-    mocker.patch('encore_api_cli.utils.Settings', settings_mock)
+    mocker.patch("encore_api_cli.utils.Settings", settings_mock)
 
     with pytest.raises(click.ClickException):
         get_client(profile)

@@ -22,4 +22,4 @@ def movie():
 def list(state):
     """Show movie list."""
     c = get_client(state.profile)
-    c.show_list('movies')
+    c.show_list("movies")

@@ -22,4 +22,4 @@ def image():
 def list(state):
     """Show image list."""
     c = get_client(state.profile)
-    c.show_list('images')
+    c.show_list("images")

@@ -13,7 +13,7 @@ def cli():
 
 
 @cli.command()
-@click.argument('path', type=click.Path(exists=True))
+@click.argument("path", type=click.Path(exists=True))
 @common_options
 @pass_state
 def upload(state, path):
@@ -27,8 +27,9 @@ def upload(state, path):
     except RequestsError as e:
         raise click.ClickException(e)
 
-    message = (f"{click.style('Success', fg='green')}: "
-               f"Uploaded { click.style(path, fg='blue')} "
-               'to the cloud storage. '
-               f"({click.style(f'{media_type}_id: {media_id}', fg='cyan')})")
+    message = (
+        f"{click.style('Success', fg='green')}: "
+        f"Uploaded { click.style(path, fg='blue')} to the cloud storage. "
+        f"({click.style(f'{media_type}_id: {media_id}', fg='cyan')})"
+    )
     click.echo(message)

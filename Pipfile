@@ -13,9 +13,9 @@ pytest-cov = "*"
 pytest-mock = "*"
 pytest-watch = "*"
 requests-mock = "*"
-yapf = "*"
 bandit = "*"
 tox = "*"
+black = "*"
 
 [packages]
 click = "*"
@@ -24,3 +24,6 @@ tabulate = "*"
 
 [scripts]
 test = 'pytest tests/unit -v --cov=encore_api_cli --cov-report=html'
+
+[pipenv]
+allow_prereleases = true

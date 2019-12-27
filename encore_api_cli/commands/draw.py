@@ -11,13 +11,15 @@ def cli():
 
 
 @cli.command()
-@click.argument('keypoint_id', type=int)
-@click.option('-o',
-              '--out_dir',
-              default='.',
-              type=click.Path(),
-              show_default=True,
-              help='Path of directory to output drawn file.')
+@click.argument("keypoint_id", type=int)
+@click.option(
+    "-o",
+    "--out_dir",
+    default=".",
+    type=click.Path(),
+    show_default=True,
+    help="Path of directory to output drawn file.",
+)
 @common_options
 @pass_state
 def draw(state, keypoint_id, out_dir):

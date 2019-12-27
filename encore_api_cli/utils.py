@@ -8,14 +8,18 @@ from encore_api_cli.settings import Settings
 def get_client(profile):
     settings = get_settings(profile)
     if not settings.is_ok():
-        message = ('The credentials is invalid or not set. '
-                   'Run "encore configure" to set credentials.')
+        message = (
+            "The credentials is invalid or not set. "
+            'Run "encore configure" to set credentials.'
+        )
         raise click.ClickException(message)
-    return Client(settings.client_id,
-                  settings.client_secret,
-                  settings.url,
-                  interval=settings.interval,
-                  timeout=settings.timeout)
+    return Client(
+        settings.client_id,
+        settings.client_secret,
+        settings.url,
+        interval=settings.interval,
+        timeout=settings.timeout,
+    )
 
 
 def get_settings(profile, use_env=True):
