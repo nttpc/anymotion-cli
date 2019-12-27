@@ -3,8 +3,8 @@
 ## 0.6.0
 
 - Added environment variables to the way to tell about credentials
-- Added assertions for `upload` command and config values
-- Update `configure list` and `upload` command
+- Added assertions for `upload` and `keypoint extract` command and config values
+- Improve display using `configure list` command
 - Split the credentials file from the config file
 
 ## 0.5.3

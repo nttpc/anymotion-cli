@@ -13,6 +13,8 @@ def test_is_okがTrueの場合clientが取得できること(mocker):
     settings_mock.return_value.client_id = 'client_id'
     settings_mock.return_value.client_secret = 'client_secret'
     settings_mock.return_value.url = 'http://api.example.com/'
+    settings_mock.return_value.interval = 10
+    settings_mock.return_value.timeout = 600
     mocker.patch('encore_api_cli.utils.Settings', settings_mock)
 
     client = get_client(profile)

@@ -29,8 +29,8 @@ class Client(object):
         self.oauth_url = urljoin(base_url, 'v1/oauth/accesstokens')
         self.api_url = urljoin(base_url, 'anymotion/v1/')
 
-        self.interval = interval
-        self.max_steps = timeout // interval
+        self.interval = max(1, interval)
+        self.max_steps = max(1, timeout // interval)
 
     def upload_to_s3(self, path):
         """Upload movie or image to Amazon S3
@@ -76,31 +76,16 @@ class Client(object):
         data = json.dumps(data, indent=4)
         print(data)
 
-    def extract_keypoint(self, movie_id=None, image_id=None):
-        url = urljoin(self.api_url, 'keypoints/')
+    def extract_keypoint_from_image(self, image_id: int):
+        return self._extract_keypoint({'image_id': image_id})
 
-        if movie_id is not None:
-            data = {'movie_id': movie_id}
-        elif image_id is not None:
-            data = {'image_id': image_id}
-        else:
-            raise Exception('Either "movie_id" or "image_id" is required.')
+    def extract_keypoint_from_movie(self, movie_id: int):
+        return self._extract_keypoint({'movie_id': movie_id})
 
-        response = self._requests(requests.post, url, data)
-        keypoint_id, = self._parse_response(response, ('id', ))
-
-        print(f'Extract keypoint (keypoint_id: {keypoint_id})')
+    def wait_for_extraction(self, keypoint_id):
         url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
         status = self._wait_for_done(url)
-
-        if status == 'SUCCESS':
-            print('Keypoint extraction is complete.')
-        elif status == 'FAILURE':
-            print('Keypoint extraction failed.')
-        else:
-            print('Keypoint extraction is timed out.')
-
-        return keypoint_id
+        return status
 
     def get_keypoint(self, keypoint_id):
         url = urljoin(self.api_url, f'keypoints/{keypoint_id}/')
@@ -188,6 +173,17 @@ class Client(object):
             content_md5 = encoded_content_md5.decode()
         return content_md5
 
+    def _extract_keypoint(self, data: dict):
+        """Extract keypoint
+
+        Raises:
+            RequestsError: Exception raised in _requests function.
+        """
+        url = urljoin(self.api_url, 'keypoints/')
+        response = self._requests(requests.post, url, data)
+        keypoint_id, = self._parse_response(response, ('id', ))
+        return keypoint_id
+
     def _requests(self, requests_func, url, data=None, headers=None):
         """Make a requests to AnyMotion API or Amazon S3.
 
@@ -270,7 +266,7 @@ class Client(object):
             time.sleep(self.interval)
             print('.', end='', flush=True)
         else:
-            status = 'TIME_OUT'
+            status = 'TIMEOUT'
         print()
 
         return status

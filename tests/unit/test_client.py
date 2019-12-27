@@ -44,20 +44,30 @@ class TestUpload(object):
             client.upload_to_s3(path)
 
 
-def test_キーポイント抽出ができること(requests_mock, client, capfd):
-    keypoint_id = 1
+class TestExtractKeypoint(object):
+    def test_画像からキーポイント抽出ができること(self, requests_mock, client):
+        keypoint_id = 1
 
-    requests_mock.post(urljoin(client.api_url, 'keypoints/'),
-                       json={'id': keypoint_id})
-    requests_mock.get(urljoin(client.api_url, f'keypoints/{keypoint_id}/'),
-                      json={'exec_status': 'SUCCESS'})
+        requests_mock.post(urljoin(client.api_url, 'keypoints/'),
+                           json={'id': keypoint_id})
+        requests_mock.get(urljoin(client.api_url, f'keypoints/{keypoint_id}/'),
+                          json={'exec_status': 'SUCCESS'})
 
-    client.extract_keypoint(image_id=1)
+        result = client.extract_keypoint_from_image(1)
 
-    out, err = capfd.readouterr()
-    assert out == f'Extract keypoint (keypoint_id: {keypoint_id})\n\n' \
-                  'Keypoint extraction is complete.\n'
-    assert err == ''
+        assert result == keypoint_id
+
+    def test_動画からキーポイント抽出ができること(self, requests_mock, client):
+        keypoint_id = 1
+
+        requests_mock.post(urljoin(client.api_url, 'keypoints/'),
+                           json={'id': keypoint_id})
+        requests_mock.get(urljoin(client.api_url, f'keypoints/{keypoint_id}/'),
+                          json={'exec_status': 'SUCCESS'})
+
+        result = client.extract_keypoint_from_movie(1)
+
+        assert result == keypoint_id
 
 
 def test_キーポイントデータを取得できること(requests_mock, client):
