@@ -2,6 +2,8 @@ import configparser
 import os
 from pathlib import Path
 
+from encore_api_cli.exceptions import SettingsValueError
+
 # default values
 BASE_URL = 'https://api.customer.jp/'
 POLLING_INTERVAL = 10
@@ -86,13 +88,25 @@ class Settings(object):
         if url is not None:
             self.url = url
 
-        interval = profile.getint('polling_interval')
-        if interval is not None:
-            self.interval = interval
+        def get_value(value, name, min_value):
+            try:
+                value = int(value)
+            except ValueError:
+                message = f'The {name} value is invalid: {value}'
+                raise SettingsValueError(message)
+            if value < min_value:
+                th = min_value - 1
+                message = f'The {name} value must be greater than {th}: {value}'
+                raise SettingsValueError(message)
+            return value
 
-        timeout = profile.getint('timeout')
+        interval = profile.get('polling_interval')
+        if interval is not None:
+            self.interval = get_value(interval, 'polling_interval', 1)
+
+        timeout = profile.get('timeout')
         if timeout is not None:
-            self.timeout = timeout
+            self.timeout = get_value(timeout, 'timeout', 1)
 
     def _set_credentials_from_file(self, profile_name):
         if profile_name not in self.credentials.sections():

@@ -2,8 +2,8 @@ import click
 from tabulate import tabulate
 
 from encore_api_cli.options import common_options
-from encore_api_cli.settings import Settings
 from encore_api_cli.state import pass_state
+from encore_api_cli.utils import get_settings
 
 
 @click.group()
@@ -18,7 +18,7 @@ def cli():
 def configure(ctx, state):
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
-        settings = Settings(state.profile, use_env=False)
+        settings = get_settings(state.profile, use_env=False)
         settings.url = click.prompt('AnyMotion API URL', default=settings.url)
         settings.client_id = click.prompt('AnyMotion Client ID',
                                           default=settings.client_id)
@@ -32,7 +32,7 @@ def configure(ctx, state):
 @pass_state
 def list(state):
     """Show the configuration you use."""
-    settings = Settings(state.profile)
+    settings = get_settings(state.profile)
 
     def hidden_credentials(string):
         if string is None:

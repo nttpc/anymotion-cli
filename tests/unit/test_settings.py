@@ -3,6 +3,7 @@ from textwrap import dedent
 
 import pytest
 
+from encore_api_cli.exceptions import SettingsValueError
 from encore_api_cli.settings import Settings
 
 
@@ -117,6 +118,23 @@ class Test_設定ファイルが存在する場合(object):
         assert settings.url == 'http://api.example.com/'
         assert settings.interval == 20
         assert settings.timeout == 300
+
+    @pytest.mark.parametrize('interval, timeout', [(0, 10), ('a', 10),
+                                                   (10, -1)])
+    def test_configファイルの値が無効な場合エラーが発生すること(self, mocker_home, interval,
+                                          timeout):
+        config_file_path = mocker_home / '.anymotion' / 'config'
+        (mocker_home / '.anymotion').mkdir()
+        config_file_path.write_text(
+            dedent(f"""\
+                [default]
+                anymotion_api_url = http://api.example.com/
+                polling_interval = {interval}
+                timeout = {timeout}
+            """))
+
+        with pytest.raises(SettingsValueError):
+            Settings('default')
 
     def test_credentialsファイルの値が設定されていること(self, mocker_home, credentials_file):
         settings = Settings('default')

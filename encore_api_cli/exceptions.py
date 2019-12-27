@@ -8,3 +8,11 @@ class InvalidFileType(ClientException):
 
 class RequestsError(ClientException):
     pass
+
+
+class SettingsException(Exception):
+    pass
+
+
+class SettingsValueError(SettingsException):
+    pass

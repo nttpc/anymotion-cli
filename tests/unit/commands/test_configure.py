@@ -48,7 +48,8 @@ def test_configure_list(mocker, client_id, expected_client_id):
     settings_mock.return_value.client_secret = 'client_secret'
     settings_mock.return_value.interval = 10
     settings_mock.return_value.timeout = 600
-    mocker.patch('encore_api_cli.commands.configure.Settings', settings_mock)
+    mocker.patch('encore_api_cli.commands.configure.get_settings',
+                 settings_mock)
 
     runner = CliRunner()
     result = runner.invoke(cli, ['configure', 'list'])
