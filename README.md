@@ -52,6 +52,8 @@ anymotion_client_secret=<your_client_secret>
 
 and place it in `~/.anymotion/credentials`.
 
+**Note**: If set in both the credentials file and environment variables, the environment variables takes precedence.
+
 ## Usage
 
 ``` sh
@@ -86,7 +88,7 @@ First, upload the image file.
 
 ``` sh
 $ encore upload image.jpg
-Uploaded the image file to cloud storage (image_id: 111)
+Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
 ```
 
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
@@ -103,6 +105,7 @@ Downloaded the file to image_xxx.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
+To save to a specific directory, use the ``--out_dir`` option.
 
 ### Tips
 
@@ -118,4 +121,19 @@ Get a list of keypoint_id for only movie:
 
 ``` sh
 $ encore keypoint list | jq '.[] | select(.movie != null) | .id'
+```
+
+## Bash Complete
+
+The encore-api-cli supports Bash completion.
+To enable Bash completion, you would need to put into your `.bashrc`:
+
+``` sh
+$ eval "$(_ENCORE_COMPLETE=source encore)"
+```
+
+For zsh users add this to your `.zshrc`:
+
+``` sh
+$ eval "$(_ENCORE_COMPLETE=source_zsh encore)"
 ```
