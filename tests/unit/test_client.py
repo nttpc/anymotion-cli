@@ -10,7 +10,7 @@ from encore_api_cli.exceptions import InvalidFileType
 @pytest.fixture
 def client(requests_mock):
     base_url = "http://api.example.com/"
-    client = Client("client_id", "client_secret", base_url)
+    client = Client("client_id", "client_secret", base_url, 5, 600)
     requests_mock.post(client.oauth_url, json={"accessToken": "token"})
     yield client
 

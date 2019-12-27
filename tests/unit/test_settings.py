@@ -39,7 +39,7 @@ class Test_設定ファイルが存在しない場合(object):
     def test_設定情報の初期値を取得できること(self, mocker_home):
         settings = Settings("default")
 
-        assert settings.interval == 10
+        assert settings.interval == 5
         assert settings.timeout == 600
         assert settings.url == "https://api.customer.jp/"
         assert settings.client_id is None

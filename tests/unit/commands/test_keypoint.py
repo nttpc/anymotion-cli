@@ -20,7 +20,7 @@ def test_keypoint():
 
 def test_keypoint_list(mocker, requests_mock):
     client_mock = mocker.MagicMock(
-        return_value=Client("client_id", "client_secret", base_url)
+        return_value=Client("client_id", "client_secret", base_url, 5, 600)
     )
     mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
 

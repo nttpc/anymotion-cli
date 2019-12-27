@@ -96,10 +96,8 @@ When the upload is complete, you get an `image_id`. Extract keypoints using this
 ``` sh
 $ encore keypoint extract --image_id 111 --with_drawing
 Extract keypoint (keypoint_id: 222)
-.
 Keypoint extraction is complete.
 Draw keypoint (drawing_id: 333)
-.
 Keypoint drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```

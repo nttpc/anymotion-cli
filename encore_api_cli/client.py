@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 from urllib.parse import urlparse
 
 import requests
+from yaspin import yaspin
 
 from encore_api_cli.exceptions import InvalidFileType
 from encore_api_cli.exceptions import RequestsError
@@ -17,7 +18,7 @@ IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
 
 
 class Client(object):
-    def __init__(self, client_id, client_secret, base_url, interval=10, timeout=600):
+    def __init__(self, client_id, client_secret, base_url, interval, timeout):
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -250,17 +251,14 @@ class Client(object):
     def _is_image(self, path):
         return True if path.suffix in IMAGE_SUFFIXES else False
 
+    @yaspin(text="Processing...")
     def _wait_for_done(self, url):
         for _ in range(self.max_steps):
             response = self._requests(requests.get, url)
             (status,) = self._parse_response(response, ("exec_status",))
             if status in ["SUCCESS", "FAILURE"]:
                 break
-
             time.sleep(self.interval)
-            print(".", end="", flush=True)
         else:
             status = "TIMEOUT"
-        print()
-
         return status

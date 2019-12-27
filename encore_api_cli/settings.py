@@ -6,7 +6,7 @@ from encore_api_cli.exceptions import SettingsValueError
 
 # default values
 BASE_URL = "https://api.customer.jp/"
-POLLING_INTERVAL = 10
+POLLING_INTERVAL = 5
 TIMEOUT = 600
 
 
