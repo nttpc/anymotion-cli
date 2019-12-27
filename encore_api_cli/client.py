@@ -33,19 +33,33 @@ class Client(object):
         self.max_steps = timeout // interval
 
     def upload_to_s3(self, path):
+        """Upload movie or image to Amazon S3
+
+        Args:
+            path (str or Path)
+
+        Returns:
+            str: Created image_id or movie_id.
+            str: image or movie
+
+        Raises:
+            InvalidFileType: Exception raised in _get_media_type function.
+            RequestsError: Exception raised in _requests function.
+        """
         if isinstance(path, str):
             path = Path(path)
 
         media_type = self._get_media_type(path)
         content_md5 = self._create_md5(path)
 
-        # POST movie or image
+        # Register movie or image
         data = {'origin_key': path.name, 'content_md5': content_md5}
         url = urljoin(self.api_url, f'{media_type}s/')
         response = self._requests(requests.post, url, data)
         media_id, upload_url = self._parse_response(response,
                                                     ('id', 'upload_url'))
-        # PUT S3
+        # Upload to S3
+        # TODO(y_kumiha): use self._requests
         requests.put(upload_url,
                      path.open('rb'),
                      headers={'Content-MD5': content_md5})
@@ -167,9 +181,49 @@ class Client(object):
 
         print(f'Downloaded the file to {path}.')
 
-    def get_token(self):
-        """Client IDとSecretを用いてトークンを取得する"""
+    def _create_md5(self, path):
+        with path.open('rb') as f:
+            md5 = hashlib.md5(f.read()).digest()
+            encoded_content_md5 = base64.b64encode(md5)
+            content_md5 = encoded_content_md5.decode()
+        return content_md5
 
+    def _requests(self, requests_func, url, data=None, headers=None):
+        """Make a requests to AnyMotion API or Amazon S3.
+
+        Raises:
+            RequestsError
+        """
+        if headers is None:
+            headers = self._get_headers(with_content_type=data)
+        data = json.dumps(data)
+
+        try:
+            response = requests_func(url, data=data, headers=headers)
+        except requests.exceptions.ConnectionError:
+            message = f'{requests_func.__name__.upper()} {url} is failed.'
+            raise RequestsError(message)
+
+        if response.status_code not in [200, 201]:
+            message = dedent(f"""\
+                {requests_func.__name__.upper()} {url} is failed.
+                status code: {response.status_code}
+                content: {response.content.decode()}
+            """)
+            raise RequestsError(message)
+
+        return response
+
+    def _get_headers(self, with_content_type=True):
+        """Generate Authorization and Content-Type headers."""
+        token = self._get_token()
+        headers = {'Authorization': f'Bearer {token}'}
+        if with_content_type:
+            headers['Content-Type'] = 'application/json'
+        return headers
+
+    def _get_token(self):
+        """Get a token using client ID and secret."""
         data = {
             'grantType': 'client_credentials',
             'clientId': self.client_id,
@@ -180,42 +234,6 @@ class Client(object):
         token, = self._parse_response(response, ('accessToken', ))
 
         return token
-
-    def _create_md5(self, path):
-        with path.open('rb') as f:
-            md5 = hashlib.md5(f.read()).digest()
-            encoded_content_md5 = base64.b64encode(md5)
-            content_md5 = encoded_content_md5.decode()
-        return content_md5
-
-    def _requests(self, requests_func, url, data=None, headers=None):
-        if headers is None:
-            token = self.get_token()
-
-            if data is None:
-                headers = {'Authorization': f'Bearer {token}'}
-            else:
-                headers = {
-                    'Authorization': f'Bearer {token}',
-                    'Content-Type': 'application/json'
-                }
-        data = json.dumps(data)
-
-        try:
-            response = requests_func(url, data=data, headers=headers)
-        except requests.exceptions.ConnectionError:
-            message = f'{requests_func.__name__.upper()} {url} is failed.'
-            raise RequestsError(message)
-
-        if response.status_code in [200, 201]:
-            return response
-        else:
-            message = dedent(f"""\
-                {requests_func.__name__.upper()} {url} is failed.
-                status code: {response.status_code}
-                content: {response.content.decode()}
-            """)
-            raise RequestsError(message)
 
     def _parse_response(self, response, keys):
         response = response.json()

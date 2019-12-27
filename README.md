@@ -137,3 +137,9 @@ For zsh users add this to your `.zshrc`:
 ``` sh
 $ eval "$(_ENCORE_COMPLETE=source_zsh encore)"
 ```
+
+## Contributing
+
+- Code must work on Python 3.6 and higher.
+- Code should follow flake8 + hacking.
+- Docstring should follow [Google Style](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).

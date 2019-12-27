@@ -88,25 +88,43 @@ class Settings(object):
         if url is not None:
             self.url = url
 
-        def get_value(value, name, min_value):
-            try:
-                value = int(value)
-            except ValueError:
-                message = f'The {name} value is invalid: {value}'
-                raise SettingsValueError(message)
-            if value < min_value:
-                th = min_value - 1
-                message = f'The {name} value must be greater than {th}: {value}'
-                raise SettingsValueError(message)
-            return value
-
         interval = profile.get('polling_interval')
         if interval is not None:
-            self.interval = get_value(interval, 'polling_interval', 1)
+            self.interval = self._to_int_with_check(interval,
+                                                    'polling_interval', 1)
 
         timeout = profile.get('timeout')
         if timeout is not None:
-            self.timeout = get_value(timeout, 'timeout', 1)
+            self.timeout = self._to_int_with_check(timeout, 'timeout', 1)
+
+    def _to_int_with_check(self, value, name, min_value):
+        """Convert value to int
+
+        Args:
+            value (str)
+            name (str)
+            min_value (int)
+
+        Returns:
+            int: The converted value.
+
+        Raises:
+            SettingsValueError: If conversion is not possible or value is less
+            than min_value.
+
+        Note:
+            Expected to be used in _set_config_from_file function.
+        """
+        try:
+            value = int(value)
+        except ValueError:
+            message = f'The {name} value is invalid: {value}'
+            raise SettingsValueError(message)
+        if value < min_value:
+            th = min_value - 1
+            message = f'The {name} value must be greater than {th}: {value}'
+            raise SettingsValueError(message)
+        return value
 
     def _set_credentials_from_file(self, profile_name):
         if profile_name not in self.credentials.sections():
