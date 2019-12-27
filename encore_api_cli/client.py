@@ -17,15 +17,20 @@ IMAGE_SUFFIXES = ['.jpg', '.jpeg', '.png']
 
 
 class Client(object):
-    def __init__(self, client_id, client_secret, base_url):
+    def __init__(self,
+                 client_id,
+                 client_secret,
+                 base_url,
+                 interval=10,
+                 timeout=600):
         self.client_id = client_id
         self.client_secret = client_secret
 
         self.oauth_url = urljoin(base_url, 'v1/oauth/accesstokens')
         self.api_url = urljoin(base_url, 'anymotion/v1/')
 
-        self.interval = 10
-        self.max_steps = 60
+        self.interval = interval
+        self.max_steps = timeout // interval
 
     def upload_to_s3(self, path):
         if isinstance(path, str):
