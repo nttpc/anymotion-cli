@@ -54,4 +54,4 @@ def test_configure_list(mocker, client_id, expected_client_id):
     result = runner.invoke(cli, ['configure', 'list'])
 
     assert result.exit_code == 0
-    assert result.output == expected
+    assert expected in result.output

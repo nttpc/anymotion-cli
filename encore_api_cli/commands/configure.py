@@ -36,6 +36,9 @@ def list(state):
 
     def hidden_credentials(string):
         if string is None:
+            message = 'Warning: client_id and/or client_secret not set.'
+            click.echo(click.style(message, fg='yellow'))
+            click.echo()
             return 'None'
         else:
             return string[-4:].rjust(20, '*')
