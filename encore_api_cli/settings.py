@@ -35,6 +35,10 @@ class Settings(object):
     def is_ok(self):
         return self.client_id is not None and self.client_secret is not None
 
+    def write(self):
+        self.write_config()
+        self.write_credentials()
+
     def write_config(self):
         """Update config file.
 

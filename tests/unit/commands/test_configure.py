@@ -5,11 +5,10 @@ from click.testing import CliRunner
 
 from encore_api_cli.commands.configure import cli
 
-base_url = 'http://api.example.com'
-
 
 def test_configure(mocker, tmpdir):
     default_url = 'https://api.customer.jp/'
+    base_url = 'http://api.example.com'
     expected = textwrap.dedent(f"""\
         AnyMotion API URL [{default_url}]: {base_url}
         AnyMotion Client ID: client id
@@ -28,11 +27,26 @@ def test_configure(mocker, tmpdir):
 
 
 def test_configure_list(mocker):
-    expected = ''
+    expected = textwrap.dedent("""\
+        Name              Value
+        ----------------  -----------------------
+        profile           default
+        api_url           https://api.example.jp/
+        client_id         ****************t_id
+        client_secret     ****************cret
+        polling_interval  10
+        timeout           600
+    """)
 
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.show.return_value = expected
-    mocker.patch('encore_api_cli.commands.configure.Config', config_mock)
+    class SettingsMock(object):
+        url = 'https://api.example.jp/'
+        client_id = 'client_id'
+        client_secret = 'client_secret'
+        interval = 10
+        timeout = 600
+
+    settings_mock = mocker.MagicMock(return_value=SettingsMock())
+    mocker.patch('encore_api_cli.commands.configure.Settings', settings_mock)
 
     runner = CliRunner()
     result = runner.invoke(cli, ['configure', 'list'])

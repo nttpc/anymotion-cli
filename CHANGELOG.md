@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.6.0
+
+- Added environment variables to the way to tell about credentials
+- Update `encore configure list` command
+- Split the credentials file from the config file
+
 ## 0.5.3
 
 - Added `--with_drawing` option to keypoint extract command
@@ -15,4 +21,4 @@
 
 ## 0.5.0
 
-- Changed to an authentication format that uses a client id and secret.
+- Changed to an authentication format that uses a client id and secret

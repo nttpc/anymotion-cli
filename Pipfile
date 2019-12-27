@@ -20,6 +20,7 @@ tox = "*"
 [packages]
 click = "*"
 requests = "*"
+tabulate = "*"
 
 [scripts]
 test = 'pytest tests/unit -v --cov=encore_api_cli --cov-report=html'

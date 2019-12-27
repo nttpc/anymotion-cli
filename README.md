@@ -20,7 +20,13 @@ $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.gi
 
 ## Getting Started
 
-Before encore-api-cli, you need to tell it about your AnyMotion credentials.
+Before using encore-api-cli, you need to tell it about your AnyMotion credentials.
+You can do this in several ways:
+
+- Credentials file
+- Environment variables
+
+The quickest way to get started is to run the `encore configure` command:
 
 ``` sh
 $ encore configure
@@ -29,8 +35,22 @@ AnyMotion Client ID: your_client_id
 AnyMotion Client Secret: your_client_secret
 ```
 
-and create an INI formatted file.
-Then, place it in `~/.anymotion/config`.
+To use environment variables, do the following:
+
+``` sh
+export ANYMOTION_CLIENT_ID=<your_client_id>
+export ANYMOTION_CLIENT_SECRET=<your_client_secret>
+```
+
+To use the credentials file, create an INI formatted file like this:
+
+``` text
+[default]
+anymotion_client_id=<your_client_id>
+anymotion_client_secret=<your_client_secret>
+```
+
+and place it in `~/.anymotion/credentials`.
 
 ## Usage
 

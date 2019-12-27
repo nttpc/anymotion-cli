@@ -5,30 +5,30 @@ from encore_api_cli.client import Client
 from encore_api_cli.utils import get_client
 
 
-def test_configのis_okがTrueの場合clientが取得できること(mocker):
+def test_is_okがTrueの場合clientが取得できること(mocker):
     profile = 'default'
 
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.is_ok = True
-    config_mock.return_value.client_id = 'client_id'
-    config_mock.return_value.client_secret = 'client_secret'
-    config_mock.return_value.url = 'http://api.example.com/'
-    mocker.patch('encore_api_cli.utils.Config', config_mock)
+    settings_mock = mocker.MagicMock()
+    settings_mock.return_value.is_ok.return_value = True
+    settings_mock.return_value.client_id = 'client_id'
+    settings_mock.return_value.client_secret = 'client_secret'
+    settings_mock.return_value.url = 'http://api.example.com/'
+    mocker.patch('encore_api_cli.utils.Settings', settings_mock)
 
     client = get_client(profile)
 
-    assert config_mock.call_count == 1
+    assert settings_mock.call_count == 1
     assert type(client) is Client
 
 
-def test_configのis_okがFalseの場合エラーが発生すること(mocker):
+def test_is_okがFalseの場合エラーが発生すること(mocker):
     profile = 'default'
 
-    config_mock = mocker.MagicMock()
-    config_mock.return_value.is_ok = False
-    mocker.patch('encore_api_cli.utils.Config', config_mock)
+    settings_mock = mocker.MagicMock()
+    settings_mock.return_value.is_ok.return_value = False
+    mocker.patch('encore_api_cli.utils.Settings', settings_mock)
 
     with pytest.raises(click.ClickException):
         get_client(profile)
 
-    assert config_mock.call_count == 1
+    assert settings_mock.call_count == 1
