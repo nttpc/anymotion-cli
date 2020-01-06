@@ -13,9 +13,18 @@ from encore_api_cli.commands.upload import cli as upload
 
 @click.command(
     cls=click.CommandCollection,
-    sources=[analysis, analyze, configure, draw, image, keypoint, movie, upload],
+    sources=[
+        analysis,
+        analyze,
+        configure,
+        draw,
+        image,
+        keypoint,
+        movie,
+        upload,
+    ],  # type: ignore
 )
-@click.version_option(version=__version__)
+@click.version_option(version=click.style(__version__, fg="cyan"))
 def cli():
     """Command Line Interface for AnyMotion API."""
     pass

@@ -1,6 +1,7 @@
 import click
 
 from encore_api_cli.commands.draw import draw
+from encore_api_cli.commands.draw import draw_options
 from encore_api_cli.exceptions import RequestsError
 from encore_api_cli.options import common_options
 from encore_api_cli.state import pass_state
@@ -44,18 +45,11 @@ def list(state):
     is_flag=True,
     help="Flag for whether to draw at the same time.",
 )
-@click.option(
-    "-o",
-    "--out_dir",
-    default=".",
-    type=click.Path(),
-    show_default=True,
-    help="Path of directory to output drawn file.",
-)
+@draw_options
 @common_options
 @pass_state
 @click.pass_context
-def extract(ctx, state, movie_id, image_id, with_drawing, out_dir):
+def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, no_download):
     """Extract keypoints from uploaded images or movies."""
     if [movie_id, image_id].count(None) in [0, 2]:
         raise click.UsageError('Either "movie_id" or "image_id" is required.')
@@ -80,7 +74,9 @@ def extract(ctx, state, movie_id, image_id, with_drawing, out_dir):
         click.echo("Keypoint extraction failed.")
 
     if with_drawing:
-        ctx.invoke(draw, keypoint_id=keypoint_id, out_dir=out_dir)
+        ctx.invoke(
+            draw, keypoint_id=keypoint_id, out_dir=out_dir, no_download=no_download
+        )
 
 
 @keypoint.command()

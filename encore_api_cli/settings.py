@@ -1,6 +1,7 @@
-import configparser
+from configparser import ConfigParser
 import os
 from pathlib import Path
+from typing import Optional
 
 from encore_api_cli.exceptions import SettingsValueError
 
@@ -11,19 +12,19 @@ TIMEOUT = 600
 
 
 class Settings(object):
-    def __init__(self, profile_name, use_env=True):
+    def __init__(self, profile_name: str, use_env: bool = True) -> None:
         self.profile_name = profile_name
 
         self.settings_dir = self._get_dir()
         self.settings_dir.mkdir(exist_ok=True)
 
         # read config and credentials files
-        self.config = configparser.ConfigParser()
+        self.config = ConfigParser()
         self.config_file = self.settings_dir / "config"
         if self.config_file.exists():
             self.config.read(self.config_file)
 
-        self.credentials = configparser.ConfigParser()
+        self.credentials = ConfigParser()
         self.credentials_file = self.settings_dir / "credentials"
         if self.credentials_file.exists():
             self.credentials.read(self.credentials_file)
@@ -35,14 +36,14 @@ class Settings(object):
         if use_env:
             self._set_credentials_from_env()
 
-    def is_ok(self):
+    def is_ok(self) -> bool:
         return self.client_id is not None and self.client_secret is not None
 
-    def write(self):
+    def write(self) -> None:
         self.write_config()
         self.write_credentials()
 
-    def write_config(self):
+    def write_config(self) -> None:
         """Update config file.
 
         Update only when different from default value.
@@ -56,30 +57,30 @@ class Settings(object):
         with self.config_file.open("w") as f:
             self.config.write(f)
 
-    def write_credentials(self):
+    def write_credentials(self) -> None:
         """Update credentials file."""
         if not self.is_ok():
             raise ValueError("client_id or client_secret is invald.")
 
         self.credentials[self.profile_name] = {
-            "anymotion_client_id": self.client_id,
-            "anymotion_client_secret": self.client_secret,
+            "anymotion_client_id": self.client_id,  # type: ignore
+            "anymotion_client_secret": self.client_secret,  # type: ignore
         }
         with self.credentials_file.open("w") as f:
             self.credentials.write(f)
 
-    def _get_dir(self):
+    def _get_dir(self) -> Path:
         root_dir = os.getenv("ANYMOTION_ROOT", Path.home())
         return Path(root_dir) / ".anymotion"
 
-    def _set_default_values(self):
+    def _set_default_values(self) -> None:
         self.url = BASE_URL
         self.interval = POLLING_INTERVAL
         self.timeout = TIMEOUT
-        self.client_id = None
-        self.client_secret = None
+        self.client_id: Optional[str] = None
+        self.client_secret: Optional[str] = None
 
-    def _set_config_from_file(self, profile_name):
+    def _set_config_from_file(self, profile_name: str) -> None:
         if profile_name not in self.config.sections():
             return
         profile = self.config[profile_name]
@@ -96,16 +97,16 @@ class Settings(object):
         if timeout is not None:
             self.timeout = self._to_int_with_check(timeout, "timeout", 1)
 
-    def _to_int_with_check(self, value, name, min_value):
+    def _to_int_with_check(self, value: str, name: str, min_value: int) -> int:
         """Convert value to int
 
         Args:
-            value (str)
-            name (str)
-            min_value (int)
+            value
+            name
+            min_value
 
         Returns:
-            int: The converted value.
+            The converted value.
 
         Raises:
             SettingsValueError: If conversion is not possible or value is less
@@ -115,17 +116,17 @@ class Settings(object):
             Expected to be used in _set_config_from_file function.
         """
         try:
-            value = int(value)
+            x = int(value)
         except ValueError:
             message = f"The {name} value is invalid: {value}"
             raise SettingsValueError(message)
-        if value < min_value:
+        if x < min_value:
             th = min_value - 1
-            message = f"The {name} value must be greater than {th}: {value}"
+            message = f"The {name} value must be greater than {th}: {x}"
             raise SettingsValueError(message)
-        return value
+        return x
 
-    def _set_credentials_from_file(self, profile_name):
+    def _set_credentials_from_file(self, profile_name: str) -> None:
         if profile_name not in self.credentials.sections():
             return
         profile = self.credentials[profile_name]
@@ -138,7 +139,7 @@ class Settings(object):
         if client_secret is not None:
             self.client_secret = client_secret
 
-    def _set_credentials_from_env(self):
+    def _set_credentials_from_env(self) -> None:
         client_id = os.getenv("ANYMOTION_CLIENT_ID")
         if client_id is not None:
             self.client_id = client_id

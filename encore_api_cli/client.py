@@ -4,6 +4,12 @@ import json
 from pathlib import Path
 from textwrap import dedent
 import time
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Union
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
@@ -18,7 +24,14 @@ IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
 
 
 class Client(object):
-    def __init__(self, client_id, client_secret, base_url, interval, timeout):
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        base_url: str,
+        interval: int,
+        timeout: int,
+    ):
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -28,15 +41,15 @@ class Client(object):
         self.interval = max(1, interval)
         self.max_steps = max(1, timeout // interval)
 
-    def upload_to_s3(self, path):
+    def upload_to_s3(self, path: Union[str, Path]) -> Tuple[str, str]:
         """Upload movie or image to Amazon S3
 
         Args:
-            path (str or Path)
+            path
 
         Returns:
-            str: Created image_id or movie_id.
-            str: image or movie
+            Created image_id or movie_id.
+            image or movie
 
         Raises:
             InvalidFileType: Exception raised in _get_media_type function.
@@ -59,28 +72,27 @@ class Client(object):
 
         return media_id, media_type
 
-    def show_list(self, endpoint):
-        data = []
+    def show_list(self, endpoint: str) -> None:
+        data: List[Any] = []
         url = urljoin(self.api_url, f"{endpoint}/")
         while url:
             response = self._requests(requests.get, url)
             d, url = self._parse_response(response, ("data", "next"))
             data += d
-        data = json.dumps(data, indent=4)
-        print(data)
+        print(json.dumps(data, indent=4))
 
-    def extract_keypoint_from_image(self, image_id: int):
+    def extract_keypoint_from_image(self, image_id: int) -> int:
         return self._extract_keypoint({"image_id": image_id})
 
-    def extract_keypoint_from_movie(self, movie_id: int):
+    def extract_keypoint_from_movie(self, movie_id: int) -> int:
         return self._extract_keypoint({"movie_id": movie_id})
 
-    def wait_for_extraction(self, keypoint_id):
+    def wait_for_extraction(self, keypoint_id: int) -> str:
         url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
         status = self._wait_for_done(url)
         return status
 
-    def get_keypoint(self, keypoint_id):
+    def get_keypoint(self, keypoint_id: int) -> str:
         url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
         response = self._requests(requests.get, url)
         status, keypoint = self._parse_response(response, ("exec_status", "keypoint"))
@@ -91,7 +103,7 @@ class Client(object):
         else:
             return "Status is not SUCCESS."
 
-    def get_analysis(self, analysis_id):
+    def get_analysis(self, analysis_id: int) -> str:
         url = urljoin(self.api_url, f"analyses/{analysis_id}/")
         response = self._requests(requests.get, url)
         status, result = self._parse_response(response, ("exec_status", "result"))
@@ -102,7 +114,7 @@ class Client(object):
         else:
             return "Status is not SUCCESS."
 
-    def draw_keypoint(self, keypoint_id):
+    def draw_keypoint(self, keypoint_id: int) -> Optional[str]:
         url = urljoin(self.api_url, f"drawings/")
         data = {"keypoint_id": keypoint_id}
         response = self._requests(requests.post, url, data=data)
@@ -124,7 +136,7 @@ class Client(object):
 
         return drawing_url
 
-    def analyze_keypoint(self, keypoint_id):
+    def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
         url = urljoin(self.api_url, f"analyses/")
         data = {"keypoint_id": keypoint_id}
         response = self._requests(requests.post, url, data=data)
@@ -146,8 +158,10 @@ class Client(object):
 
         return result
 
-    def download(self, url, out_dir):
-        out_dir = Path(out_dir)
+    def download(self, url: str, out_dir: Union[str, Path]) -> None:
+        if isinstance(out_dir, str):
+            out_dir = Path(out_dir)
+
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / Path(urlparse(url).path).name
 
@@ -157,14 +171,14 @@ class Client(object):
 
         print(f"Downloaded the file to {path}.")
 
-    def _create_md5(self, path):
+    def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:
             md5 = hashlib.md5(f.read()).digest()
             encoded_content_md5 = base64.b64encode(md5)
             content_md5 = encoded_content_md5.decode()
         return content_md5
 
-    def _extract_keypoint(self, data: dict):
+    def _extract_keypoint(self, data: dict) -> int:
         """Extract keypoint
 
         Raises:
@@ -175,18 +189,24 @@ class Client(object):
         (keypoint_id,) = self._parse_response(response, ("id",))
         return keypoint_id
 
-    def _requests(self, requests_func, url, data=None, headers=None):
+    def _requests(
+        self,
+        requests_func: Callable,
+        url: str,
+        data: Optional[dict] = None,
+        headers: Optional[dict] = None,
+    ) -> requests.models.Response:
         """Make a requests to AnyMotion API or Amazon S3.
 
         Raises:
             RequestsError
         """
         if headers is None:
-            headers = self._get_headers(with_content_type=data)
-        data = json.dumps(data)
+            headers = self._get_headers(with_content_type=data is not None)
+        json_data = json.dumps(data)
 
         try:
-            response = requests_func(url, data=data, headers=headers)
+            response = requests_func(url, data=json_data, headers=headers)
         except requests.exceptions.ConnectionError:
             message = f"{requests_func.__name__.upper()} {url} is failed."
             raise RequestsError(message)
@@ -203,7 +223,7 @@ class Client(object):
 
         return response
 
-    def _get_headers(self, with_content_type=True):
+    def _get_headers(self, with_content_type: bool = True) -> dict:
         """Generate Authorization and Content-Type headers."""
         token = self._get_token()
         headers = {"Authorization": f"Bearer {token}"}
@@ -211,7 +231,7 @@ class Client(object):
             headers["Content-Type"] = "application/json"
         return headers
 
-    def _get_token(self):
+    def _get_token(self) -> str:
         """Get a token using client ID and secret."""
         data = {
             "grantType": "client_credentials",
@@ -224,15 +244,15 @@ class Client(object):
 
         return token
 
-    def _parse_response(self, response, keys):
-        response = response.json()
-        if not all(k in response for k in keys):
+    def _parse_response(self, response: requests.models.Response, keys: tuple) -> tuple:
+        res = response.json()
+        if not all(k in res for k in keys):
             print(f"Response does NOT contain {keys}")
-            print(f"response: {response}")
+            print(f"response: {res}")
             raise Exception("Invalid response")
-        return (response[k] for k in keys)
+        return tuple(res[k] for k in keys)
 
-    def _get_media_type(self, path):
+    def _get_media_type(self, path: Path) -> str:
         if self._is_movie(path):
             return "movie"
         elif self._is_image(path):
@@ -245,14 +265,14 @@ class Client(object):
             )
             raise InvalidFileType(message)
 
-    def _is_movie(self, path):
+    def _is_movie(self, path: Path) -> bool:
         return True if path.suffix in MOVIE_SUFFIXES else False
 
-    def _is_image(self, path):
+    def _is_image(self, path: Path) -> bool:
         return True if path.suffix in IMAGE_SUFFIXES else False
 
     @yaspin(text="Processing...")
-    def _wait_for_done(self, url):
+    def _wait_for_done(self, url: str) -> str:
         for _ in range(self.max_steps):
             response = self._requests(requests.get, url)
             (status,) = self._parse_response(response, ("exec_status",))

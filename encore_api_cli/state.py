@@ -2,7 +2,7 @@ import click
 
 
 class State(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.verbose = False
         self.profile = "default"
         self.format = "json"

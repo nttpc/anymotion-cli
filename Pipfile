@@ -16,6 +16,7 @@ requests-mock = "*"
 bandit = "*"
 tox = "*"
 black = "*"
+mypy = "*"
 
 [packages]
 click = "*"

@@ -35,13 +35,11 @@ def configure(ctx, state):
 def list(state):
     """Show the configuration you use."""
     settings = get_settings(state.profile)
+    none = click.style("None", fg="yellow")
 
     def hidden_credentials(string):
-        if string is None:
-            message = "Warning: client_id and/or client_secret not set."
-            click.echo(click.style(message, fg="yellow"))
-            click.echo()
-            return "None"
+        if string is None or len(string) == 0:
+            return none
         else:
             return string[-4:].rjust(20, "*")
 
@@ -59,3 +57,7 @@ def list(state):
         headers=["Name", "Value"],
     )
     click.echo(table)
+
+    if client_id == none or client_secret == none:
+        message = "\nWarning: client_id and/or client_secret not set."
+        click.secho(message, fg="yellow")
