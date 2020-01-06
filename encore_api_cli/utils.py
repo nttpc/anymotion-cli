@@ -7,6 +7,7 @@ from encore_api_cli.state import State
 
 
 def get_client(state: State) -> Client:
+    """Get client from state."""
     settings = get_settings(state.profile)
     if not settings.is_ok():
         message = (
@@ -26,6 +27,7 @@ def get_client(state: State) -> Client:
 
 
 def get_settings(profile: str, use_env: bool = True) -> Settings:
+    """Get settings from profile."""
     try:
         settings = Settings(profile, use_env=use_env)
     except SettingsValueError as e:

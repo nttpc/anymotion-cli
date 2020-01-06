@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
 from encore_api_cli.client import Client
 from encore_api_cli.commands.keypoint import cli

@@ -1,17 +1,15 @@
 import click
 
-from encore_api_cli.commands.draw import draw
-from encore_api_cli.commands.draw import draw_options
+from encore_api_cli.commands.draw import draw, draw_options
 from encore_api_cli.exceptions import RequestsError
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_message
-from encore_api_cli.output import write_success
+from encore_api_cli.output import write_message, write_success
 from encore_api_cli.state import pass_state
 from encore_api_cli.utils import get_client
 
 
 @click.group()
-def cli():
+def cli() -> None:  # noqa: D103
     pass
 
 

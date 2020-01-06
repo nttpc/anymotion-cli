@@ -1,11 +1,10 @@
 import json
 import sys
-from typing import Any
-from typing import Optional
+from typing import Any, Optional
 
 import click
-from pygments.formatters import TerminalFormatter
 from pygments import highlight
+from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
 
 STDOUT_ISATTY = sys.stdout.isatty()

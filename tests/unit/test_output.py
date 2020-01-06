@@ -2,10 +2,12 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.output import write_http
-from encore_api_cli.output import write_json_data
-from encore_api_cli.output import write_message
-from encore_api_cli.output import write_success
+from encore_api_cli.output import (
+    write_http,
+    write_json_data,
+    write_message,
+    write_success,
+)
 
 
 @pytest.mark.parametrize("stdout_isatty, expected", [(True, "message\n"), (False, "")])

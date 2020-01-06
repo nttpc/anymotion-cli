@@ -4,6 +4,7 @@ from encore_api_cli.state import State
 
 
 def verbose_option(f):
+    """Set verbose option."""
     def callback(ctx, param, value):
         state = ctx.ensure_object(State)
         state.verbose = value
@@ -20,6 +21,7 @@ def verbose_option(f):
 
 
 def profile_option(f):
+    """Set profile option."""
     def callback(ctx, param, value):
         state = ctx.ensure_object(State)
         state.profile = value
@@ -35,6 +37,7 @@ def profile_option(f):
 
 
 def common_options(f):
+    """Set common options."""
     f = profile_option(f)
     f = verbose_option(f)
     return f

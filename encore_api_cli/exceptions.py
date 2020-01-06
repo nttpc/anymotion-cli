@@ -1,5 +1,4 @@
-from typing import Any
-from typing import Optional
+from typing import Any, Optional
 
 import click
 from click._compat import get_text_stderr
@@ -7,6 +6,7 @@ from click._compat import get_text_stderr
 
 class ClickException(click.ClickException):
     def show(self, file: Optional[Any] = None) -> None:
+        """Show error message."""
         if file is None:
             file = get_text_stderr()
         click.echo(

@@ -1,23 +1,16 @@
 import base64
 import hashlib
 import json
+import time
 from pathlib import Path
 from textwrap import dedent
-import time
-from typing import Any
-from typing import Callable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Union
-from urllib.parse import urljoin
-from urllib.parse import urlparse
+from typing import Any, Callable, List, Optional, Tuple, Union
+from urllib.parse import urljoin, urlparse
 
 import requests
 from yaspin import yaspin
 
-from encore_api_cli.exceptions import InvalidFileType
-from encore_api_cli.exceptions import RequestsError
+from encore_api_cli.exceptions import InvalidFileType, RequestsError
 from encore_api_cli.output import write_http
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
@@ -46,7 +39,7 @@ class Client(object):
         self.verbose = verbose
 
     def upload_to_s3(self, path: Union[str, Path]) -> Tuple[str, str]:
-        """Upload movie or image to Amazon S3
+        """Upload movie or image to Amazon S3.
 
         Args:
             path: The path of the file to upload.
@@ -71,12 +64,13 @@ class Client(object):
         response = self._requests(requests.post, url, data)
         media_id, upload_url = self._parse_response(response, ("id", "upload_url"))
         # Upload to S3
-        # TODO(y_kumiha): use self._requests
+        # TODO: use self._requests
         requests.put(upload_url, path.open("rb"), headers={"Content-MD5": content_md5})
 
         return media_id, media_type
 
     def show_list(self, endpoint: str) -> None:
+        """Show list."""
         data: List[Any] = []
         url = urljoin(self.api_url, f"{endpoint}/")
         while url:
@@ -86,17 +80,21 @@ class Client(object):
         print(json.dumps(data, indent=4))
 
     def extract_keypoint_from_image(self, image_id: int) -> int:
+        """Extract keypoint using image_id."""
         return self._extract_keypoint({"image_id": image_id})
 
     def extract_keypoint_from_movie(self, movie_id: int) -> int:
+        """Extract keypoint using movie_id."""
         return self._extract_keypoint({"movie_id": movie_id})
 
     def wait_for_extraction(self, keypoint_id: int) -> str:
+        """Wait for extraction."""
         url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
         status = self._wait_for_done(url)
         return status
 
     def get_keypoint(self, keypoint_id: int) -> str:
+        """Get keypoint using keypoint_id."""
         url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
         response = self._requests(requests.get, url)
         status, keypoint = self._parse_response(response, ("exec_status", "keypoint"))
@@ -108,6 +106,7 @@ class Client(object):
             return "Status is not SUCCESS."
 
     def get_analysis(self, analysis_id: int) -> str:
+        """Get result of analysis using analysis_id."""
         url = urljoin(self.api_url, f"analyses/{analysis_id}/")
         response = self._requests(requests.get, url)
         status, result = self._parse_response(response, ("exec_status", "result"))
@@ -119,6 +118,7 @@ class Client(object):
             return "Status is not SUCCESS."
 
     def draw_keypoint(self, keypoint_id: int) -> Optional[str]:
+        """Draw keypoint."""
         url = urljoin(self.api_url, f"drawings/")
         data = {"keypoint_id": keypoint_id}
         response = self._requests(requests.post, url, data=data)
@@ -141,6 +141,7 @@ class Client(object):
         return drawing_url
 
     def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
+        """Analyze keypoint."""
         url = urljoin(self.api_url, f"analyses/")
         data = {"keypoint_id": keypoint_id}
         response = self._requests(requests.post, url, data=data)
@@ -163,6 +164,7 @@ class Client(object):
         return result
 
     def download(self, url: str, out_dir: Union[str, Path]) -> None:
+        """Download file."""
         if isinstance(out_dir, str):
             out_dir = Path(out_dir)
 
@@ -183,7 +185,7 @@ class Client(object):
         return content_md5
 
     def _extract_keypoint(self, data: dict) -> int:
-        """Extract keypoint
+        """Extract keypoint.
 
         Raises:
             RequestsError: Exception raised in _requests function.

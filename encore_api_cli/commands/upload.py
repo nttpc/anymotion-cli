@@ -1,16 +1,14 @@
 import click
 
-from encore_api_cli.exceptions import InvalidFileType
-from encore_api_cli.exceptions import RequestsError
+from encore_api_cli.exceptions import InvalidFileType, RequestsError
 from encore_api_cli.options import common_options
 from encore_api_cli.output import write_success
-from encore_api_cli.state import pass_state
-from encore_api_cli.state import State
+from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import get_client
 
 
 @click.group()
-def cli() -> None:
+def cli() -> None:  # noqa: D103
     pass
 
 

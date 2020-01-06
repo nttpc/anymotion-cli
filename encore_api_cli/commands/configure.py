@@ -7,7 +7,7 @@ from encore_api_cli.utils import get_settings
 
 
 @click.group()
-def cli():
+def cli() -> None:  # noqa: D103
     pass
 
 

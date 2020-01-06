@@ -1,8 +1,8 @@
 from pathlib import Path
 from textwrap import dedent
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
 from encore_api_cli.commands.configure import cli
 

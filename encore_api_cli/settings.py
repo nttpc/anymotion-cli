@@ -1,5 +1,5 @@
-from configparser import ConfigParser
 import os
+from configparser import ConfigParser
 from pathlib import Path
 from typing import Optional
 
@@ -37,9 +37,11 @@ class Settings(object):
             self._set_credentials_from_env()
 
     def is_ok(self) -> bool:
+        """Whether credentials are valid value."""
         return self.client_id is not None and self.client_secret is not None
 
     def write(self) -> None:
+        """Update config and credentials file."""
         self.write_config()
         self.write_credentials()
 
@@ -98,7 +100,7 @@ class Settings(object):
             self.timeout = self._to_int_with_check(timeout, "timeout", 1)
 
     def _to_int_with_check(self, value: str, name: str, min_value: int) -> int:
-        """Convert value to int
+        """Convert value to int.
 
         Args:
             value

@@ -4,19 +4,19 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+bandit = "*"
+black = "*"
 encore-api-cli = {editable = true,path = "."}
 flake8 = "*"
-hacking = "*"
+flake8-docstrings = "*"
 isort = "*"
+mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
 pytest-watch = "*"
 requests-mock = "*"
-bandit = "*"
 tox = "*"
-black = "*"
-mypy = "*"
 
 [packages]
 click = "*"

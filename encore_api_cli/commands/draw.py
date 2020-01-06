@@ -6,6 +6,7 @@ from encore_api_cli.utils import get_client
 
 
 def draw_options(f):
+    """Set draw options."""
     f = click.option(
         "-o",
         "--out_dir",
@@ -19,7 +20,7 @@ def draw_options(f):
 
 
 @click.group()
-def cli():
+def cli() -> None:  # noqa: D103
     pass
 
 
@@ -33,6 +34,6 @@ def draw(state, keypoint_id, out_dir, no_download):
     c = get_client(state)
     url = c.draw_keypoint(keypoint_id)
 
-    # TODO(y_kumiha): すでにファイルが存在する場合
+    # TODO: すでにファイルが存在する場合
     if url is not None and not no_download:
         c.download(url, out_dir)
