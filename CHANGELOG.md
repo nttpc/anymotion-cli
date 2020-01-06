@@ -2,6 +2,7 @@
 
 ## 0.6.0
 
+- Added new `download` command to download the drawn file
 - Added environment variables to the way to tell about credentials
 - Added assertions for some commands and config values
 - Improved display by adding a spinner and adding color

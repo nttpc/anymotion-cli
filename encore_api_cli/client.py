@@ -250,8 +250,8 @@ class Client(object):
         else:
             suffix = MOVIE_SUFFIXES + IMAGE_SUFFIXES
             message = (
-                f"File {path} must have a {', '.join(suffix[:-1])} "
-                f"or {suffix[-1]} extension."
+                f"The extension of the file {path} must be"
+                f"{', '.join(suffix[:-1])} or {suffix[-1]}."
             )
             raise InvalidFileType(message)
 

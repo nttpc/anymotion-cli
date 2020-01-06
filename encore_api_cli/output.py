@@ -9,6 +9,7 @@ from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
 from yaspin.core import Yaspin
 
+# TODO: use environment
 STDOUT_ISATTY = sys.stdout.isatty()
 
 

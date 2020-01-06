@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Union
+
 import click
 
 from encore_api_cli.client import Client
@@ -40,6 +43,6 @@ def color_id(number: int) -> str:
     return click.style(str(number), fg="cyan")
 
 
-def color_path(path: str) -> str:
+def color_path(path: Union[str, Path]) -> str:
     """Set color to path."""
     return click.style(str(path), fg="blue")

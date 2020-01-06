@@ -12,6 +12,7 @@ from encore_api_cli.cli import cli
         "analysis",
         "analyze",
         "configure",
+        "download",
         "draw",
         "image",
         "keypoint",

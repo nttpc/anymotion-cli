@@ -39,6 +39,7 @@ def draw(state, keypoint_id, out_dir, no_download):
     drawing_id = c.draw_keypoint(keypoint_id)
     write_message(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
 
+    # TODO: invoke download command
     status, url = c.wait_for_drawing(drawing_id)
     if status == "SUCCESS":
         write_success("Drawing is complete.")
@@ -53,10 +54,6 @@ def draw(state, keypoint_id, out_dir, no_download):
             write_message(f"File already exists: {color_path(path)}")
             if not click.confirm("Do you want to overwrite?"):
                 write_message("Skip download.")
-                # write_message(
-                #     "Skip download. To download it, run the following command."
-                # )
-                # write_message(f"\nencore download {drawing_id}")
                 return
         c.download(url, path)
         write_message(f"Downloaded the file to {color_path(path)}.")

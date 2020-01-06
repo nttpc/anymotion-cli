@@ -18,7 +18,7 @@ def test_upload(mocker, tmp_path):
 
 def test_upload_with_InvalidFileType(mocker, tmp_path):
     message = (
-        f"File {tmp_path} must have " "a .mp4, .mov, .jpg, .jpeg or .png extension."
+        f"The extension of the file {tmp_path} must be .mp4, .mov, .jpg, .jpeg or .png."
     )
     client_mock = mocker.MagicMock()
     client_mock.return_value.upload_to_s3.side_effect = InvalidFileType(message)
