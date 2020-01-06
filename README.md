@@ -70,14 +70,14 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  analysis   Manege analyses.
-  analyze    Analyze keypoints data and get information such as angles.
-  configure  Configure your AnyMotion Access Token.
+  analysis   Show analysis results.
+  analyze    Analyze the extracted keypoint data.
+  configure  Configure your AnyMotion Credentials.
   draw       Draw keypoints on uploaded movie or image.
-  image      Manege images.
+  image      Show the information of the uploaded images.
   keypoint   Extract keypoints and show the list.
-  movie      Manege movies.
-  upload     Upload a local movie or image to cloud storage.
+  movie      Show the information of the uploaded movies.
+  upload     Upload the local movie or image file to the cloud storage.
 ```
 
 ### Examples
@@ -94,12 +94,15 @@ Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
 
 ``` sh
-$ encore keypoint extract --image_id 111 --with_drawing
+$ encore keypoint extract --image_id 111
 Keypoint extraction started. (keypoint_id: 222)
 Success: Keypoint extraction is complete.
+```
 
-Keypoint drawing is started. (drawing_id: 333)
-Success: Keypoint drawing is complete.
+``` sh
+$ encore draw --keypoint_id 222
+Drawing is started. (drawing_id: 333)
+Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```
 

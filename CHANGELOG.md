@@ -3,8 +3,9 @@
 ## 0.6.0
 
 - Added environment variables to the way to tell about credentials
-- Added assertions for `upload` and `keypoint extract` command and config values
-- Improve display using `configure list` command
+- Added assertions for some commands and config values
+- Improved display by adding a spinner and adding color
+- Changed to output stdout for each command instead of `client` class
 - Split the credentials file from the config file
 
 ## 0.5.3

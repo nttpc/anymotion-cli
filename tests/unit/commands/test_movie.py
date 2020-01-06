@@ -28,4 +28,4 @@ def test_movie_list(mocker, requests_mock):
     result = runner.invoke(cli, ["movie", "list"])
 
     assert result.exit_code == 0
-    assert result.output == "[]\n"
+    assert result.output == "[]\n\n"

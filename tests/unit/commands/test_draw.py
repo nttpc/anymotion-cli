@@ -5,7 +5,8 @@ from encore_api_cli.commands.draw import cli
 
 def test_draw(mocker):
     client_mock = mocker.MagicMock()
-    client_mock.return_value.draw_keypoint.return_value = "url"
+    client_mock.return_value.draw_keypoint.return_value = 2
+    client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
     client_mock.return_value.download.return_value = None
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
 

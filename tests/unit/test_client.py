@@ -46,109 +46,99 @@ class TestUpload(object):
 
 
 class TestExtractKeypoint(object):
-    def test_画像からキーポイント抽出ができること(self, requests_mock, client):
-        keypoint_id = 1
-
+    def test_画像からキーポイント抽出を開始できること(self, requests_mock, client):
+        image_id = 111
+        expected_keypoint_id = 222
         requests_mock.post(
-            urljoin(client.api_url, "keypoints/"), json={"id": keypoint_id}
+            urljoin(client.api_url, "keypoints/"), json={"id": expected_keypoint_id}
         )
+
+        keypoint_id = client.extract_keypoint_from_image(image_id)
+
+        assert keypoint_id == expected_keypoint_id
+
+    def test_動画からキーポイント抽出を開始できること(self, requests_mock, client):
+        movie_id = 111
+        expected_keypoint_id = 222
+        requests_mock.post(
+            urljoin(client.api_url, "keypoints/"), json={"id": expected_keypoint_id}
+        )
+
+        keypoint_id = client.extract_keypoint_from_movie(movie_id)
+
+        assert keypoint_id == expected_keypoint_id
+
+    def test_キーポイント抽出を完了できること(self, requests_mock, client):
+        keypoint_id = 1
         requests_mock.get(
             urljoin(client.api_url, f"keypoints/{keypoint_id}/"),
             json={"exec_status": "SUCCESS"},
         )
 
-        result = client.extract_keypoint_from_image(1)
+        status = client.wait_for_extraction(keypoint_id)
 
-        assert result == keypoint_id
+        assert status == "SUCCESS"
 
-    def test_動画からキーポイント抽出ができること(self, requests_mock, client):
+
+class TestDrawingKeypoint(object):
+    def test_キーポイント描画を開始できること(self, requests_mock, client):
         keypoint_id = 1
-
+        expected_drawing_id = 1
         requests_mock.post(
-            urljoin(client.api_url, "keypoints/"), json={"id": keypoint_id}
+            f"{client.api_url}drawings/", json={"id": expected_drawing_id}
         )
+
+        drawing_id = client.draw_keypoint(keypoint_id)
+
+        assert drawing_id == expected_drawing_id
+
+    def test_キーポイント描画を完了できること(self, requests_mock, client):
+        drawing_id = 1
+        expected_drawing_url = "http://drawing_url.example.com"
         requests_mock.get(
-            urljoin(client.api_url, f"keypoints/{keypoint_id}/"),
-            json={"exec_status": "SUCCESS"},
+            f"{client.api_url}drawings/{drawing_id}/",
+            json={"exec_status": "SUCCESS", "drawing_url": expected_drawing_url},
         )
 
-        result = client.extract_keypoint_from_movie(1)
+        status, drawing_url = client.wait_for_drawing(drawing_id)
 
-        assert result == keypoint_id
-
-
-def test_キーポイントデータを取得できること(requests_mock, client):
-    keypoint_id = 1
-    expected_keypoint = "[]"
-    # expected_keypoint = '[{"0": [1, 2]}]'
-
-    requests_mock.get(
-        urljoin(client.api_url, f"keypoints/{keypoint_id}/"),
-        json={"exec_status": "SUCCESS", "keypoint": expected_keypoint},
-    )
-
-    keypoint = client.get_keypoint(keypoint_id)
-
-    assert keypoint == expected_keypoint
+        assert status == "SUCCESS"
+        assert drawing_url == expected_drawing_url
 
 
-def test_解析結果を取得できること(requests_mock, client):
-    analysis_id = 1
-    expected_result = "[]"
+class TestAnalysisKeypoint(object):
+    def test_キーポイント解析を開始できること(self, requests_mock, client):
+        keypoint_id = 111
+        expected_analysis_id = 222
+        requests_mock.post(
+            f"{client.api_url}analyses/", json={"id": expected_analysis_id}
+        )
 
-    requests_mock.get(
-        urljoin(client.api_url, f"analyses/{analysis_id}/"),
-        json={"exec_status": "SUCCESS", "result": expected_result},
-    )
+        analysis_id = client.analyze_keypoint(keypoint_id)
 
-    result = client.get_analysis(analysis_id)
+        assert analysis_id == expected_analysis_id
 
-    assert result == expected_result
+    def test_キーポイント解析を完了できること(self, requests_mock, client):
+        analysis_id = 222
+        requests_mock.get(
+            f"{client.api_url}analyses/{analysis_id}/",
+            json={"exec_status": "SUCCESS", "result": "[]"},
+        )
 
+        status = client.wait_for_analysis(analysis_id)
 
-def test_キーポイントを描画できること(requests_mock, client):
-    keypoint_id = 1
-    drawing_id = 1
-    expected_drawing_url = "http://drawing_url.example.com"
-
-    requests_mock.post(f"{client.api_url}drawings/", json={"id": drawing_id})
-    requests_mock.get(
-        f"{client.api_url}drawings/{drawing_id}/",
-        json={"exec_status": "SUCCESS", "drawing_url": expected_drawing_url},
-    )
-
-    drawing_url = client.draw_keypoint(keypoint_id)
-
-    assert drawing_url == expected_drawing_url
-
-
-def test_キーポイントの解析ができること(requests_mock, client):
-    keypoint_id = 1
-    analysis_id = 1
-    expected_result = "[]"
-
-    requests_mock.post(f"{client.api_url}analyses/", json={"id": analysis_id})
-    requests_mock.get(
-        f"{client.api_url}analyses/{analysis_id}/",
-        json={"exec_status": "SUCCESS", "result": expected_result},
-    )
-
-    result = client.analyze_keypoint(keypoint_id)
-
-    assert result == expected_result
+        assert status == "SUCCESS"
 
 
 def test_ファイルをダウンロードできること(mocker, requests_mock, client, tmpdir):
-    tmpdir = Path(tmpdir)
     url = "http://download.example.com/image.jpg"
-    path = tmpdir / "image.jpg"
+    path = Path(tmpdir) / "image.jpg"
 
     requests_mock.get(url, content=b"image data")
-    mkdir_mock = mocker.MagicMock()
-    mocker.patch("pathlib.Path.mkdir", mkdir_mock)
+    mocker.patch("pathlib.Path.mkdir", mocker.MagicMock())
 
     assert not path.exists()
 
-    client.download(url, tmpdir)
+    client.download(url, path)
 
     assert path.exists()

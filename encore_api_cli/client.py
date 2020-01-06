@@ -1,17 +1,15 @@
 import base64
 import hashlib
-import json
 import time
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Callable, List, Optional, Tuple, Union
-from urllib.parse import urljoin, urlparse
+from typing import Callable, List, Optional, Tuple, Union
+from urllib.parse import urljoin
 
 import requests
-from yaspin import yaspin
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import write_http
+from encore_api_cli.output import spin, write_http
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -38,7 +36,18 @@ class Client(object):
 
         self.verbose = verbose
 
-    def upload_to_s3(self, path: Union[str, Path]) -> Tuple[str, str]:
+    def get_info(
+        self, endpoint: str, endpoint_id: int = None
+    ) -> Union[List[dict], dict]:
+        """Get infomation."""
+        if endpoint_id is None:
+            url = urljoin(self.api_url, f"{endpoint}/")
+            return self._get_list(url)
+        else:
+            url = urljoin(self.api_url, f"{endpoint}/{endpoint_id}/")
+            return self._get_one(url)
+
+    def upload_to_s3(self, path: Union[str, Path]) -> Tuple[int, str]:
         """Upload movie or image to Amazon S3.
 
         Args:
@@ -59,33 +68,44 @@ class Client(object):
         content_md5 = self._create_md5(path)
 
         # Register movie or image
-        data = {"origin_key": path.name, "content_md5": content_md5}
-        url = urljoin(self.api_url, f"{media_type}s/")
-        response = self._requests(requests.post, url, data)
+        response = self._requests(
+            requests.post,
+            urljoin(self.api_url, f"{media_type}s/"),
+            json={"origin_key": path.name, "content_md5": content_md5},
+        )
         media_id, upload_url = self._parse_response(response, ("id", "upload_url"))
+
         # Upload to S3
-        # TODO: use self._requests
-        requests.put(upload_url, path.open("rb"), headers={"Content-MD5": content_md5})
+        self._requests(
+            requests.put,
+            upload_url,
+            data=path.open("rb"),
+            headers={"Content-MD5": content_md5},
+        )
 
         return media_id, media_type
 
-    def show_list(self, endpoint: str) -> None:
-        """Show list."""
-        data: List[Any] = []
-        url = urljoin(self.api_url, f"{endpoint}/")
-        while url:
-            response = self._requests(requests.get, url)
-            d, url = self._parse_response(response, ("data", "next"))
-            data += d
-        print(json.dumps(data, indent=4))
-
     def extract_keypoint_from_image(self, image_id: int) -> int:
-        """Extract keypoint using image_id."""
+        """Start keypoint extraction for image_id."""
         return self._extract_keypoint({"image_id": image_id})
 
     def extract_keypoint_from_movie(self, movie_id: int) -> int:
-        """Extract keypoint using movie_id."""
+        """Start keypoint extraction for movie_id."""
         return self._extract_keypoint({"movie_id": movie_id})
+
+    def draw_keypoint(self, keypoint_id: int) -> int:
+        """Start drawing for keypoint_id."""
+        url = urljoin(self.api_url, f"drawings/")
+        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        (drawing_id,) = self._parse_response(response, ("id",))
+        return drawing_id
+
+    def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
+        """Start analyze for keypoint_id."""
+        url = urljoin(self.api_url, f"analyses/")
+        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        (analysis_id,) = self._parse_response(response, ("id",))
+        return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> str:
         """Wait for extraction."""
@@ -93,89 +113,27 @@ class Client(object):
         status = self._wait_for_done(url)
         return status
 
-    def get_keypoint(self, keypoint_id: int) -> str:
-        """Get keypoint using keypoint_id."""
-        url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
-        response = self._requests(requests.get, url)
-        status, keypoint = self._parse_response(response, ("exec_status", "keypoint"))
-        if status == "SUCCESS":
-            keypoint = json.loads(keypoint)
-            keypoint = json.dumps(keypoint, indent=4)
-            return keypoint
-        else:
-            return "Status is not SUCCESS."
-
-    def get_analysis(self, analysis_id: int) -> str:
-        """Get result of analysis using analysis_id."""
-        url = urljoin(self.api_url, f"analyses/{analysis_id}/")
-        response = self._requests(requests.get, url)
-        status, result = self._parse_response(response, ("exec_status", "result"))
-        if status == "SUCCESS":
-            result = json.loads(result)
-            result = json.dumps(result, indent=4)
-            return result
-        else:
-            return "Status is not SUCCESS."
-
-    def draw_keypoint(self, keypoint_id: int) -> Optional[str]:
-        """Draw keypoint."""
-        url = urljoin(self.api_url, f"drawings/")
-        data = {"keypoint_id": keypoint_id}
-        response = self._requests(requests.post, url, data=data)
-        (drawing_id,) = self._parse_response(response, ("id",))
-
-        print(f"Draw keypoint (drawing_id: {drawing_id})")
+    def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
+        """Wait for drawing."""
         url = urljoin(self.api_url, f"drawings/{drawing_id}/")
         status = self._wait_for_done(url)
-
         drawing_url = None
         if status == "SUCCESS":
             response = self._requests(requests.get, url)
             (drawing_url,) = self._parse_response(response, ("drawing_url",))
-            print("Keypoint drawing is complete.")
-        elif status == "FAILURE":
-            print("Keypoint drawing failed.")
-        else:
-            print("Keypoint drawing is timed out.")
+        return status, drawing_url
 
-        return drawing_url
-
-    def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
-        """Analyze keypoint."""
-        url = urljoin(self.api_url, f"analyses/")
-        data = {"keypoint_id": keypoint_id}
-        response = self._requests(requests.post, url, data=data)
-        (analysis_id,) = self._parse_response(response, ("id",))
-
-        print(f"Analyze keypoint (analysis_id: {analysis_id})")
+    def wait_for_analysis(self, analysis_id: int) -> str:
+        """Wait for analysis."""
         url = urljoin(self.api_url, f"analyses/{analysis_id}/")
         status = self._wait_for_done(url)
+        return status
 
-        result = None
-        if status == "SUCCESS":
-            response = self._requests(requests.get, url)
-            (result,) = self._parse_response(response, ("result",))
-            print("Keypoint analysis is complete.")
-        elif status == "FAILURE":
-            print("Keypoint analysis failed.")
-        else:
-            print("Keypoint analysis is timed out.")
-
-        return result
-
-    def download(self, url: str, out_dir: Union[str, Path]) -> None:
-        """Download file."""
-        if isinstance(out_dir, str):
-            out_dir = Path(out_dir)
-
-        out_dir.mkdir(parents=True, exist_ok=True)
-        path = out_dir / Path(urlparse(url).path).name
-
+    def download(self, url: str, path: Path) -> None:
+        """Download file from url."""
         response = self._requests(requests.get, url, headers={})
         with path.open("wb") as f:
             f.write(response.content)
-
-        print(f"Downloaded the file to {path}.")
 
     def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:
@@ -184,6 +142,19 @@ class Client(object):
             content_md5 = encoded_content_md5.decode()
         return content_md5
 
+    def _get_one(self, url: str) -> dict:
+        response = self._requests(requests.get, url)
+        return response.json()
+
+    @spin(text="Retrieving...")
+    def _get_list(self, url: str) -> List[dict]:
+        data: List[dict] = []
+        while url:
+            response = self._requests(requests.get, url)
+            sub_data, url = self._parse_response(response, ("data", "next"))
+            data += sub_data
+        return data
+
     def _extract_keypoint(self, data: dict) -> int:
         """Extract keypoint.
 
@@ -191,7 +162,7 @@ class Client(object):
             RequestsError: Exception raised in _requests function.
         """
         url = urljoin(self.api_url, "keypoints/")
-        response = self._requests(requests.post, url, data)
+        response = self._requests(requests.post, url, json=data)
         (keypoint_id,) = self._parse_response(response, ("id",))
         return keypoint_id
 
@@ -199,7 +170,8 @@ class Client(object):
         self,
         requests_func: Callable,
         url: str,
-        data: Optional[dict] = None,
+        json: Optional[dict] = None,
+        data: Optional[object] = None,
         headers: Optional[dict] = None,
     ) -> requests.models.Response:
         """Make a requests to AnyMotion API or Amazon S3.
@@ -208,14 +180,19 @@ class Client(object):
             RequestsError
         """
         method = requests_func.__name__.upper()
+        is_json = json is not None
+
         if headers is None:
-            headers = self._get_headers(with_content_type=data is not None)
+            headers = self._get_headers(with_content_type=is_json)
 
         if self.verbose:
-            write_http(url, method, headers, data)
+            write_http(url, method, headers, json)
 
         try:
-            response = requests_func(url, json=data, headers=headers)
+            if is_json:
+                response = requests_func(url, json=json, headers=headers)
+            else:
+                response = requests_func(url, data=data, headers=headers)
         except requests.exceptions.ConnectionError:
             message = f"{method} {url} is failed."
             raise RequestsError(message)
@@ -247,8 +224,12 @@ class Client(object):
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        headers = {"Content-Type": "application/json"}
-        response = self._requests(requests.post, self.oauth_url, data, headers)
+        response = self._requests(
+            requests.post,
+            self.oauth_url,
+            json=data,
+            headers={"Content-Type": "application/json"},
+        )
         (token,) = self._parse_response(response, ("accessToken",))
 
         return token
@@ -280,7 +261,7 @@ class Client(object):
     def _is_image(self, path: Path) -> bool:
         return True if path.suffix in IMAGE_SUFFIXES else False
 
-    @yaspin(text="Processing...")
+    @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
         for _ in range(self.max_steps):
             response = self._requests(requests.get, url)

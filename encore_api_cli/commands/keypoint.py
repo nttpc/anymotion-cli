@@ -1,11 +1,13 @@
+import json
+
 import click
 
 from encore_api_cli.commands.draw import draw, draw_options
 from encore_api_cli.exceptions import RequestsError
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_message, write_success
+from encore_api_cli.output import write_json_data, write_message, write_success
 from encore_api_cli.state import pass_state
-from encore_api_cli.utils import get_client
+from encore_api_cli.utils import color_id, get_client
 
 
 @click.group()
@@ -20,12 +22,28 @@ def keypoint():
 
 
 @keypoint.command()
+@click.argument("keypoint_id", type=int)
+@common_options
+@pass_state
+def show(state, keypoint_id):
+    """Show extracted keypoint data."""
+    c = get_client(state)
+    response = c.get_info("keypoints", keypoint_id)
+    status = response.get("exec_status", "FAILURE")
+    if status == "SUCCESS":
+        keypoint = response.get("keypoint")
+        write_json_data(json.loads(keypoint), sort_keys=False)
+    else:
+        write_message("Status is not SUCCESS.")
+
+
+@keypoint.command()
 @common_options
 @pass_state
 def list(state):
-    """Show keypoint list."""
+    """Show a list of information for all keypoints."""
     c = get_client(state)
-    c.show_list("keypoints")
+    write_json_data(c.get_info("keypoints"), sort_keys=False)
 
 
 @keypoint.command()
@@ -62,9 +80,7 @@ def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, no_download):
             keypoint_id = c.extract_keypoint_from_image(image_id)
 
         write_message(
-            "Keypoint extraction started. (keypoint_id: {keypoint_id})".format(
-                keypoint_id=click.style(str(keypoint_id), fg="cyan")
-            )
+            f"Keypoint extraction started. (keypoint_id: {color_id(keypoint_id)})"
         )
         status = c.wait_for_extraction(keypoint_id)
     except RequestsError as e:
@@ -82,14 +98,3 @@ def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, no_download):
         ctx.invoke(
             draw, keypoint_id=keypoint_id, out_dir=out_dir, no_download=no_download
         )
-
-
-@keypoint.command()
-@click.argument("keypoint_id", type=int)
-@common_options
-@pass_state
-def show(state, keypoint_id):
-    """Display extracted keypoint data in JSON format."""
-    c = get_client(state)
-    keypoint = c.get_keypoint(keypoint_id)
-    click.echo(keypoint)

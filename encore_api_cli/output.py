@@ -1,3 +1,4 @@
+import functools
 import json
 import sys
 from typing import Any, Optional
@@ -6,6 +7,7 @@ import click
 from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
+from yaspin.core import Yaspin
 
 STDOUT_ISATTY = sys.stdout.isatty()
 
@@ -32,21 +34,14 @@ def write_success(message: str, **kwargs: Any) -> None:
 
 
 def write_json_data(
-    data: object,
-    with_format: bool = True,
-    with_color: bool = True,
-    stdout_isatty: bool = STDOUT_ISATTY,
+    data: object, sort_keys: bool = True, stdout_isatty: bool = STDOUT_ISATTY,
 ) -> None:
     """Output json data."""
     if stdout_isatty:
         click.echo()
 
-    if with_format:
-        body = json.dumps(data, sort_keys=True, indent=2)
-    else:
-        body = json.dumps(data)
-    if with_color:
-        body = highlight(body, JsonLexer(), TerminalFormatter())
+    body = json.dumps(data, sort_keys=sort_keys, indent=2)
+    body = highlight(body, JsonLexer(), TerminalFormatter())
     click.echo(body)
 
 
@@ -69,3 +64,32 @@ def write_http(
 
     if data is not None:
         write_json_data(data, **kwargs)
+
+
+def spin(stdout_isatty: bool = STDOUT_ISATTY, *args, **kwargs):
+    """Display spinner in terminal."""
+    if stdout_isatty:
+        return Yaspin(*args, **kwargs)
+    else:
+        return Nospin()
+
+
+class Nospin:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        pass
+
+    def __call__(self, fn):
+        """Call."""
+
+        @functools.wraps(fn)
+        def inner(*args, **kwargs):
+            with self:
+                return fn(*args, **kwargs)
+
+        return inner

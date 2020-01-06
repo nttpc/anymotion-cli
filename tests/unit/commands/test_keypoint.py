@@ -18,6 +18,36 @@ def test_keypoint():
     assert result.exit_code == 0
 
 
+def test_keypoint_show(mocker, requests_mock):
+    client_mock = mocker.MagicMock()
+    client_mock.return_value.get_info.return_value = {
+        "id": 1,
+        "keypoint": '[{"1": [143, 195]}]',
+        "exec_status": "SUCCESS",
+    }
+    mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["keypoint", "show", "1"])
+
+    assert client_mock.call_count == 1
+
+    assert result.exit_code == 0
+    assert result.output == dedent(
+        """\
+            [
+              {
+                "1": [
+                  143,
+                  195
+                ]
+              }
+            ]
+
+        """
+    )
+
+
 def test_keypoint_list(mocker, requests_mock):
     client_mock = mocker.MagicMock(
         return_value=Client("client_id", "client_secret", base_url, 5, 600)
@@ -33,7 +63,7 @@ def test_keypoint_list(mocker, requests_mock):
     assert client_mock.call_count == 1
 
     assert result.exit_code == 0
-    assert result.output == "[]\n"
+    assert result.output == "[]\n\n"
 
 
 def test_keypoint_extract_movie(mocker):
@@ -84,7 +114,8 @@ def test_keypoint_extract_with_drawing(mocker):
     client_mock.return_value.wait_for_extraction.return_value = "SUCCESS"
     extract_keypoint_mock = client_mock.return_value.extract_keypoint_from_image
     extract_keypoint_mock.return_value = keypoint_id
-    client_mock.return_value.draw_keypoint.return_value = "url"
+    client_mock.return_value.draw_keypoint.return_value = 333
+    client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
     client_mock.return_value.download.return_value = None
     mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)

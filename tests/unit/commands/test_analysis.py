@@ -30,4 +30,4 @@ def test_analysis_list(mocker, requests_mock):
     assert client_mock.call_count == 1
 
     assert result.exit_code == 0
-    assert result.output == "[]\n"
+    assert result.output == "[]\n\n"
