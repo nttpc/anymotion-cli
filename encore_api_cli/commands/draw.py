@@ -30,8 +30,9 @@ def cli():
 @pass_state
 def draw(state, keypoint_id, out_dir, no_download):
     """Draw keypoints on uploaded movie or image."""
-    c = get_client(state.profile)
+    c = get_client(state)
     url = c.draw_keypoint(keypoint_id)
 
+    # TODO(y_kumiha): すでにファイルが存在する場合
     if url is not None and not no_download:
         c.download(url, out_dir)

@@ -17,7 +17,7 @@ def cli():
 @pass_state
 def analyze(state, keypoint_id, show_result):
     """Analyze keypoints data and get information such as angles."""
-    c = get_client(state.profile)
+    c = get_client(state)
     result = c.analyze_keypoint(keypoint_id)
     if show_result:
         click.echo(result)

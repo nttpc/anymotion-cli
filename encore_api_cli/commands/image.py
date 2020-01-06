@@ -21,5 +21,5 @@ def image():
 @pass_state
 def list(state):
     """Show image list."""
-    c = get_client(state.profile)
+    c = get_client(state)
     c.show_list("images")

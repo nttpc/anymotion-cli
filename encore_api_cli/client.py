@@ -18,6 +18,7 @@ from yaspin import yaspin
 
 from encore_api_cli.exceptions import InvalidFileType
 from encore_api_cli.exceptions import RequestsError
+from encore_api_cli.output import write_http
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -31,6 +32,7 @@ class Client(object):
         base_url: str,
         interval: int,
         timeout: int,
+        verbose: bool = False,
     ):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -41,15 +43,17 @@ class Client(object):
         self.interval = max(1, interval)
         self.max_steps = max(1, timeout // interval)
 
+        self.verbose = verbose
+
     def upload_to_s3(self, path: Union[str, Path]) -> Tuple[str, str]:
         """Upload movie or image to Amazon S3
 
         Args:
-            path
+            path: The path of the file to upload.
 
         Returns:
-            Created image_id or movie_id.
-            image or movie
+            A tuple of media_id and media_type. media_id is the created image_id or
+            movie_id. media_type is the string of "image" or "movie".
 
         Raises:
             InvalidFileType: Exception raised in _get_media_type function.
@@ -201,22 +205,25 @@ class Client(object):
         Raises:
             RequestsError
         """
+        method = requests_func.__name__.upper()
         if headers is None:
             headers = self._get_headers(with_content_type=data is not None)
-        json_data = json.dumps(data)
+
+        if self.verbose:
+            write_http(url, method, headers, data)
 
         try:
-            response = requests_func(url, data=json_data, headers=headers)
+            response = requests_func(url, json=data, headers=headers)
         except requests.exceptions.ConnectionError:
-            message = f"{requests_func.__name__.upper()} {url} is failed."
+            message = f"{method} {url} is failed."
             raise RequestsError(message)
 
         if response.status_code not in [200, 201]:
             message = dedent(
                 f"""\
-                {requests_func.__name__.upper()} {url} is failed.
-                status code: {response.status_code}
-                content: {response.content.decode()}
+                    {method} {url} is failed.
+                    status code: {response.status_code}
+                    content: {response.content.decode()}
                 """
             )
             raise RequestsError(message)

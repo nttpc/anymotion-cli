@@ -15,10 +15,6 @@ def test_upload(mocker, tmp_path):
 
     assert client_mock.call_count == 1
     assert result.exit_code == 0
-    assert (
-        result.output == f"Success: Uploaded {tmp_path} to "
-        "the cloud storage. (image_id: 1)\n"
-    )
 
 
 def test_upload_with_InvalidFileType(mocker, tmp_path):

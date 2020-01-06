@@ -21,7 +21,7 @@ def analysis():
 @pass_state
 def list(state):
     """Show analysis list."""
-    c = get_client(state.profile)
+    c = get_client(state)
     c.show_list("analyses")
 
 
@@ -31,6 +31,6 @@ def list(state):
 @pass_state
 def show(state, analysis_id):
     """Display analysis result in JSON format."""
-    c = get_client(state.profile)
+    c = get_client(state)
     result = c.get_analysis(analysis_id)
     click.echo(result)

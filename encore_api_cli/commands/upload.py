@@ -3,12 +3,14 @@ import click
 from encore_api_cli.exceptions import InvalidFileType
 from encore_api_cli.exceptions import RequestsError
 from encore_api_cli.options import common_options
+from encore_api_cli.output import write_success
 from encore_api_cli.state import pass_state
+from encore_api_cli.state import State
 from encore_api_cli.utils import get_client
 
 
 @click.group()
-def cli():
+def cli() -> None:
     pass
 
 
@@ -16,20 +18,21 @@ def cli():
 @click.argument("path", type=click.Path(exists=True))
 @common_options
 @pass_state
-def upload(state, path):
-    """Upload the local movie or image file to cloud storage."""
-    c = get_client(state.profile)
+def upload(state: State, path: str) -> None:
+    """Upload the local movie or image file to the cloud storage."""
+    c = get_client(state)
 
     try:
         media_id, media_type = c.upload_to_s3(path)
     except InvalidFileType as e:
-        raise click.BadParameter(e)
+        raise click.BadParameter(str(e))
     except RequestsError as e:
-        raise click.ClickException(e)
+        raise click.ClickException(str(e))
 
-    message = (
-        f"{click.style('Success', fg='green')}: "
-        f"Uploaded { click.style(path, fg='blue')} to the cloud storage. "
-        f"({click.style(f'{media_type}_id: {media_id}', fg='cyan')})"
+    write_success(
+        "Uploaded {path} to the cloud storage. ({media_type}_id: {media_id})".format(
+            path=click.style(path, fg="blue"),
+            media_type=media_type,
+            media_id={click.style(str(media_id), fg="cyan")},
+        )
     )
-    click.echo(message)

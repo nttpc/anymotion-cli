@@ -63,8 +63,8 @@ class Settings(object):
             raise ValueError("client_id or client_secret is invald.")
 
         self.credentials[self.profile_name] = {
-            "anymotion_client_id": self.client_id,  # type: ignore
-            "anymotion_client_secret": self.client_secret,  # type: ignore
+            "anymotion_client_id": str(self.client_id),
+            "anymotion_client_secret": str(self.client_secret),
         }
         with self.credentials_file.open("w") as f:
             self.credentials.write(f)

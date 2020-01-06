@@ -12,5 +12,5 @@ setup(
     url="https://bitbucket.org/nttpc-datascience/encore-api-cli",
     entry_points={"console_scripts": ["encore = encore_api_cli.cli:cli"]},
     packages=find_packages(exclude=("tests", "docs")),
-    install_requires=["click", "requests", "tabulate", "yaspin"],
+    install_requires=["click", "pygments", "requests", "tabulate", "yaspin"],
 )
