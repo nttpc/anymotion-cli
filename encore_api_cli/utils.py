@@ -19,7 +19,7 @@ def get_client(state: State) -> Client:
     return Client(
         str(settings.client_id),
         str(settings.client_secret),
-        settings.url,
+        settings.base_url,
         settings.interval,
         settings.timeout,
         verbose=state.verbose,

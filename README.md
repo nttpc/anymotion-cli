@@ -154,5 +154,5 @@ $ pipenv install --dev
 - Before submitting pull requests, run tests with:
 
 ``` sh
-$ tox
+$ pipenv run tox
 ```

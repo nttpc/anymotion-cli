@@ -25,26 +25,26 @@ class Client(object):
         timeout: int,
         verbose: bool = False,
     ):
-        self.client_id = client_id
-        self.client_secret = client_secret
+        self._client_id = client_id
+        self._client_secret = client_secret
 
-        self.oauth_url = urljoin(base_url, "v1/oauth/accesstokens")
-        self.api_url = urljoin(base_url, "anymotion/v1/")
+        self._oauth_url = urljoin(base_url, "v1/oauth/accesstokens")
+        self._api_url = urljoin(base_url, "anymotion/v1/")
 
-        self.interval = max(1, interval)
-        self.max_steps = max(1, timeout // interval)
+        self._interval = max(1, interval)
+        self._max_steps = max(1, timeout // interval)
 
-        self.verbose = verbose
+        self._verbose = verbose
 
     def get_info(
         self, endpoint: str, endpoint_id: int = None
     ) -> Union[List[dict], dict]:
         """Get infomation."""
         if endpoint_id is None:
-            url = urljoin(self.api_url, f"{endpoint}/")
+            url = urljoin(self._api_url, f"{endpoint}/")
             return self._get_list(url)
         else:
-            url = urljoin(self.api_url, f"{endpoint}/{endpoint_id}/")
+            url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
             return self._get_one(url)
 
     def upload_to_s3(self, path: Union[str, Path]) -> Tuple[int, str]:
@@ -70,7 +70,7 @@ class Client(object):
         # Register movie or image
         response = self._requests(
             requests.post,
-            urljoin(self.api_url, f"{media_type}s/"),
+            urljoin(self._api_url, f"{media_type}s/"),
             json={"origin_key": path.name, "content_md5": content_md5},
         )
         media_id, upload_url = self._parse_response(response, ("id", "upload_url"))
@@ -95,27 +95,27 @@ class Client(object):
 
     def draw_keypoint(self, keypoint_id: int) -> int:
         """Start drawing for keypoint_id."""
-        url = urljoin(self.api_url, f"drawings/")
+        url = urljoin(self._api_url, f"drawings/")
         response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
         """Start analyze for keypoint_id."""
-        url = urljoin(self.api_url, f"analyses/")
+        url = urljoin(self._api_url, f"analyses/")
         response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
         (analysis_id,) = self._parse_response(response, ("id",))
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> str:
         """Wait for extraction."""
-        url = urljoin(self.api_url, f"keypoints/{keypoint_id}/")
+        url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
         status = self._wait_for_done(url)
         return status
 
     def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
         """Wait for drawing."""
-        url = urljoin(self.api_url, f"drawings/{drawing_id}/")
+        url = urljoin(self._api_url, f"drawings/{drawing_id}/")
         status = self._wait_for_done(url)
         drawing_url = None
         if status == "SUCCESS":
@@ -125,7 +125,7 @@ class Client(object):
 
     def wait_for_analysis(self, analysis_id: int) -> str:
         """Wait for analysis."""
-        url = urljoin(self.api_url, f"analyses/{analysis_id}/")
+        url = urljoin(self._api_url, f"analyses/{analysis_id}/")
         status = self._wait_for_done(url)
         return status
 
@@ -161,7 +161,7 @@ class Client(object):
         Raises:
             RequestsError: Exception raised in _requests function.
         """
-        url = urljoin(self.api_url, "keypoints/")
+        url = urljoin(self._api_url, "keypoints/")
         response = self._requests(requests.post, url, json=data)
         (keypoint_id,) = self._parse_response(response, ("id",))
         return keypoint_id
@@ -185,7 +185,7 @@ class Client(object):
         if headers is None:
             headers = self._get_headers(with_content_type=is_json)
 
-        if self.verbose:
+        if self._verbose:
             write_http(url, method, headers, json)
 
         try:
@@ -221,12 +221,12 @@ class Client(object):
         """Get a token using client ID and secret."""
         data = {
             "grantType": "client_credentials",
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret,
+            "clientId": self._client_id,
+            "clientSecret": self._client_secret,
         }
         response = self._requests(
             requests.post,
-            self.oauth_url,
+            self._oauth_url,
             json=data,
             headers={"Content-Type": "application/json"},
         )
@@ -263,12 +263,12 @@ class Client(object):
 
     @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
-        for _ in range(self.max_steps):
+        for _ in range(self._max_steps):
             response = self._requests(requests.get, url)
             (status,) = self._parse_response(response, ("exec_status",))
             if status in ["SUCCESS", "FAILURE"]:
                 break
-            time.sleep(self.interval)
+            time.sleep(self._interval)
         else:
             status = "TIMEOUT"
         return status

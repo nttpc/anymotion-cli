@@ -1,7 +1,7 @@
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, SectionProxy
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, Tuple, Union
 
 from encore_api_cli.exceptions import SettingsValueError
 
@@ -12,100 +12,100 @@ TIMEOUT = 600
 
 
 class Settings(object):
-    def __init__(self, profile_name: str, use_env: bool = True) -> None:
-        self.profile_name = profile_name
+    """Read and write settings.
 
-        self.settings_dir = self._get_dir()
-        self.settings_dir.mkdir(exist_ok=True)
+    Attributes:
+        client_id (Optional[str]): The value used for authentication.
+        client_secret (Optional[str]): The value used for authentication.
+        base_url (str): The base URL to request.
+        interval (int): The interval time(sec).
+        timeout (int): The timeout period(sec).
 
-        # read config and credentials files
-        self.config = ConfigParser()
-        self.config_file = self.settings_dir / "config"
-        if self.config_file.exists():
-            self.config.read(self.config_file)
+    Note:
+        interval and timeout is used only when requesting asynchronous processing.
+    """
 
-        self.credentials = ConfigParser()
-        self.credentials_file = self.settings_dir / "credentials"
-        if self.credentials_file.exists():
-            self.credentials.read(self.credentials_file)
+    def __init__(self, profile_name: str, use_env: bool = True):
+        settings_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
+        settings_dir.mkdir(exist_ok=True)
 
-        # set values
-        self._set_default_values()
-        self._set_config_from_file(profile_name)
-        self._set_credentials_from_file(profile_name)
-        if use_env:
-            self._set_credentials_from_env()
+        self._config = Profile(settings_dir / "config", profile_name)
+        self._credentials = Profile(settings_dir / "credentials", profile_name)
+
+        self._env = Environment(use_env)
 
     def is_ok(self) -> bool:
         """Whether credentials are valid value."""
         return self.client_id is not None and self.client_secret is not None
 
-    def write(self) -> None:
-        """Update config and credentials file."""
-        self.write_config()
-        self.write_credentials()
-
-    def write_config(self) -> None:
+    def write_config(self, base_url: str) -> None:
         """Update config file.
 
         Update only when different from default value.
         """
-        if self.url == BASE_URL:
+        if base_url == BASE_URL:
             return
+        if base_url is None:
+            raise ValueError("api_url is invald.")
 
-        self.config[self.profile_name] = {
-            "anymotion_api_url": self.url,
-        }
-        with self.config_file.open("w") as f:
-            self.config.write(f)
+        self._config.anymotion_api_url = base_url
+        self._config.save()
 
-    def write_credentials(self) -> None:
+    def write_credentials(self, client_id: str, client_secret: str) -> None:
         """Update credentials file."""
-        if not self.is_ok():
+        if client_id is None or client_secret is None:
             raise ValueError("client_id or client_secret is invald.")
 
-        self.credentials[self.profile_name] = {
-            "anymotion_client_id": str(self.client_id),
-            "anymotion_client_secret": str(self.client_secret),
-        }
-        with self.credentials_file.open("w") as f:
-            self.credentials.write(f)
+        self._credentials.anymotion_client_id = client_id
+        self._credentials.anymotion_client_secret = client_secret
+        self._credentials.save()
 
-    def _get_dir(self) -> Path:
-        root_dir = os.getenv("ANYMOTION_ROOT", Path.home())
-        return Path(root_dir) / ".anymotion"
+    @property
+    def client_id(self) -> Optional[str]:
+        """Return the value used for authentication."""
+        value_from_env = self._env.anymotion_client_id
+        value_from_file = self._credentials.anymotion_client_id
+        return value_from_env or value_from_file
 
-    def _set_default_values(self) -> None:
-        self.url = BASE_URL
-        self.interval = POLLING_INTERVAL
-        self.timeout = TIMEOUT
-        self.client_id: Optional[str] = None
-        self.client_secret: Optional[str] = None
+    @property
+    def client_secret(self) -> Optional[str]:
+        """Return the value used for authentication."""
+        value_from_env = self._env.anymotion_client_secret
+        value_from_file = self._credentials.anymotion_client_secret
+        return value_from_env or value_from_file
 
-    def _set_config_from_file(self, profile_name: str) -> None:
-        if profile_name not in self.config.sections():
-            return
-        profile = self.config[profile_name]
+    @property
+    def base_url(self) -> str:
+        """Return the base URL to request.
 
-        url = profile.get("anymotion_api_url")
-        if url is not None:
-            self.url = url
+        If not in config file, return the default value.
+        """
+        return self._config.anymotion_api_url or BASE_URL
 
-        interval = profile.get("polling_interval")
-        if interval is not None:
-            self.interval = self._to_int_with_check(interval, "polling_interval", 1)
+    @property
+    def interval(self) -> int:
+        """Return the interval time(sec).
 
-        timeout = profile.get("timeout")
-        if timeout is not None:
-            self.timeout = self._to_int_with_check(timeout, "timeout", 1)
+        If not in config file, return the default value.
+        """
+        interval = self._config.polling_interval or POLLING_INTERVAL
+        interval = self._to_int_with_check(interval, "polling_interval", 1)
+        return interval
 
-    def _to_int_with_check(self, value: str, name: str, min_value: int) -> int:
+    @property
+    def timeout(self) -> int:
+        """Return the timeout period(sec).
+
+        If not in config file, return the default value.
+        """
+        timeout = self._config.timeout or TIMEOUT
+        timeout = self._to_int_with_check(timeout, "timeout", 1)
+        return timeout
+
+    def _to_int_with_check(
+        self, value: Union[str, int], name: str, min_value: int
+    ) -> int:
         """Convert value to int.
-
-        Args:
-            value
-            name
-            min_value
 
         Returns:
             The converted value.
@@ -113,9 +113,6 @@ class Settings(object):
         Raises:
             SettingsValueError: If conversion is not possible or value is less
             than min_value.
-
-        Note:
-            Expected to be used in _set_config_from_file function.
         """
         try:
             x = int(value)
@@ -128,24 +125,46 @@ class Settings(object):
             raise SettingsValueError(message)
         return x
 
-    def _set_credentials_from_file(self, profile_name: str) -> None:
-        if profile_name not in self.credentials.sections():
-            return
-        profile = self.credentials[profile_name]
 
-        client_id = profile.get("anymotion_client_id")
-        if client_id is not None:
-            self.client_id = client_id
+class Profile(object):
+    def __init__(self, file: Path, profile_name: str):
+        self._file = file
+        self._parser, self._section = self._read(file, profile_name)
 
-        client_secret = profile.get("anymotion_client_secret")
-        if client_secret is not None:
-            self.client_secret = client_secret
+    def __getattr__(self, name: str) -> Optional[str]:
+        return self._section.get(name)
 
-    def _set_credentials_from_env(self) -> None:
-        client_id = os.getenv("ANYMOTION_CLIENT_ID")
-        if client_id is not None:
-            self.client_id = client_id
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name[0] == "_":
+            object.__setattr__(self, name, value)
+        else:
+            self._section[name] = value
 
-        client_secret = os.getenv("ANYMOTION_CLIENT_SECRET")
-        if client_secret is not None:
-            self.client_secret = client_secret
+    def save(self) -> None:
+        """Save profile to file."""
+        with self._file.open("w") as f:
+            self._parser.write(f)
+
+    def _read(self, file: Path, profile_name: str) -> Tuple[ConfigParser, SectionProxy]:
+        parser = ConfigParser()
+        if file.exists():
+            parser.read(file)
+
+        try:
+            section = parser[profile_name]
+        except KeyError:
+            parser[profile_name] = {}
+            section = parser[profile_name]
+
+        return parser, section
+
+
+class Environment(object):
+    def __init__(self, use_env):
+        self._use_env = use_env
+
+    def __getattr__(self, name: str) -> Optional[str]:
+        if self._use_env:
+            return os.getenv(name.upper())
+        else:
+            return None

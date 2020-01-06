@@ -41,7 +41,7 @@ class Test_設定ファイルが存在しない場合(object):
 
         assert settings.interval == 5
         assert settings.timeout == 600
-        assert settings.url == "https://api.customer.jp/"
+        assert settings.base_url == "https://api.customer.jp/"
         assert settings.client_id is None
         assert settings.client_secret is None
 
@@ -51,7 +51,7 @@ class Test_設定ファイルが存在しない場合(object):
         assert not config_file_path.exists()
 
         settings = Settings("default")
-        settings.write_config()
+        settings.write_config("https://api.customer.jp/")
 
         assert not config_file_path.exists()
 
@@ -61,8 +61,7 @@ class Test_設定ファイルが存在しない場合(object):
         assert not config_file_path.exists()
 
         settings = Settings("default")
-        settings.url = "http://api.example.com/"
-        settings.write_config()
+        settings.write_config("http://api.example.com/")
 
         assert config_file_path.exists()
 
@@ -72,26 +71,21 @@ class Test_設定ファイルが存在しない場合(object):
         assert not credentials_file_path.exists()
 
         settings = Settings("default")
-        settings.client_id = "client_id"
-        settings.client_secret = "client_secret"
-        settings.write_credentials()
+        settings.write_credentials("client_id", "client_secret")
 
         assert credentials_file_path.exists()
 
     def test_configファイルを更新できること(self, mocker_home):
         settings1 = Settings("default")
-        settings1.url = "http://api.example.com/"
-        settings1.write_config()
+        settings1.write_config("http://api.example.com/")
 
         settings2 = Settings("default")
 
-        assert settings2.url == "http://api.example.com/"
+        assert settings2.base_url == "http://api.example.com/"
 
     def test_credentialsファイルを更新できること(self, mocker_home):
         settings1 = Settings("default")
-        settings1.client_id = "client_id"
-        settings1.client_secret = "client_secret"
-        settings1.write_credentials()
+        settings1.write_credentials("client_id", "client_secret")
 
         settings2 = Settings("default")
 
@@ -101,7 +95,7 @@ class Test_設定ファイルが存在しない場合(object):
     def test_正しい値出ない場合credentialsファイルを更新できないこと(self, mocker_home):
         settings = Settings("default")
         with pytest.raises(ValueError):
-            settings.write_credentials()
+            settings.write_credentials(None, None)
 
 
 class Test_設定ファイルが存在する場合(object):
@@ -121,7 +115,7 @@ class Test_設定ファイルが存在する場合(object):
 
         settings = Settings("default")
 
-        assert settings.url == "http://api.example.com/"
+        assert settings.base_url == "http://api.example.com/"
         assert settings.interval == 20
         assert settings.timeout == 300
 
@@ -140,8 +134,11 @@ class Test_設定ファイルが存在する場合(object):
             )
         )
 
+        settings = Settings("default")
+
         with pytest.raises(SettingsValueError):
-            Settings("default")
+            settings.interval
+            settings.timeout
 
     def test_credentialsファイルの値が設定されていること(self, mocker_home, credentials_file):
         settings = Settings("default")

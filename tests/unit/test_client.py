@@ -11,7 +11,7 @@ from encore_api_cli.exceptions import InvalidFileType
 def client(requests_mock):
     base_url = "http://api.example.com/"
     client = Client("client_id", "client_secret", base_url, 5, 600)
-    requests_mock.post(client.oauth_url, json={"accessToken": "token"})
+    requests_mock.post(client._oauth_url, json={"accessToken": "token"})
     yield client
 
 
@@ -28,7 +28,7 @@ class TestUpload(object):
         file_mock = mocker.mock_open(read_data=b"image data")
         mocker.patch("pathlib.Path.open", file_mock)
         requests_mock.post(
-            urljoin(client.api_url, f"{expected_media_type}s/"),
+            urljoin(client._api_url, f"{expected_media_type}s/"),
             json={"id": expected_media_id, "upload_url": upload_url},
         )
         requests_mock.put(upload_url)
@@ -50,7 +50,7 @@ class TestExtractKeypoint(object):
         image_id = 111
         expected_keypoint_id = 222
         requests_mock.post(
-            urljoin(client.api_url, "keypoints/"), json={"id": expected_keypoint_id}
+            urljoin(client._api_url, "keypoints/"), json={"id": expected_keypoint_id}
         )
 
         keypoint_id = client.extract_keypoint_from_image(image_id)
@@ -61,7 +61,7 @@ class TestExtractKeypoint(object):
         movie_id = 111
         expected_keypoint_id = 222
         requests_mock.post(
-            urljoin(client.api_url, "keypoints/"), json={"id": expected_keypoint_id}
+            urljoin(client._api_url, "keypoints/"), json={"id": expected_keypoint_id}
         )
 
         keypoint_id = client.extract_keypoint_from_movie(movie_id)
@@ -71,7 +71,7 @@ class TestExtractKeypoint(object):
     def test_キーポイント抽出を完了できること(self, requests_mock, client):
         keypoint_id = 1
         requests_mock.get(
-            urljoin(client.api_url, f"keypoints/{keypoint_id}/"),
+            urljoin(client._api_url, f"keypoints/{keypoint_id}/"),
             json={"exec_status": "SUCCESS"},
         )
 
@@ -85,7 +85,7 @@ class TestDrawingKeypoint(object):
         keypoint_id = 1
         expected_drawing_id = 1
         requests_mock.post(
-            f"{client.api_url}drawings/", json={"id": expected_drawing_id}
+            f"{client._api_url}drawings/", json={"id": expected_drawing_id}
         )
 
         drawing_id = client.draw_keypoint(keypoint_id)
@@ -96,7 +96,7 @@ class TestDrawingKeypoint(object):
         drawing_id = 1
         expected_drawing_url = "http://drawing_url.example.com"
         requests_mock.get(
-            f"{client.api_url}drawings/{drawing_id}/",
+            f"{client._api_url}drawings/{drawing_id}/",
             json={"exec_status": "SUCCESS", "drawing_url": expected_drawing_url},
         )
 
@@ -111,7 +111,7 @@ class TestAnalysisKeypoint(object):
         keypoint_id = 111
         expected_analysis_id = 222
         requests_mock.post(
-            f"{client.api_url}analyses/", json={"id": expected_analysis_id}
+            f"{client._api_url}analyses/", json={"id": expected_analysis_id}
         )
 
         analysis_id = client.analyze_keypoint(keypoint_id)
@@ -121,7 +121,7 @@ class TestAnalysisKeypoint(object):
     def test_キーポイント解析を完了できること(self, requests_mock, client):
         analysis_id = 222
         requests_mock.get(
-            f"{client.api_url}analyses/{analysis_id}/",
+            f"{client._api_url}analyses/{analysis_id}/",
             json={"exec_status": "SUCCESS", "result": "[]"},
         )
 

@@ -74,14 +74,14 @@ def spin(stdout_isatty: bool = STDOUT_ISATTY, *args, **kwargs):
         return Nospin()
 
 
-class Nospin:
+class Nospin(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(self, exception_type, exception_value, traceback) -> None:
         pass
 
     def __call__(self, fn):

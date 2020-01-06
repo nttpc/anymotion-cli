@@ -49,7 +49,7 @@ def test_configure_list(mocker, client_id, expected_client_id):
     )
 
     settings_mock = mocker.MagicMock()
-    settings_mock.return_value.url = "https://api.example.jp/"
+    settings_mock.return_value.base_url = "https://api.example.jp/"
     settings_mock.return_value.client_id = client_id
     settings_mock.return_value.client_secret = "client_secret"
     settings_mock.return_value.interval = 10

@@ -2,7 +2,7 @@ import click
 
 
 class State(object):
-    def __init__(self) -> None:
+    def __init__(self):
         self.verbose = False
         self.profile = "default"
         # self.data = {}
