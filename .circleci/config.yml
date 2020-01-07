@@ -52,8 +52,14 @@ jobs:
             sudo pip install pipenv
             pipenv sync --dev
       - run:
-          name: Check syntax with flake8
+          name: Lint with flake8
           command: pipenv run flake8
+      - run:
+          name: Lint with black
+          command: pipenv run black . --check
+      - run:
+          name: Lint with mypy
+          command: pipenv run mypy
   check-security:
     docker:
       - image: circleci/python:3

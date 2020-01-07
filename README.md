@@ -20,7 +20,13 @@ $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.gi
 
 ## Getting Started
 
-Before encore-api-cli, you need to tell it about your AnyMotion credentials.
+Before using encore-api-cli, you need to tell it about your AnyMotion credentials.
+You can do this in several ways:
+
+- Credentials file
+- Environment variables
+
+The quickest way to get started is to run the `encore configure` command:
 
 ``` sh
 $ encore configure
@@ -29,8 +35,24 @@ AnyMotion Client ID: your_client_id
 AnyMotion Client Secret: your_client_secret
 ```
 
-and create an INI formatted file.
-Then, place it in `~/.anymotion/config`.
+To use environment variables, do the following:
+
+``` sh
+export ANYMOTION_CLIENT_ID=<your_client_id>
+export ANYMOTION_CLIENT_SECRET=<your_client_secret>
+```
+
+To use the credentials file, create an INI formatted file like this:
+
+``` text
+[default]
+anymotion_client_id=<your_client_id>
+anymotion_client_secret=<your_client_secret>
+```
+
+and place it in `~/.anymotion/credentials`.
+
+**Note**: If set in both the credentials file and environment variables, the environment variables takes precedence.
 
 ## Usage
 
@@ -48,14 +70,15 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  analysis   Manege analyses.
-  analyze    Analyze keypoints data and get information such as angles.
-  configure  Configure your AnyMotion Access Token.
+  analysis   Show analysis results.
+  analyze    Analyze the extracted keypoint data.
+  configure  Configure your AnyMotion Credentials.
+  download   Download the drawn file.
   draw       Draw keypoints on uploaded movie or image.
-  image      Manege images.
+  image      Show the information of the uploaded images.
   keypoint   Extract keypoints and show the list.
-  movie      Manege movies.
-  upload     Upload a local movie or image to cloud storage.
+  movie      Show the information of the uploaded movies.
+  upload     Upload the local movie or image file to the cloud storage.
 ```
 
 ### Examples
@@ -66,23 +89,26 @@ First, upload the image file.
 
 ``` sh
 $ encore upload image.jpg
-Uploaded the image file to cloud storage (image_id: 111)
+Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
 ```
 
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
 
 ``` sh
-$ encore keypoint extract --image_id 111 --with_drawing
-Extract keypoint (keypoint_id: 222)
-.
-Keypoint extraction is complete.
-Draw keypoint (drawing_id: 333)
-.
-Keypoint drawing is complete.
+$ encore keypoint extract --image_id 111
+Keypoint extraction started. (keypoint_id: 222)
+Success: Keypoint extraction is complete.
+```
+
+``` sh
+$ encore draw --keypoint_id 222
+Drawing is started. (drawing_id: 333)
+Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
+To save to a specific directory, use the ``--out_dir`` option.
 
 ### Tips
 
@@ -98,4 +124,36 @@ Get a list of keypoint_id for only movie:
 
 ``` sh
 $ encore keypoint list | jq '.[] | select(.movie != null) | .id'
+```
+
+## Bash Complete
+
+The encore-api-cli supports Bash completion.
+To enable Bash completion, you would need to put into your `.bashrc`:
+
+``` sh
+$ eval "$(_ENCORE_COMPLETE=source encore)"
+```
+
+For zsh users add this to your `.zshrc`:
+
+``` sh
+$ eval "$(_ENCORE_COMPLETE=source_zsh encore)"
+```
+
+## Contributing
+
+- Code must work on Python 3.6 and higher.
+- Code should follow [black](https://black.readthedocs.io/en/stable/).
+- Docstring should follow [Google Style](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
+- Install all development dependencies using:
+
+``` sh
+$ pipenv install --dev
+```
+
+- Before submitting pull requests, run tests with:
+
+``` sh
+$ pipenv run tox
 ```
