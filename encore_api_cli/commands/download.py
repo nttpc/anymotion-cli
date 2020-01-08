@@ -27,7 +27,8 @@ def cli() -> None:  # noqa: D103
 )
 @common_options
 @pass_state
-def download(state: State, drawing_id: int, out_dir: str) -> None:
+@click.pass_context
+def download(ctx, state: State, drawing_id: int, out_dir: str) -> None:
     """Download the drawn file."""
     c = get_client(state)
     status, url = c.wait_for_drawing(drawing_id)
@@ -38,12 +39,13 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
         if path.exists():
             write_message(f"File already exists: {color_path(path)}")
             if not click.confirm("Do you want to overwrite?"):
+                prog = ctx.find_root().info_name
                 write_message(
                     dedent(
                         f"""\
                             Skip download. To download it, run the following command.
 
-                            "encore download {drawing_id}"\
+                            "{prog} download {drawing_id}"\
                         """
                     )
                 )

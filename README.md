@@ -23,6 +23,7 @@ $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.gi
 Before using encore-api-cli, you need to tell it about your AnyMotion credentials.
 You can do this in several ways:
 
+- CLI command
 - Credentials file
 - Environment variables
 
