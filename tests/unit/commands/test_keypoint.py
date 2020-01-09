@@ -23,7 +23,7 @@ def test_keypoint_show(mocker, requests_mock):
     client_mock.return_value.get_info.return_value = {
         "id": 1,
         "keypoint": '[{"1": [143, 195]}]',
-        "exec_status": "SUCCESS",
+        "execStatus": "SUCCESS",
     }
     mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
 

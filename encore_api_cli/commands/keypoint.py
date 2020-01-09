@@ -29,7 +29,7 @@ def show(state, keypoint_id):
     """Show extracted keypoint data."""
     c = get_client(state)
     response = c.get_info("keypoints", keypoint_id)
-    status = response.get("exec_status", "FAILURE")
+    status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
         keypoint = response.get("keypoint")
         write_json_data(json.loads(keypoint), sort_keys=False)
