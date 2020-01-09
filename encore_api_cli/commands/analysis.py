@@ -26,7 +26,7 @@ def show(state, analysis_id):
     """Show analysis result."""
     c = get_client(state)
     response = c.get_info("analyses", analysis_id)
-    status = response.get("exec_status", "FAILURE")
+    status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
         result = response.get("result")
         write_json_data(json.loads(result), sort_keys=False)

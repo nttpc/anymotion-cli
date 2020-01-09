@@ -29,7 +29,7 @@ class TestUpload(object):
         mocker.patch("pathlib.Path.open", file_mock)
         requests_mock.post(
             urljoin(client._api_url, f"{expected_media_type}s/"),
-            json={"id": expected_media_id, "upload_url": upload_url},
+            json={"id": expected_media_id, "uploadUrl": upload_url},
         )
         requests_mock.put(upload_url)
 
@@ -72,7 +72,7 @@ class TestExtractKeypoint(object):
         keypoint_id = 1
         requests_mock.get(
             urljoin(client._api_url, f"keypoints/{keypoint_id}/"),
-            json={"exec_status": "SUCCESS"},
+            json={"execStatus": "SUCCESS"},
         )
 
         status = client.wait_for_extraction(keypoint_id)
@@ -97,7 +97,7 @@ class TestDrawingKeypoint(object):
         expected_drawing_url = "http://drawing_url.example.com"
         requests_mock.get(
             f"{client._api_url}drawings/{drawing_id}/",
-            json={"exec_status": "SUCCESS", "drawing_url": expected_drawing_url},
+            json={"execStatus": "SUCCESS", "drawingUrl": expected_drawing_url},
         )
 
         status, drawing_url = client.wait_for_drawing(drawing_id)
@@ -122,7 +122,7 @@ class TestAnalysisKeypoint(object):
         analysis_id = 222
         requests_mock.get(
             f"{client._api_url}analyses/{analysis_id}/",
-            json={"exec_status": "SUCCESS", "result": "[]"},
+            json={"execStatus": "SUCCESS", "result": "[]"},
         )
 
         status = client.wait_for_analysis(analysis_id)
