@@ -73,7 +73,7 @@ class Client(object):
             urljoin(self._api_url, f"{media_type}s/"),
             json={"origin_key": path.name, "content_md5": content_md5},
         )
-        media_id, upload_url = self._parse_response(response, ("id", "upload_url"))
+        media_id, upload_url = self._parse_response(response, ("id", "uploadUrl"))
 
         # Upload to S3
         self._requests(
@@ -120,7 +120,7 @@ class Client(object):
         drawing_url = None
         if status == "SUCCESS":
             response = self._requests(requests.get, url)
-            (drawing_url,) = self._parse_response(response, ("drawing_url",))
+            (drawing_url,) = self._parse_response(response, ("drawingUrl",))
         return status, drawing_url
 
     def wait_for_analysis(self, analysis_id: int) -> str:
@@ -265,7 +265,7 @@ class Client(object):
     def _wait_for_done(self, url: str) -> str:
         for _ in range(self._max_steps):
             response = self._requests(requests.get, url)
-            (status,) = self._parse_response(response, ("exec_status",))
+            (status,) = self._parse_response(response, ("execStatus",))
             if status in ["SUCCESS", "FAILURE"]:
                 break
             time.sleep(self._interval)
