@@ -17,6 +17,7 @@ pytest-mock = "*"
 pytest-watch = "*"
 requests-mock = "*"
 tox = "*"
+mkdocs-material = "*"
 
 [packages]
 click = "*"
@@ -27,6 +28,7 @@ yaspin = "*"
 
 [scripts]
 test = 'pytest tests/unit -v --cov=encore_api_cli --cov-report=html'
+build = 'python setup.py sdist bdist_wheel'
 
 [pipenv]
 allow_prereleases = true
