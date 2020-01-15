@@ -102,7 +102,7 @@ Success: Keypoint extraction is complete.
 ```
 
 ```sh
-$ encore draw --keypoint_id 222
+$ encore draw 222
 Drawing is started. (drawing_id: 333)
 Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
