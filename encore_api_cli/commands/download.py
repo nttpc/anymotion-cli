@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import click
 
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_message
+from encore_api_cli.output import echo
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import color_path, get_client
 
@@ -43,9 +43,9 @@ def download(
         else:
             prog = ctx.find_root().info_name
             message = message % {"prog": prog, "drawing_id": drawing_id}
-        write_message(message)
+        echo(message)
     else:
-        write_message("Unable to download because drawing failed.")
+        echo("Unable to download because drawing failed.")
 
 
 def check_download(out_dir: str, url: str) -> Tuple[bool, str, Path]:
@@ -57,7 +57,7 @@ def check_download(out_dir: str, url: str) -> Tuple[bool, str, Path]:
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     path = Path(out_dir) / Path(str(urlparse(url).path)).name
     if path.exists():
-        write_message(f"File already exists: {color_path(path)}")
+        echo(f"File already exists: {color_path(path)}")
         if not click.confirm("Do you want to overwrite?"):
             message = dedent(
                 """\

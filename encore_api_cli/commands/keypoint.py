@@ -6,7 +6,7 @@ import click
 from encore_api_cli.commands.draw import draw, draw_options
 from encore_api_cli.exceptions import RequestsError
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_json_data, write_message, write_success
+from encore_api_cli.output import echo, echo_json, echo_success
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import color_id, get_client
 
@@ -40,9 +40,9 @@ def show(state: State, keypoint_id: int) -> None:
         if not isinstance(keypoint, str):
             # TODO: catch error
             raise
-        write_json_data(json.loads(keypoint), sort_keys=False)
+        echo_json(json.loads(keypoint), sort_keys=False)
     else:
-        write_message("Status is not SUCCESS.")
+        echo("Status is not SUCCESS.")
 
 
 @keypoint.command()
@@ -51,7 +51,7 @@ def show(state: State, keypoint_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all keypoints."""
     c = get_client(state)
-    write_json_data(c.get_info("keypoints"), sort_keys=False)
+    echo_json(c.get_info("keypoints"), sort_keys=False)
 
 
 @keypoint.command()
@@ -96,22 +96,20 @@ def extract(
         elif image_id is not None:
             keypoint_id = c.extract_keypoint_from_image(image_id)
 
-        write_message(
-            f"Keypoint extraction started. (keypoint_id: {color_id(keypoint_id)})"
-        )
+        echo(f"Keypoint extraction started. (keypoint_id: {color_id(keypoint_id)})")
         status = c.wait_for_extraction(keypoint_id)
     except RequestsError as e:
         raise click.ClickException(str(e))
 
     if status == "SUCCESS":
-        write_success("Keypoint extraction is complete.")
+        echo_success("Keypoint extraction is complete.")
     elif status == "TIMEOUT":
-        write_message("Keypoint extraction is timed out.")
+        echo("Keypoint extraction is timed out.")
     else:
-        write_message("Keypoint extraction failed.")
+        echo("Keypoint extraction failed.")
 
     if with_drawing:
-        write_message()
+        echo()
         ctx.invoke(
             draw,
             keypoint_id=keypoint_id,

@@ -1,7 +1,7 @@
 import click
 
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_json_data
+from encore_api_cli.output import echo_json
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import get_client
 
@@ -24,7 +24,7 @@ def movie() -> None:
 def show(state: State, movie_id: int) -> None:
     """Show movie information."""
     c = get_client(state)
-    write_json_data(c.get_info("movies", movie_id), sort_keys=False)
+    echo_json(c.get_info("movies", movie_id), sort_keys=False)
 
 
 @movie.command()
@@ -33,4 +33,4 @@ def show(state: State, movie_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all movies."""
     c = get_client(state)
-    write_json_data(c.get_info("movies"), sort_keys=False)
+    echo_json(c.get_info("movies"), sort_keys=False)

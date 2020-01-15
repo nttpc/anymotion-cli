@@ -3,7 +3,7 @@ import json
 import click
 
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_json_data, write_message
+from encore_api_cli.output import echo, echo_json
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import get_client
 
@@ -36,9 +36,9 @@ def show(state: State, analysis_id: int) -> None:
         if not isinstance(result, str):
             # TODO: catch error
             raise
-        write_json_data(json.loads(result), sort_keys=False)
+        echo_json(json.loads(result), sort_keys=False)
     else:
-        write_message("Status is not SUCCESS.")
+        echo("Status is not SUCCESS.")
 
 
 @analysis.command()
@@ -47,4 +47,4 @@ def show(state: State, analysis_id: int) -> None:
 def list(state: State) -> None:
     """Show analysis list."""
     c = get_client(state)
-    write_json_data(c.get_info("analyses"), sort_keys=False)
+    echo_json(c.get_info("analyses"), sort_keys=False)

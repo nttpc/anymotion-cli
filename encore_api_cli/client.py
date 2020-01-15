@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 import requests
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import spin, write_http
+from encore_api_cli.output import echo_http, spin
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -190,7 +190,7 @@ class Client(object):
             headers = self._get_headers(with_content_type=is_json)
 
         if self._verbose:
-            write_http(url, method, headers, json)
+            echo_http(url, method, headers, json)
 
         try:
             if is_json:

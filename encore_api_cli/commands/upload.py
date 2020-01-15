@@ -2,7 +2,7 @@ import click
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_success
+from encore_api_cli.output import echo_success
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import color_id, color_path, get_client
 
@@ -29,4 +29,4 @@ def upload(state: State, path: str) -> None:
 
     cpath = color_path(path)
     cid = color_id(media_id)
-    write_success(f"Uploaded {cpath} to the cloud storage. ({media_type}_id: {cid})")
+    echo_success(f"Uploaded {cpath} to the cloud storage. ({media_type}_id: {cid})")

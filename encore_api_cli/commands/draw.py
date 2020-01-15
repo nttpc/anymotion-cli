@@ -4,7 +4,7 @@ import click
 
 from encore_api_cli.commands.download import check_download
 from encore_api_cli.options import common_options
-from encore_api_cli.output import write_message, write_success
+from encore_api_cli.output import echo, echo_success
 from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import color_id, get_client, parse_rule
 
@@ -46,11 +46,11 @@ def draw(
     """Draw keypoints on uploaded movie or image."""
     c = get_client(state)
     drawing_id = c.draw_keypoint(keypoint_id, rule=parse_rule(rule))
-    write_message(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
+    echo(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
 
     status, url = c.wait_for_drawing(drawing_id)
     if status == "SUCCESS" and url is not None:
-        write_success("Drawing is complete.")
+        echo_success("Drawing is complete.")
         if no_download:
             return
 
@@ -60,8 +60,8 @@ def draw(
         else:
             prog = ctx.find_root().info_name
             message = message % {"prog": prog, "drawing_id": drawing_id}
-        write_message(message)
+        echo(message)
     elif status == "TIMEOUT":
-        write_message("Drawing is timed out.")
+        echo("Drawing is timed out.")
     else:
-        write_message("Drawing failed.")
+        echo("Drawing failed.")
