@@ -1,21 +1,19 @@
-import json
 from pathlib import Path
 from typing import Callable, Optional
 from urllib.parse import urlparse
 
 import click
 
-from encore_api_cli.exceptions import ClickException
 from encore_api_cli.options import common_options
 from encore_api_cli.output import write_message, write_success
 from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import color_id, color_path, get_client
+from encore_api_cli.utils import color_id, color_path, get_client, parse_rule
 
 
 def draw_options(f: Callable) -> Callable:
     """Set draw options."""
     f = click.option("--no-download", is_flag=True, help="Disable download.")(f)
-    f = click.option("--rule", help="Drawing rules.")(f)
+    f = click.option("--rule", help="Drawing rules in JSON format.")(f)
     f = click.option(
         "-o",
         "--out_dir",
@@ -42,7 +40,7 @@ def draw(
 ) -> None:
     """Draw keypoints on uploaded movie or image."""
     c = get_client(state)
-    drawing_id = c.draw_keypoint(keypoint_id, rule=_parse_rule(rule))
+    drawing_id = c.draw_keypoint(keypoint_id, rule=parse_rule(rule))
     write_message(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
 
     # TODO: invoke download command
@@ -67,18 +65,3 @@ def draw(
         write_message("Drawing is timed out.")
     else:
         write_message("Drawing failed.")
-
-
-def _parse_rule(rule: Optional[str]) -> Optional[list]:
-    if rule is None:
-        return rule
-
-    try:
-        rule = json.loads(rule)
-    except json.decoder.JSONDecodeError:
-        raise ClickException("Rule format is invalid. Must be in JSON format.")
-
-    if not isinstance(rule, list):
-        raise ClickException("Rule format is invalid. Must be in list format.")
-
-    return rule

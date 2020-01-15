@@ -97,15 +97,17 @@ class Client(object):
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
         response = self._requests(
-            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule},
+            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
         )
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
-    def analyze_keypoint(self, keypoint_id: int) -> int:
+    def analyze_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start analyze for keypoint_id."""
         url = urljoin(self._api_url, f"analyses/")
-        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        response = self._requests(
+            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
+        )
         (analysis_id,) = self._parse_response(response, ("id",))
         return analysis_id
 
