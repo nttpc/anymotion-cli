@@ -1,13 +1,9 @@
 from textwrap import dedent
 
+import pytest
 from click.testing import CliRunner
 
-from encore_api_cli.client import Client
 from encore_api_cli.commands.image import cli
-
-base_url = "http://api.example.com"
-api_url = "http://api.example.com/anymotion/v1/"
-oauth_url = "http://api.example.com/v1/oauth/accesstokens"
 
 
 def test_image():
@@ -17,32 +13,72 @@ def test_image():
     assert result.exit_code == 0
 
 
-def test_image_list(mocker, requests_mock):
-    expected = dedent(
-        """\
-            [
-              {
-                "id": 1,
-                "name": null
-              }
-            ]
+class TestImageShow(object):
+    def test_valid(self, mocker):
+        expected = dedent(
+            """\
 
-        """
+                {
+                  "id": 1,
+                  "name": "image"
+                }
+
+            """
+        )
+
+        client_mock = self._get_client_mock(mocker)
+        runner = CliRunner()
+        result = runner.invoke(cli, ["image", "show", "1"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (["image", "show"], 'Error: Missing argument "IMAGE_ID"'),
+            (["image", "show", "not_value"], 'Error: Invalid value for "IMAGE_ID"'),
+        ],
     )
-    client_mock = mocker.MagicMock(
-        return_value=Client("client_id", "client_secret", base_url, 5, 600)
-    )
-    mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
+    def test_invalid_params(self, mocker, args, expected):
+        client_mock = self._get_client_mock(mocker)
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
 
-    requests_mock.post(oauth_url, json={"accessToken": "token"})
-    requests_mock.get(
-        f"{api_url}images/", json={"data": [{"id": 1, "name": None}], "next": None}
-    )
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert expected in result.output
 
-    runner = CliRunner()
-    result = runner.invoke(cli, ["image", "list"])
+    def _get_client_mock(self, mocker):
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = {"id": 1, "name": "image"}
+        mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
+        return client_mock
 
-    assert client_mock.call_count == 1
 
-    assert result.exit_code == 0
-    assert result.output == expected
+class TestImageList(object):
+    def test_valid(self, mocker):
+        expected = dedent(
+            """\
+
+                [
+                  {
+                    "id": 1,
+                    "name": "image"
+                  }
+                ]
+
+            """
+        )
+
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = [{"id": 1, "name": "image"}]
+        mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["image", "list"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected

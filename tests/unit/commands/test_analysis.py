@@ -1,11 +1,9 @@
+from textwrap import dedent
+
+import pytest
 from click.testing import CliRunner
 
-from encore_api_cli.client import Client
 from encore_api_cli.commands.analysis import cli
-
-base_url = "http://api.example.com/"
-api_url = "http://api.example.com/anymotion/v1/"
-oauth_url = "http://api.example.com/v1/oauth/accesstokens"
 
 
 def test_analysis():
@@ -15,19 +13,60 @@ def test_analysis():
     assert result.exit_code == 0
 
 
-def test_analysis_list(mocker, requests_mock):
-    client_mock = mocker.MagicMock(
-        return_value=Client("client_id", "client_secret", base_url, 5, 600)
+class TestAnalysisShow(object):
+    @pytest.mark.parametrize(
+        "response, expected",
+        [
+            ({"result": "[]", "execStatus": "SUCCESS"}, "\n[]\n\n"),
+            ({"execStatus": "FAILURE"}, "Status is not SUCCESS.\n"),
+        ],
     )
-    mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
+    def test_valid(self, mocker, response, expected):
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = response
+        mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
 
-    requests_mock.post(oauth_url, json={"accessToken": "token"})
-    requests_mock.get(f"{api_url}analyses/", json={"data": "", "next": None})
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analysis", "show", "1"])
 
-    runner = CliRunner()
-    result = runner.invoke(cli, ["analysis", "list"])
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected
 
-    assert client_mock.call_count == 1
+    def test_missing_args(self):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analysis", "show"])
 
-    assert result.exit_code == 0
-    assert result.output == "[]\n\n"
+        assert result.exit_code == 2
+
+    def test_invalid_params(self):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analysis", "show", "not_value"])
+
+        assert result.exit_code == 2
+
+
+class TestAnalysisList(object):
+    def test_valid(self, mocker):
+        expected = dedent(
+            """\
+
+                [
+                  {
+                    "id": 1
+                  }
+                ]
+
+            """
+        )
+
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = [{"id": 1}]
+        mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analysis", "list"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected

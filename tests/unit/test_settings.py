@@ -55,6 +55,17 @@ class Test_設定ファイルが存在しない場合(object):
 
         assert not config_file_path.exists()
 
+    def test_base_urlがNoneの場合configファイルを作成しないこと(self, mocker_home):
+        config_file_path = mocker_home / ".anymotion" / "config"
+
+        assert not config_file_path.exists()
+
+        settings = Settings("default")
+        with pytest.raises(ValueError):
+            settings.write_config(None)
+
+        assert not config_file_path.exists()
+
     def test_デフォルト値と等しくない場合configファイルを作成できること(self, mocker_home):
         config_file_path = mocker_home / ".anymotion" / "config"
 
@@ -167,3 +178,20 @@ class Test_設定ファイルと環境変数の両方が存在する場合(objec
 
         assert settings.client_id == "client_id_from_env"
         assert settings.client_secret == "client_secret_from_env"
+
+
+@pytest.mark.parametrize(
+    "client_id, client_secret, expected",
+    [
+        (None, None, False),
+        ("client_id", None, False),
+        (None, "client_secret", False),
+        ("client_id", "client_secret", True),
+    ],
+)
+def test_is_ok(monkeypatch, mocker_home, client_id, client_secret, expected):
+    monkeypatch.setattr(Settings, "client_id", client_id)
+    monkeypatch.setattr(Settings, "client_secret", client_secret)
+    settings = Settings("default")
+
+    assert settings.is_ok() is expected

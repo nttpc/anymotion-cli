@@ -15,6 +15,27 @@ def client(requests_mock):
     yield client
 
 
+class TestGetInfo(object):
+    def test_get_one(self, requests_mock, client):
+        data = {"id": 1, "name": "image"}
+        requests_mock.get(
+            f"{client._api_url}images/1/", json=data,
+        )
+        result = client.get_info("images", 1)
+
+        assert result == data
+
+    def test_get_list(self, requests_mock, client):
+        data = [{"id": 1, "name": "image"}, {"id": 2, "name": "image"}]
+        requests_mock.get(
+            f"{client._api_url}images/",
+            json={"next": None, "previous": None, "maxPage": 1, "data": data},
+        )
+        result = client.get_info("images")
+
+        assert result == data
+
+
 class TestUpload(object):
     @pytest.mark.parametrize(
         "expected_media_type, path", [("image", "image.jpg"), ("movie", "movie.mp4")]

@@ -10,6 +10,7 @@ from encore_api_cli.output import echo, echo_http, echo_json, echo_success
     [("True", "message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo(capfd, monkeypatch, is_show, expected):
+    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
     if is_show:
         monkeypatch.setenv("STDOUT_ISSHOW", is_show)
 
@@ -25,6 +26,7 @@ def test_echo(capfd, monkeypatch, is_show, expected):
     [("True", "Success: message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo_success(capfd, monkeypatch, is_show, expected):
+    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
     if is_show:
         monkeypatch.setenv("STDOUT_ISSHOW", is_show)
 
@@ -41,6 +43,7 @@ def test_echo_json(capfd):
     out, err = capfd.readouterr()
     assert out == dedent(
         """\
+
             {
               "key": "value"
             }

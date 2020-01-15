@@ -63,7 +63,7 @@ def check_download(out_dir: str, url: str) -> Tuple[bool, str, Path]:
                 """\
                     Skip download. To download it, run the following command.
 
-                    "%(prog)s download %(drawing_id)s"\
+                    "%(prog)s download %(drawing_id)s"
                 """
             )
             return (False, message, path)

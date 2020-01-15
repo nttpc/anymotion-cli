@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 import pytest
 from click.testing import CliRunner
 
@@ -14,48 +16,115 @@ class TestAnalyze(object):
         mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
         yield client_mock
 
+    @pytest.fixture
+    def show_mock(self, mocker):
+        show_mock = mocker.MagicMock()
+        mocker.patch("encore_api_cli.commands.analyze.show", show_mock)
+        yield show_mock
+
     @pytest.mark.parametrize(
-        "params", [["analyze", "1"], ["analyze", "1", "--rule", "[]"]],
+        "args, show_mock_count",
+        [
+            (["analyze", "1"], 0),
+            (["analyze", "--rule", "[]", "1"], 0),
+            (["analyze", "1", "--rule", "[]"], 0),
+            (["analyze", "--show_result", "1"], 1),
+            (["analyze", "1", "--show_result"], 1),
+        ],
     )
-    def test_valid(self, client_mock, params):
+    def test_valid(self, client_mock, show_mock, args, show_mock_count):
         runner = CliRunner()
-        result = runner.invoke(cli, params)
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert show_mock.call_count == show_mock_count
+        assert result.exit_code == 0
+        assert result.output == dedent(
+            """\
+                Start the analysis. (analysis_id: 111)
+                Success: Analysis is complete.
+            """
+        )
+
+    @pytest.mark.parametrize(
+        "status, message",
+        [("TIMEOUT", "Analysis is timed out."), ("FAILURE", "Analysis failed.")],
+    )
+    def test_valid_not_success(self, mocker, status, message):
+        analysis_id = 111
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.analyze_keypoint.return_value = analysis_id
+        client_mock.return_value.wait_for_analysis.return_value = status
+        mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analyze", "1"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == ""
+        assert result.output == dedent(
+            f"""\
+                Start the analysis. (analysis_id: 111)
+                {message}
+            """
+        )
 
     @pytest.mark.parametrize(
-        "rule, expected",
+        "args, expected",
         [
-            ("[1: 2]", "Error: Rule format is invalid. Must be in JSON format.\n"),
-            ("{}", "Error: Rule format is invalid. Must be in list format.\n"),
+            (
+                ["analyze", "--rule", "[1: 2]", "1"],
+                "Error: Rule format is invalid. Must be in JSON format.\n",
+            ),
+            (
+                ["analyze", "1", "--rule", "[1: 2]"],
+                "Error: Rule format is invalid. Must be in JSON format.\n",
+            ),
+            (
+                ["analyze", "--rule", "{}", "1"],
+                "Error: Rule format is invalid. Must be in list format.\n",
+            ),
+            (
+                ["analyze", "1", "--rule", "{}"],
+                "Error: Rule format is invalid. Must be in list format.\n",
+            ),
         ],
     )
-    def test_invalid(self, client_mock, rule, expected):
+    def test_invalid_rule(self, client_mock, args, expected):
         runner = CliRunner()
-        result = runner.invoke(cli, ["analyze", "1", "--rule", rule])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 1
         assert result.output == expected
 
+    @pytest.mark.parametrize("args", [["analyze", "invalid_id"]])
+    def test_invalid_params(self, client_mock, args):
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
 
-# TODO: add test
-# def test_analyze_with_show(mocker):
-#     analysis_id = 111
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert 'Error: Invalid value for "KEYPOINT_ID"' in result.output
 
-#     client_mock = mocker.MagicMock()
-#     client_mock.return_value.analyze_keypoint.return_value = analysis_id
-#     client_mock.return_value.wait_for_analysis.return_value = "SUCCESS"
-#     mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
+    @pytest.mark.parametrize(
+        "args", [["analyze"], ["analyze", "--rule", "1"], ["analyze", "--show_result"]]
+    )
+    def test_missing_args(self, client_mock, args):
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
 
-#     runner = CliRunner()
-#     result = runner.invoke(
-#         cli, ["analyze", "--show_result", "1"], catch_exceptions=True
-#     )
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert 'Error: Missing argument "KEYPOINT_ID"' in result.output
 
-#     assert client_mock.call_count == 1
+    @pytest.mark.parametrize(
+        "args", [["analyze", "--rule"], ["analyze", "1", "--rule"]]
+    )
+    def test_missing_params(self, client_mock, args):
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
 
-#     assert result.exit_code == 0
-#     assert result.output == ""
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert "Error: --rule option requires an argument" in result.output
