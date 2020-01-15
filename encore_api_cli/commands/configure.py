@@ -1,8 +1,10 @@
+from typing import Optional
+
 import click
 from tabulate import tabulate
 
 from encore_api_cli.options import common_options
-from encore_api_cli.state import pass_state
+from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import get_settings
 
 
@@ -15,7 +17,7 @@ def cli() -> None:  # noqa: D103
 @common_options
 @pass_state
 @click.pass_context
-def configure(ctx, state):
+def configure(ctx: click.core.Context, state: State) -> None:
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
         settings = get_settings(state.profile, use_env=False)
@@ -31,12 +33,12 @@ def configure(ctx, state):
 @configure.command()
 @common_options
 @pass_state
-def list(state):
+def list(state: State) -> None:
     """Show the configuration you use."""
     settings = get_settings(state.profile)
     none = click.style("None", fg="yellow")
 
-    def hidden_credentials(string):
+    def hidden_credentials(string: Optional[str]) -> str:
         if string is None or len(string) == 0:
             return none
         else:

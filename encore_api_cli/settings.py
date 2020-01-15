@@ -160,7 +160,7 @@ class Profile(object):
 
 
 class Environment(object):
-    def __init__(self, use_env):
+    def __init__(self, use_env: bool):
         self._use_env = use_env
 
     def __getattr__(self, name: str) -> Optional[str]:

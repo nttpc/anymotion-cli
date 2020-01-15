@@ -1,7 +1,7 @@
 import functools
 import json
 import sys
-from typing import Any, Optional
+from typing import Any, Callable, Optional, Union
 
 import click
 from pygments import highlight
@@ -67,30 +67,32 @@ def write_http(
         write_json_data(data, **kwargs)
 
 
-def spin(stdout_isatty: bool = STDOUT_ISATTY, *args, **kwargs):
-    """Display spinner in terminal."""
-    if stdout_isatty:
-        return Yaspin(*args, **kwargs)
-    else:
-        return Nospin()
-
-
 class Nospin(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         pass
 
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exception_type, exception_value, traceback) -> None:
+    def __exit__(self, *exc: Any) -> None:
         pass
 
-    def __call__(self, fn):
+    def __call__(self, fn: Callable) -> Callable:
         """Call."""
 
         @functools.wraps(fn)
-        def inner(*args, **kwargs):
+        def inner(*args: Any, **kwargs: Any) -> Callable:
             with self:
                 return fn(*args, **kwargs)
 
         return inner
+
+
+def spin(
+    stdout_isatty: bool = STDOUT_ISATTY, *args: Any, **kwargs: Any
+) -> Union[Yaspin, Nospin]:
+    """Display spinner in terminal."""
+    if stdout_isatty:
+        return Yaspin(*args, **kwargs)
+    else:
+        return Nospin()

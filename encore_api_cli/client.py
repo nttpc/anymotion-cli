@@ -102,7 +102,7 @@ class Client(object):
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
-    def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
+    def analyze_keypoint(self, keypoint_id: int) -> int:
         """Start analyze for keypoint_id."""
         url = urljoin(self._api_url, f"analyses/")
         response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})

@@ -28,7 +28,9 @@ def cli() -> None:  # noqa: D103
 @common_options
 @pass_state
 @click.pass_context
-def download(ctx, state: State, drawing_id: int, out_dir: str) -> None:
+def download(
+    ctx: click.core.Context, state: State, drawing_id: int, out_dir: str
+) -> None:
     """Download the drawn file."""
     c = get_client(state)
     status, url = c.wait_for_drawing(drawing_id)

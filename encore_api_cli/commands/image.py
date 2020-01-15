@@ -2,7 +2,7 @@ import click
 
 from encore_api_cli.options import common_options
 from encore_api_cli.output import write_json_data
-from encore_api_cli.state import pass_state
+from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import get_client
 
 
@@ -12,7 +12,7 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.group()
-def image():
+def image() -> None:
     """Show the information of the uploaded images."""
     pass
 
@@ -21,7 +21,7 @@ def image():
 @click.argument("image_id", type=int)
 @common_options
 @pass_state
-def show(state, image_id):
+def show(state: State, image_id: int) -> None:
     """Show image information."""
     c = get_client(state)
     write_json_data(c.get_info("images", image_id), sort_keys=False)
@@ -30,7 +30,7 @@ def show(state, image_id):
 @image.command()
 @common_options
 @pass_state
-def list(state):
+def list(state: State) -> None:
     """Show a list of information for all images."""
     c = get_client(state)
     write_json_data(c.get_info("images"), sort_keys=False)

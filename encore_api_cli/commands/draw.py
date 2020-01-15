@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Callable, Optional
 from urllib.parse import urlparse
 
 import click
@@ -7,11 +8,11 @@ import click
 from encore_api_cli.exceptions import ClickException
 from encore_api_cli.options import common_options
 from encore_api_cli.output import write_message, write_success
-from encore_api_cli.state import pass_state
+from encore_api_cli.state import State, pass_state
 from encore_api_cli.utils import color_id, color_path, get_client
 
 
-def draw_options(f):
+def draw_options(f: Callable) -> Callable:
     """Set draw options."""
     f = click.option("--no-download", is_flag=True, help="Disable download.")(f)
     f = click.option("--rule", help="Drawing rules.")(f)
@@ -36,7 +37,9 @@ def cli() -> None:  # noqa: D103
 @draw_options
 @common_options
 @pass_state
-def draw(state, keypoint_id, out_dir, rule, no_download):
+def draw(
+    state: State, keypoint_id: int, out_dir: str, rule: Optional[str], no_download: bool
+) -> None:
     """Draw keypoints on uploaded movie or image."""
     c = get_client(state)
     drawing_id = c.draw_keypoint(keypoint_id, rule=_parse_rule(rule))
@@ -44,14 +47,14 @@ def draw(state, keypoint_id, out_dir, rule, no_download):
 
     # TODO: invoke download command
     status, url = c.wait_for_drawing(drawing_id)
-    if status == "SUCCESS":
+    if status == "SUCCESS" and url is not None:
         write_success("Drawing is complete.")
         if no_download:
             return
 
-        out_dir = Path(out_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        path = out_dir / Path(urlparse(url).path).name
+        out_dir_path = Path(out_dir)
+        out_dir_path.mkdir(parents=True, exist_ok=True)
+        path = out_dir_path / Path(str(urlparse(url).path)).name
 
         if path.exists():
             write_message(f"File already exists: {color_path(path)}")
@@ -66,7 +69,7 @@ def draw(state, keypoint_id, out_dir, rule, no_download):
         write_message("Drawing failed.")
 
 
-def _parse_rule(rule):
+def _parse_rule(rule: Optional[str]) -> Optional[list]:
     if rule is None:
         return rule
 
