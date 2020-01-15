@@ -17,7 +17,12 @@ jobs:
             pipenv install --dev
       - run:
           name: Run unit test with pytest
-          command: pipenv run pytest -v
+          command: |
+            mkdir test-reports
+            pipenv run pytest -v \
+              --junitxml=test-reports/junit.xml
+      - store_test_results:
+          path: test-reports
   test-py37:
     <<: *test-template
     docker:
