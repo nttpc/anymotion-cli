@@ -19,7 +19,7 @@ setup(
     },
     packages=find_packages(exclude=("tests", "docs")),
     python_requires=">=3.6",
-    install_requires=["click", "pygments", "requests", "tabulate", "yaspin"],
+    install_requires=["click>=7.0", "pygments", "requests", "tabulate", "yaspin"],
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

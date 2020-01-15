@@ -20,7 +20,7 @@ tox = "*"
 mkdocs-material = "*"
 
 [packages]
-click = "*"
+click = ">=7.0"
 pygments = "*"
 requests = "*"
 tabulate = "*"
