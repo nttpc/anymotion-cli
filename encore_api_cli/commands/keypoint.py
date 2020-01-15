@@ -67,7 +67,7 @@ def list(state):
 @common_options
 @pass_state
 @click.pass_context
-def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, no_download):
+def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, rule, no_download):
     """Extract keypoints from uploaded images or movies."""
     if [movie_id, image_id].count(None) in [0, 2]:
         raise click.UsageError('Either "movie_id" or "image_id" is required.')
@@ -96,5 +96,9 @@ def extract(ctx, state, movie_id, image_id, with_drawing, out_dir, no_download):
     if with_drawing:
         write_message()
         ctx.invoke(
-            draw, keypoint_id=keypoint_id, out_dir=out_dir, no_download=no_download
+            draw,
+            keypoint_id=keypoint_id,
+            out_dir=out_dir,
+            rule=rule,
+            no_download=no_download,
         )

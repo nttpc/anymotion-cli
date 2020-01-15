@@ -93,10 +93,12 @@ class Client(object):
         """Start keypoint extraction for movie_id."""
         return self._extract_keypoint({"movie_id": movie_id})
 
-    def draw_keypoint(self, keypoint_id: int) -> int:
+    def draw_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
-        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        response = self._requests(
+            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule},
+        )
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 

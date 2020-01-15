@@ -5,6 +5,7 @@
 Unreleased
 
 - Added alias command `amcli`.
+- Added rule option in `draw` command.
 
 ## 0.6.1
 

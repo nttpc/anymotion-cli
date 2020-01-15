@@ -129,7 +129,10 @@ def test_keypoint_extract_with_drawing(mocker):
     assert extract_keypoint_mock.call_count == 1
     assert extract_keypoint_mock.call_args == ((image_id,),)
     assert client_mock.return_value.draw_keypoint.call_count == 1
-    assert client_mock.return_value.draw_keypoint.call_args == ((keypoint_id,),)
+    assert client_mock.return_value.draw_keypoint.call_args == (
+        (keypoint_id,),
+        {"rule": None},
+    )
     assert client_mock.return_value.download.call_count == 1
 
     assert result.exit_code == 0
