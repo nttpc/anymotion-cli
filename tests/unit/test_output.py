@@ -2,17 +2,19 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.output import (
-    write_http,
-    write_json_data,
-    write_message,
-    write_success,
+from encore_api_cli.output import echo, echo_http, echo_json, echo_success
+
+
+@pytest.mark.parametrize(
+    "is_show, expected",
+    [("True", "message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
+def test_echo(capfd, monkeypatch, is_show, expected):
+    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    if is_show:
+        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
 
-
-@pytest.mark.parametrize("stdout_isatty, expected", [(True, "message\n"), (False, "")])
-def test_write_message(capfd, stdout_isatty, expected):
-    write_message("message", stdout_isatty=stdout_isatty)
+    echo("message")
 
     out, err = capfd.readouterr()
     assert out == expected
@@ -20,22 +22,28 @@ def test_write_message(capfd, stdout_isatty, expected):
 
 
 @pytest.mark.parametrize(
-    "stdout_isatty, expected", [(True, "Success: message\n"), (False, "")]
+    "is_show, expected",
+    [("True", "Success: message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
-def test_write_success(capfd, stdout_isatty, expected):
-    write_success("message", stdout_isatty=stdout_isatty)
+def test_echo_success(capfd, monkeypatch, is_show, expected):
+    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    if is_show:
+        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
+
+    echo_success("message")
 
     out, err = capfd.readouterr()
     assert out == expected
     assert err == ""
 
 
-def test_write_json_data(capfd):
-    write_json_data({"key": "value"})
+def test_echo_json(capfd):
+    echo_json({"key": "value"})
 
     out, err = capfd.readouterr()
     assert out == dedent(
         """\
+
             {
               "key": "value"
             }
@@ -80,9 +88,11 @@ def test_write_json_data(capfd):
         (None, None, "POST http://example.com\n"),
     ],
 )
-def test_write_http(capfd, headers, data, expected):
-    write_http(
-        "http://example.com", "POST", headers=headers, data=data, stdout_isatty=True,
+def test_echo_http(capfd, monkeypatch, headers, data, expected):
+    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+
+    echo_http(
+        "http://example.com", "POST", headers=headers, data=data,
     )
 
     out, err = capfd.readouterr()

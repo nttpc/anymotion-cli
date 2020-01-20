@@ -1,12 +1,14 @@
+from typing import Any, Callable
+
 import click
 
 from encore_api_cli.state import State
 
 
-def verbose_option(f):
+def verbose_option(f: Callable) -> Callable:
     """Set verbose option."""
 
-    def callback(ctx, param, value):
+    def callback(ctx: click.core.Context, param: Any, value: bool) -> bool:
         state = ctx.ensure_object(State)
         state.verbose = value
         return value
@@ -21,10 +23,10 @@ def verbose_option(f):
     )(f)
 
 
-def profile_option(f):
+def profile_option(f: Callable) -> Callable:
     """Set profile option."""
 
-    def callback(ctx, param, value):
+    def callback(ctx: click.core.Context, param: Any, value: str) -> str:
         state = ctx.ensure_object(State)
         state.profile = value
         return value
@@ -38,7 +40,7 @@ def profile_option(f):
     )(f)
 
 
-def common_options(f):
+def common_options(f: Callable) -> Callable:
     """Set common options."""
     f = profile_option(f)
     f = verbose_option(f)

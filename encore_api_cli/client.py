@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 import requests
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import spin, write_http
+from encore_api_cli.output import echo_http, spin
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -93,17 +93,21 @@ class Client(object):
         """Start keypoint extraction for movie_id."""
         return self._extract_keypoint({"movie_id": movie_id})
 
-    def draw_keypoint(self, keypoint_id: int) -> int:
+    def draw_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
-        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        response = self._requests(
+            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
+        )
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
-    def analyze_keypoint(self, keypoint_id: int) -> Optional[str]:
+    def analyze_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start analyze for keypoint_id."""
         url = urljoin(self._api_url, f"analyses/")
-        response = self._requests(requests.post, url, json={"keypoint_id": keypoint_id})
+        response = self._requests(
+            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
+        )
         (analysis_id,) = self._parse_response(response, ("id",))
         return analysis_id
 
@@ -186,7 +190,7 @@ class Client(object):
             headers = self._get_headers(with_content_type=is_json)
 
         if self._verbose:
-            write_http(url, method, headers, json)
+            echo_http(url, method, headers, json)
 
         try:
             if is_json:

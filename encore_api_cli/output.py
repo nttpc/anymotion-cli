@@ -1,7 +1,9 @@
 import functools
 import json
+import os
 import sys
-from typing import Any, Optional
+from distutils.util import strtobool
+from typing import Any, Callable, Optional, Union
 
 import click
 from pygments import highlight
@@ -9,36 +11,21 @@ from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
 from yaspin.core import Yaspin
 
-# TODO: use environment
-STDOUT_ISATTY = sys.stdout.isatty()
 
-
-def write_message(
-    message: Optional[str] = None,
-    message_type: Optional[str] = None,
-    stdout_isatty: bool = STDOUT_ISATTY,
-) -> None:
-    """Output message only for terminal."""
-    if not stdout_isatty:
-        return
-
-    if message_type == "success" and message is not None:
-        message = f"{click.style('Success', fg='green')}: " + message
-        click.echo(message)
-    else:
+def echo(message: Optional[str] = None) -> None:
+    """Output message."""
+    if _is_show():
         click.echo(message)
 
 
-def write_success(message: str, **kwargs: Any) -> None:
+def echo_success(message: str) -> None:
     """Output success message."""
-    write_message(message, message_type="success", **kwargs)
+    echo(f"{click.style('Success', fg='green')}: {message}")
 
 
-def write_json_data(
-    data: object, sort_keys: bool = True, stdout_isatty: bool = STDOUT_ISATTY,
-) -> None:
+def echo_json(data: object, sort_keys: bool = True) -> None:
     """Output json data."""
-    if stdout_isatty:
+    if _is_show():
         click.echo()
 
     body = json.dumps(data, sort_keys=sort_keys, indent=2)
@@ -46,12 +33,8 @@ def write_json_data(
     click.echo(body)
 
 
-def write_http(
-    url: str,
-    method: str,
-    headers: Optional[dict] = None,
-    data: Optional[object] = None,
-    **kwargs: Any,
+def echo_http(
+    url: str, method: str, headers: Optional[dict] = None, data: Optional[object] = None
 ) -> None:
     """Output http request."""
     url = click.style(url, fg="cyan")
@@ -64,33 +47,44 @@ def write_http(
             click.echo(f"{key}: {value}")
 
     if data is not None:
-        write_json_data(data, **kwargs)
-
-
-def spin(stdout_isatty: bool = STDOUT_ISATTY, *args, **kwargs):
-    """Display spinner in terminal."""
-    if stdout_isatty:
-        return Yaspin(*args, **kwargs)
-    else:
-        return Nospin()
+        echo_json(data)
 
 
 class Nospin(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         pass
 
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exception_type, exception_value, traceback) -> None:
+    def __exit__(self, *exc: Any) -> None:
         pass
 
-    def __call__(self, fn):
+    def __call__(self, fn: Callable) -> Callable:
         """Call."""
 
         @functools.wraps(fn)
-        def inner(*args, **kwargs):
+        def inner(*args: Any, **kwargs: Any) -> Callable:
             with self:
                 return fn(*args, **kwargs)
 
         return inner
+
+
+def spin(*args: Any, **kwargs: Any) -> Union[Yaspin, Nospin]:
+    """Display spinner in terminal."""
+    if _is_show():
+        return Yaspin(*args, **kwargs)
+    else:
+        return Nospin()
+
+
+def _is_show() -> bool:
+    env = os.getenv("STDOUT_ISSHOW")
+    if env is None:
+        return sys.stdout.isatty()
+    else:
+        try:
+            return bool(strtobool(env))
+        except ValueError:
+            return sys.stdout.isatty()

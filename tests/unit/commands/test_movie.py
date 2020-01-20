@@ -1,11 +1,9 @@
+from textwrap import dedent
+
+import pytest
 from click.testing import CliRunner
 
-from encore_api_cli.client import Client
 from encore_api_cli.commands.movie import cli
-
-base_url = "http://api.example.com"
-api_url = "http://api.example.com/anymotion/v1/"
-oauth_url = "http://api.example.com/v1/oauth/accesstokens"
 
 
 def test_movie():
@@ -15,17 +13,72 @@ def test_movie():
     assert result.exit_code == 0
 
 
-def test_movie_list(mocker, requests_mock):
-    client_mock = mocker.MagicMock(
-        return_value=Client("client_id", "client_secret", base_url, 5, 600)
+class TestMovieShow(object):
+    def test_valid(self, mocker):
+        expected = dedent(
+            """\
+
+                {
+                  "id": 1,
+                  "name": "movie"
+                }
+
+            """
+        )
+
+        client_mock = self._get_client_mock(mocker)
+        runner = CliRunner()
+        result = runner.invoke(cli, ["movie", "show", "1"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (["movie", "show"], 'Error: Missing argument "MOVIE_ID"'),
+            (["movie", "show", "not_value"], 'Error: Invalid value for "MOVIE_ID"'),
+        ],
     )
-    mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
+    def test_invalid_params(self, mocker, args, expected):
+        client_mock = self._get_client_mock(mocker)
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
 
-    requests_mock.post(oauth_url, json={"accessToken": "token"})
-    requests_mock.get(f"{api_url}movies/", json={"data": "", "next": None})
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert expected in result.output
 
-    runner = CliRunner()
-    result = runner.invoke(cli, ["movie", "list"])
+    def _get_client_mock(self, mocker):
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = {"id": 1, "name": "movie"}
+        mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
+        return client_mock
 
-    assert result.exit_code == 0
-    assert result.output == "[]\n\n"
+
+class TestMovieList(object):
+    def test_valid(self, mocker):
+        expected = dedent(
+            """\
+
+                [
+                  {
+                    "id": 1,
+                    "name": "movie"
+                  }
+                ]
+
+            """
+        )
+
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_info.return_value = [{"id": 1, "name": "movie"}]
+        mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["movie", "list"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected

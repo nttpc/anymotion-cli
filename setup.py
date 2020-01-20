@@ -11,10 +11,15 @@ setup(
     author="Yusuke Kumihashi",
     author_email="y_kumiha@nttpc.co.jp",
     url="https://bitbucket.org/nttpc-datascience/encore-api-cli",
-    entry_points={"console_scripts": ["encore = encore_api_cli.cli:cli"]},
+    entry_points={
+        "console_scripts": [
+            "encore = encore_api_cli.cli:cli",
+            "amcli = encore_api_cli.cli:cli",
+        ]
+    },
     packages=find_packages(exclude=("tests", "docs")),
     python_requires=">=3.6",
-    install_requires=["click", "pygments", "requests", "tabulate", "yaspin"],
+    install_requires=["click>=7.0", "pygments", "requests", "tabulate", "yaspin"],
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
