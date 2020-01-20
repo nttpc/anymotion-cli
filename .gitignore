@@ -147,3 +147,6 @@ dmypy.json
 
 # direnv
 .envrc
+
+# tmp directory
+/tmp

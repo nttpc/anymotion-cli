@@ -1,3 +1,4 @@
+import io
 import json
 from typing import Optional
 
@@ -82,7 +83,8 @@ def extract(
     image_id: Optional[int],
     with_drawing: bool,
     out_dir: str,
-    rule: Optional[str],
+    rule_str: Optional[str],
+    rule_file: Optional[io.TextIOWrapper],
     no_download: bool,
 ) -> None:
     """Extract keypoints from uploaded images or movies."""
@@ -114,6 +116,7 @@ def extract(
             draw,
             keypoint_id=keypoint_id,
             out_dir=out_dir,
-            rule=rule,
+            rule_str=rule_str,
+            rule_file=rule_file,
             no_download=no_download,
         )

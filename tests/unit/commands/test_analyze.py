@@ -41,7 +41,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Start the analysis. (analysis_id: 111)
+                Analysis started. (analysis_id: 111)
                 Success: Analysis is complete.
             """
         )
@@ -64,8 +64,24 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Start the analysis. (analysis_id: 111)
+                Analysis started. (analysis_id: 111)
                 {message}
+            """
+        )
+
+    def test_valid_rule_file(self, tmp_path, client_mock):
+        rule_file = tmp_path / "rule.json"
+        rule_file.write_text("[]")
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analyze", "1", "--rule-file", rule_file])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == dedent(
+            """\
+                Analysis started. (analysis_id: 111)
+                Success: Analysis is complete.
             """
         )
 
@@ -94,7 +110,7 @@ class TestAnalyze(object):
         runner = CliRunner()
         result = runner.invoke(cli, args)
 
-        assert client_mock.call_count == 1
+        assert client_mock.call_count == 0
         assert result.exit_code == 1
         assert result.output == expected
 
@@ -128,3 +144,19 @@ class TestAnalyze(object):
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert "Error: --rule option requires an argument" in result.output
+
+    def test_invalid_params_both_rule(self, tmp_path, client_mock):
+        rule_file = tmp_path / "rule.json"
+        rule_file.write_text("[]")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            cli, ["analyze", "1", "--rule", "[]", "--rule-file", rule_file]
+        )
+
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert (
+            '"rule" and "rule_file" options cannot be used at the same time.'
+            in result.output
+        )
