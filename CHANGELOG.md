@@ -5,6 +5,7 @@
 Unreleased
 
 - Made it possible to use uppercase extensions.
+- Added rule-file option in `draw` command.
 
 ## 0.6.3
 

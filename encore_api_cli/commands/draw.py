@@ -1,3 +1,4 @@
+import io
 from typing import Callable, Optional
 
 import click
@@ -12,7 +13,10 @@ from encore_api_cli.utils import color_id, get_client, parse_rule
 def draw_options(f: Callable) -> Callable:
     """Set draw options."""
     f = click.option("--no-download", is_flag=True, help="Disable download.")(f)
-    f = click.option("--rule", help="Drawing rules in JSON format.")(f)
+    f = click.option("--rule", "rule_str", help="Drawing rules in JSON format.")(f)
+    f = click.option(
+        "--rule-file", type=click.File(), help="Drawing rules file in JSON format."
+    )(f)
     f = click.option(
         "-o",
         "--out_dir",
@@ -40,15 +44,27 @@ def draw(
     state: State,
     keypoint_id: int,
     out_dir: str,
-    rule: Optional[str],
+    rule_str: Optional[str],
+    rule_file: Optional[io.TextIOWrapper],
     no_download: bool,
 ) -> None:
     """Draw keypoints on uploaded movie or image."""
-    c = get_client(state)
-    drawing_id = c.draw_keypoint(keypoint_id, rule=parse_rule(rule))
+    if rule_str is not None and rule_file is not None:
+        raise click.UsageError(
+            '"rule" and "rule_file" options cannot be used at the same time.'
+        )
+
+    rule = None
+    if rule_str is not None:
+        rule = parse_rule(rule_str)
+    elif rule_file is not None:
+        rule = parse_rule(rule_file.read())
+
+    client = get_client(state)
+    drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
     echo(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
 
-    status, url = c.wait_for_drawing(drawing_id)
+    status, url = client.wait_for_drawing(drawing_id)
     if status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
         if no_download:
@@ -56,7 +72,7 @@ def draw(
 
         is_ok, message, path = check_download(out_dir, url)
         if is_ok:
-            c.download(url, path)
+            client.download(url, path)
         else:
             prog = ctx.find_root().info_name
             message = message % {"prog": prog, "drawing_id": drawing_id}
