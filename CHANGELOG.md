@@ -6,12 +6,13 @@ Unreleased
 
 - Made it possible to use uppercase extensions.
 - Added rule-file option in `draw` command.
+- Fixed bug without rule option in `analyze` command.
 
 ## 0.6.3
 
 Released 2020-01-20
 
-- Fixed draw bug without rule option.
+- Fixed bug without rule option in `draw` command.
 
 ## 0.6.2
 
