@@ -12,10 +12,28 @@ The encore-api-cli package works on Python versions:
 
 ## Installation
 
-Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/):
+Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/).
+
+### Latest version
+
+**NOTE**: You need access to this repository for bitbucket.
 
 ```sh
 $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.git
+```
+
+### Specific version
+
+**NOTE**: You can only access from the internal network.
+
+```sh
+$ pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-<version>-py3-none-any.whl
+```
+
+To install version 1.0.0:
+
+```sh
+$ pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-1.0.0-py3-none-any.whl
 ```
 
 ## Getting Started
