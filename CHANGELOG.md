@@ -2,7 +2,7 @@
 
 ## 0.6.2
 
-Unreleased
+Released 2020-01-20
 
 - Added alias command `amcli`.
 - Added rule option in `analyze` and `draw` command.
