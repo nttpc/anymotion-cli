@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.6.3
+
+Released 2020-01-20
+
+- Fixed draw bug without rule option.
+
 ## 0.6.2
 
 Released 2020-01-20

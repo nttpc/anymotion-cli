@@ -96,9 +96,10 @@ class Client(object):
     def draw_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
-        response = self._requests(
-            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
-        )
+        json = {"keypoint_id": keypoint_id}
+        if rule is not None:
+            json["rule"] = rule  # type: ignore
+        response = self._requests(requests.post, url, json=json)
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
