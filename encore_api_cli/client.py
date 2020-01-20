@@ -261,10 +261,10 @@ class Client(object):
             raise InvalidFileType(message)
 
     def _is_movie(self, path: Path) -> bool:
-        return True if path.suffix in MOVIE_SUFFIXES else False
+        return True if path.suffix.lower() in MOVIE_SUFFIXES else False
 
     def _is_image(self, path: Path) -> bool:
-        return True if path.suffix in IMAGE_SUFFIXES else False
+        return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
     @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:

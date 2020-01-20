@@ -38,7 +38,16 @@ class TestGetInfo(object):
 
 class TestUpload(object):
     @pytest.mark.parametrize(
-        "expected_media_type, path", [("image", "image.jpg"), ("movie", "movie.mp4")]
+        "expected_media_type, path",
+        [
+            ("image", "image.jpg"),
+            ("image", "image.JPG"),
+            ("image", "image.jpeg"),
+            ("image", "image.png"),
+            ("movie", "movie.mp4"),
+            ("movie", "movie.MP4"),
+            ("movie", "movie.mov"),
+        ],
     )
     def test_ファイルをアップロードできること(
         self, mocker, requests_mock, client, expected_media_type, path

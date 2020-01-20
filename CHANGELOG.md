@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.6.4
+
+Unreleased
+
+- Made it possible to use uppercase extensions.
+
 ## 0.6.3
 
 Released 2020-01-20
