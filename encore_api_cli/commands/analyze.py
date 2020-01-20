@@ -1,3 +1,4 @@
+import io
 from typing import Optional
 
 import click
@@ -16,7 +17,10 @@ def cli() -> None:  # noqa: D103
 
 @cli.command()
 @click.argument("keypoint_id", type=int)
-@click.option("--rule", help="Analysis rules in JSON format.")
+@click.option("--rule", "rule_str", help="Analysis rules in JSON format.")
+@click.option(
+    "--rule-file", type=click.File(), help="Analysis rules file in JSON format."
+)
 @click.option("--show_result", is_flag=True)
 @common_options
 @pass_state
@@ -25,15 +29,27 @@ def analyze(
     ctx: click.core.Context,
     state: State,
     keypoint_id: int,
-    rule: Optional[str],
+    rule_str: Optional[str],
+    rule_file: Optional[io.TextIOWrapper],
     show_result: bool,
 ) -> None:
     """Analyze the extracted keypoint data."""
-    c = get_client(state)
-    analysis_id = c.analyze_keypoint(keypoint_id, rule=parse_rule(rule))
-    echo(f"Start the analysis. (analysis_id: {color_id(analysis_id)})")
+    if rule_str is not None and rule_file is not None:
+        raise click.UsageError(
+            '"rule" and "rule_file" options cannot be used at the same time.'
+        )
 
-    status = c.wait_for_analysis(analysis_id)
+    rule = None
+    if rule_str is not None:
+        rule = parse_rule(rule_str)
+    elif rule_file is not None:
+        rule = parse_rule(rule_file.read())
+
+    client = get_client(state)
+    analysis_id = client.analyze_keypoint(keypoint_id, rule=rule)
+    echo(f"Analysis started. (analysis_id: {color_id(analysis_id)})")
+
+    status = client.wait_for_analysis(analysis_id)
     if status == "SUCCESS":
         echo_success("Analysis is complete.")
         if show_result:
