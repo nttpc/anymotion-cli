@@ -4,6 +4,9 @@
 
 Unreleased
 
+- Added output with `--verbose` option.
+- Avoided unnecessary requests to get access token.
+
 ## 0.6.4
 
 Released 2020-01-21

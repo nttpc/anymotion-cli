@@ -16,7 +16,7 @@ Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/).
 
 ### Latest version
 
-**NOTE**: You need access to this repository for bitbucket.
+**NOTICE**: You need an SSH key to install.
 
 ```sh
 $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.git
@@ -24,7 +24,7 @@ $ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.gi
 
 ### Specific version
 
-**NOTE**: You can only access from the internal network.
+**NOTICE**: You can only install from the internal network.
 
 ```sh
 $ pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-<version>-py3-none-any.whl

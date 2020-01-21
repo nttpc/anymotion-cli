@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 import requests
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import echo_http, spin
+from encore_api_cli.output import echo_request, echo_response, spin
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -27,6 +27,7 @@ class Client(object):
     ):
         self._client_id = client_id
         self._client_secret = client_secret
+        self._token = None
 
         self._oauth_url = urljoin(base_url, "v1/oauth/accesstokens")
         self._api_url = urljoin(base_url, "anymotion/v1/")
@@ -35,6 +36,11 @@ class Client(object):
         self._max_steps = max(1, timeout // interval)
 
         self._verbose = verbose
+
+    @property
+    def token(self) -> str:
+        """Return access token."""
+        return self._token or self._get_token()
 
     def get_info(
         self, endpoint: str, endpoint_id: int = None
@@ -152,7 +158,7 @@ class Client(object):
         response = self._requests(requests.get, url)
         return response.json()
 
-    @spin(text="Retrieving...")
+    # @spin(text="Retrieving...")
     def _get_list(self, url: str) -> List[dict]:
         data: List[dict] = []
         while url:
@@ -192,7 +198,7 @@ class Client(object):
             headers = self._get_headers(with_content_type=is_json)
 
         if self._verbose:
-            echo_http(url, method, headers, json)
+            echo_request(url, method, headers, json)
 
         try:
             if is_json:
@@ -202,6 +208,15 @@ class Client(object):
         except requests.exceptions.ConnectionError:
             message = f"{method} {url} is failed."
             raise RequestsError(message)
+
+        if self._verbose:
+            echo_response(
+                response.status_code,
+                response.reason,
+                response.raw.version,
+                response.headers,
+                response.json(),
+            )
 
         if response.status_code not in [200, 201]:
             message = dedent(
@@ -217,8 +232,7 @@ class Client(object):
 
     def _get_headers(self, with_content_type: bool = True) -> dict:
         """Generate Authorization and Content-Type headers."""
-        token = self._get_token()
-        headers = {"Authorization": f"Bearer {token}"}
+        headers = {"Authorization": f"Bearer {self.token}"}
         if with_content_type:
             headers["Content-Type"] = "application/json"
         return headers
@@ -238,6 +252,7 @@ class Client(object):
         )
         (token,) = self._parse_response(response, ("accessToken",))
 
+        self._token = token
         return token
 
     def _parse_response(self, response: requests.models.Response, keys: tuple) -> tuple:
@@ -267,14 +282,21 @@ class Client(object):
     def _is_image(self, path: Path) -> bool:
         return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
-    @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
-        for _ in range(self._max_steps):
-            response = self._requests(requests.get, url)
-            (status,) = self._parse_response(response, ("execStatus",))
-            if status in ["SUCCESS", "FAILURE"]:
-                break
-            time.sleep(self._interval)
+        def _loop(url: str) -> str:
+            for _ in range(self._max_steps):
+                response = self._requests(requests.get, url)
+                (status,) = self._parse_response(response, ("execStatus",))
+                if status in ["SUCCESS", "FAILURE"]:
+                    break
+                time.sleep(self._interval)
+            else:
+                status = "TIMEOUT"
+            return status
+
+        if self._verbose:
+            status = _loop(url)
         else:
-            status = "TIMEOUT"
+            with spin(text="Processing..."):
+                status = _loop(url)
         return status

@@ -41,7 +41,7 @@ def show(state: State, keypoint_id: int) -> None:
         if not isinstance(keypoint, str):
             # TODO: catch error
             raise
-        echo_json(json.loads(keypoint), sort_keys=False)
+        echo_json(json.loads(keypoint))
     else:
         echo("Status is not SUCCESS.")
 
@@ -52,7 +52,7 @@ def show(state: State, keypoint_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all keypoints."""
     c = get_client(state)
-    echo_json(c.get_info("keypoints"), sort_keys=False)
+    echo_json(c.get_info("keypoints"))
 
 
 @keypoint.command()
