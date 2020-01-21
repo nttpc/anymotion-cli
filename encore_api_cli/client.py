@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 import requests
 
 from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import echo_http, spin
+from encore_api_cli.output import echo_request, echo_response, spin
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -192,7 +192,7 @@ class Client(object):
             headers = self._get_headers(with_content_type=is_json)
 
         if self._verbose:
-            echo_http(url, method, headers, json)
+            echo_request(url, method, headers, json)
 
         try:
             if is_json:
@@ -202,6 +202,15 @@ class Client(object):
         except requests.exceptions.ConnectionError:
             message = f"{method} {url} is failed."
             raise RequestsError(message)
+
+        if self._verbose:
+            echo_response(
+                response.status_code,
+                response.reason,
+                response.raw.version,
+                response.headers,
+                response.json(),
+            )
 
         if response.status_code not in [200, 201]:
             message = dedent(
@@ -267,6 +276,7 @@ class Client(object):
     def _is_image(self, path: Path) -> bool:
         return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
+    # TODO: when verbose
     @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
         for _ in range(self._max_steps):

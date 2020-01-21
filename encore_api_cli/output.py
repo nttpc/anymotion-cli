@@ -20,10 +20,11 @@ def echo(message: Optional[str] = None) -> None:
 
 def echo_success(message: str) -> None:
     """Output success message."""
-    echo(f"{click.style('Success', fg='green')}: {message}")
+    if _is_show():
+        echo(f"{click.style('Success', fg='green')}: {message}")
 
 
-def echo_json(data: object, sort_keys: bool = True) -> None:
+def echo_json(data: object, sort_keys: bool = False) -> None:
     """Output json data."""
     if _is_show():
         click.echo()
@@ -33,8 +34,8 @@ def echo_json(data: object, sort_keys: bool = True) -> None:
     click.echo(body)
 
 
-def echo_http(
-    url: str, method: str, headers: Optional[dict] = None, data: Optional[object] = None
+def echo_request(
+    url: str, method: str, headers: Optional[dict] = None, json: Optional[object] = None
 ) -> None:
     """Output http request."""
     url = click.style(url, fg="cyan")
@@ -46,8 +47,40 @@ def echo_http(
             key = click.style(key, fg="cyan")
             click.echo(f"{key}: {value}")
 
-    if data is not None:
-        echo_json(data)
+    if json is not None:
+        echo_json(json)
+
+    click.echo()
+
+
+def echo_response(
+    status_code: int,
+    reason: str,
+    version: int,
+    headers: Optional[dict],
+    json: Optional[object],
+) -> None:
+    """Output http response."""
+    status = click.style(str(status_code), fg="blue")
+    reason = click.style(reason, fg="cyan")
+    http_version = "HTTP"
+    if version == 10:
+        http_version = "HTTP/1.0"
+    elif version == 11:
+        http_version = "HTTP/1.1"
+    http_version = click.style(http_version, fg="blue")
+    click.echo(f"{http_version} {status} {reason}")
+
+    if headers is not None:
+        for key, value in headers.items():
+            key = click.style(key, fg="cyan")
+            click.echo(f"{key}: {value}")
+
+    if json is not None:
+        echo_json(json)
+
+    click.echo()
+    click.echo()
 
 
 class Nospin(object):

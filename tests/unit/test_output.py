@@ -2,7 +2,13 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.output import echo, echo_http, echo_json, echo_success
+from encore_api_cli.output import (
+    echo,
+    echo_json,
+    echo_request,
+    echo_response,
+    echo_success,
+)
 
 
 @pytest.mark.parametrize(
@@ -54,7 +60,7 @@ def test_echo_json(capfd):
 
 
 @pytest.mark.parametrize(
-    "headers, data, expected",
+    "headers, json, expected",
     [
         (
             {"Content-Type": "application/json"},
@@ -67,6 +73,7 @@ def test_echo_json(capfd):
                     {
                       "key": "value"
                     }
+
 
                 """
             ),
@@ -82,18 +89,86 @@ def test_echo_json(capfd):
                       "key": "value"
                     }
 
+
                 """
             ),
         ),
-        (None, None, "POST http://example.com\n"),
+        (None, None, "POST http://example.com\n\n"),
     ],
 )
-def test_echo_http(capfd, monkeypatch, headers, data, expected):
+def test_echo_request(capfd, monkeypatch, headers, json, expected):
     monkeypatch.setenv("STDOUT_ISSHOW", "True")
 
-    echo_http(
-        "http://example.com", "POST", headers=headers, data=data,
+    echo_request(
+        "http://example.com", "POST", headers=headers, json=json,
     )
+
+    out, err = capfd.readouterr()
+    assert out == expected
+    assert err == ""
+
+
+@pytest.mark.parametrize(
+    "status_code, reason, version, headers, json, expected",
+    [
+        (
+            200,
+            "OK",
+            11,
+            {"Content-Type": "application/json"},
+            None,
+            dedent(
+                """\
+                    HTTP/1.1 200 OK
+                    Content-Type: application/json
+
+
+                """
+            ),
+        ),
+        (
+            201,
+            "Created",
+            10,
+            {"Content-Type": "application/json"},
+            None,
+            dedent(
+                """\
+                    HTTP/1.0 201 Created
+                    Content-Type: application/json
+
+
+                """
+            ),
+        ),
+        (
+            200,
+            "OK",
+            11,
+            {"Content-Type": "application/json"},
+            {"id": 1},
+            dedent(
+                """\
+                    HTTP/1.1 200 OK
+                    Content-Type: application/json
+
+                    {
+                      "id": 1
+                    }
+
+
+
+                """
+            ),
+        ),
+    ],
+)
+def test_echo_response(
+    capfd, monkeypatch, status_code, reason, version, headers, json, expected
+):
+    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+
+    echo_response(status_code, reason, version, headers, json)
 
     out, err = capfd.readouterr()
     assert out == expected

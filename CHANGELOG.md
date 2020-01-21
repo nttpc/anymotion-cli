@@ -4,6 +4,8 @@
 
 Unreleased
 
+- Added output with `--verbose` option.
+
 ## 0.6.4
 
 Released 2020-01-21
