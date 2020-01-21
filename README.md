@@ -45,10 +45,10 @@ You can do this in several ways:
 - Credentials file
 - Environment variables
 
-The quickest way to get started is to run the `encore configure` command:
+The quickest way to get started is to run the `amcli configure` command:
 
 ```sh
-$ encore configure
+$ amcli configure
 AnyMotion API URL [https://api.customer.jp/]:
 AnyMotion Client ID: your_client_id
 AnyMotion Client Secret: your_client_secret
@@ -76,11 +76,11 @@ and place it in `~/.anymotion/credentials`.
 ## Usage
 
 ```sh
-$ encore --help
+$ amcli --help
 ```
 
 ```text
-Usage: encore [OPTIONS] COMMAND [ARGS]...
+Usage: amcli [OPTIONS] COMMAND [ARGS]...
 
   Command Line Interface for AnyMotion API.
 
@@ -107,20 +107,20 @@ Commands:
 First, upload the image file.
 
 ```sh
-$ encore upload image.jpg
+$ amcli upload image.jpg
 Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
 ```
 
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
 
 ```sh
-$ encore keypoint extract --image_id 111
+$ amcli keypoint extract --image_id 111
 Keypoint extraction started. (keypoint_id: 222)
 Success: Keypoint extraction is complete.
 ```
 
 ```sh
-$ encore draw 222
+$ amcli draw 222
 Drawing is started. (drawing_id: 333)
 Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
@@ -136,13 +136,13 @@ You can use [jq](https://stedolan.github.io/jq/) to filter according to conditio
 Get a list of keypoints whose execStatus is SUCCESS:
 
 ```sh
-$ encore keypoint list | jq '.[] | select(.execStatus == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
+$ amcli keypoint list | jq '.[] | select(.execStatus == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
 ```
 
 Get a list of keypoint_id for only movie:
 
 ```sh
-$ encore keypoint list | jq '.[] | select(.movie != null) | .id'
+$ amcli keypoint list | jq '.[] | select(.movie != null) | .id'
 ```
 
 ## Bash Complete
@@ -151,13 +151,13 @@ The encore-api-cli supports Bash completion.
 To enable Bash completion, you would need to put into your `.bashrc`:
 
 ```sh
-$ eval "$(_ENCORE_COMPLETE=source encore)"
+$ eval "$(_AMCLI_COMPLETE=source amcli)"
 ```
 
 For zsh users add this to your `.zshrc`:
 
 ```sh
-$ eval "$(_ENCORE_COMPLETE=source_zsh encore)"
+$ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 ```
 
 ## Contributing
