@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   codecov: codecov/codecov@1.0.5
+  aws-cli: circleci/aws-cli@0.1.19
 
 jobs:
   test-py38: &test-template
@@ -78,13 +79,63 @@ jobs:
       - run:
           name: Check security with bandit
           command: pipenv run bandit -r encore_api_cli -s B303
+  build-and-upload:
+    docker:
+      - image: circleci/python:3
+    steps:
+      - checkout
+      - aws-cli/setup
+      - run:
+          name: Install python packages
+          command: |
+            sudo pip install pipenv
+            pipenv sync
+      - run:
+          name: Build
+          command: pipenv run build
+      - run:
+          name: Upload build file to S3
+          command: |
+            aws s3 sync dist s3://encore-api-cli
+            aws s3 sync README.md s3://encore-api-cli
 
 workflows:
   build-and-test:
     jobs:
-      - test-py36
-      - test-py37
-      - test-py38
-      - measure-coverage
-      - check-syntax
-      - check-security
+      - test-py36:
+          filters:
+            tags:
+              only: /^\d.*/
+      - test-py37:
+          filters:
+            tags:
+              only: /^\d.*/
+      - test-py38:
+          filters:
+            tags:
+              only: /^\d.*/
+      - measure-coverage:
+          filters:
+            tags:
+              only: /^\d.*/
+      - check-syntax:
+          filters:
+            tags:
+              only: /^\d.*/
+      - check-security:
+          filters:
+            tags:
+              only: /^\d.*/
+      - build-and-upload:
+          filters:
+            tags:
+              only: /^\d.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - test-py36
+            - test-py37
+            - test-py38
+            - measure-coverage
+            - check-syntax
+            - check-security

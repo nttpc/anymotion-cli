@@ -99,6 +99,23 @@ class TestDraw(object):
             """
         )
 
+    def test_valid_rule_file(self, tmp_path, client_mock):
+        rule_file = tmp_path / "rule.json"
+        rule_file.write_text("[]")
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["draw", "1", "--rule-file", rule_file])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == dedent(
+            """\
+                Drawing started. (drawing_id: 111)
+                Success: Drawing is complete.
+                Downloaded the file to image.jpg.
+            """
+        )
+
     @pytest.mark.parametrize(
         "args, expected",
         [
@@ -116,35 +133,41 @@ class TestDraw(object):
         runner = CliRunner()
         result = runner.invoke(cli, args)
 
-        assert client_mock.call_count == 1
+        assert client_mock.call_count == 0
         assert result.exit_code == 1
         assert result.output == expected
 
-    @pytest.mark.parametrize("args", [["draw", "invalid_id"]])
-    def test_invalid_params(self, client_mock, args):
-        runner = CliRunner()
-        result = runner.invoke(cli, args)
-
-        assert client_mock.call_count == 0
-        assert result.exit_code == 2
-        assert 'Error: Invalid value for "KEYPOINT_ID"' in result.output
-
     @pytest.mark.parametrize(
-        "args", [["draw"], ["draw", "--rule", "1"], ["draw", "--no-download"]]
+        "args, expected",
+        [
+            (["draw", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
+            (["draw"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["draw", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["draw", "--no-download"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["draw", "--rule"], "Error: --rule option requires an argument"),
+            (["draw", "1", "--rule"], "Error: --rule option requires an argument"),
+        ],
     )
-    def test_missing_args(self, client_mock, args):
+    def test_invalid_params(self, client_mock, args, expected):
         runner = CliRunner()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert 'Error: Missing argument "KEYPOINT_ID"' in result.output
+        assert expected in result.output
 
-    @pytest.mark.parametrize("args", [["draw", "--rule"], ["draw", "1", "--rule"]])
-    def test_missing_params(self, client_mock, args):
+    def test_invalid_params_both_rule(self, tmp_path, client_mock):
+        rule_file = tmp_path / "rule.json"
+        rule_file.write_text("[]")
+
         runner = CliRunner()
-        result = runner.invoke(cli, args)
+        result = runner.invoke(
+            cli, ["draw", "1", "--rule", "[]", "--rule-file", rule_file]
+        )
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert "Error: --rule option requires an argument" in result.output
+        assert (
+            '"rule" and "rule_file" options cannot be used at the same time.'
+            in result.output
+        )

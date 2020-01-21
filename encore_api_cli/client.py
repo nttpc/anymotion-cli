@@ -3,7 +3,7 @@ import hashlib
 import time
 from pathlib import Path
 from textwrap import dedent
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 
 import requests
@@ -96,9 +96,9 @@ class Client(object):
     def draw_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
-        json = {"keypoint_id": keypoint_id}
+        json: Dict[str, Union[int, list]] = {"keypoint_id": keypoint_id}
         if rule is not None:
-            json["rule"] = rule  # type: ignore
+            json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
@@ -106,9 +106,10 @@ class Client(object):
     def analyze_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
         """Start analyze for keypoint_id."""
         url = urljoin(self._api_url, f"analyses/")
-        response = self._requests(
-            requests.post, url, json={"keypoint_id": keypoint_id, "rule": rule}
-        )
+        json: Dict[str, Union[int, list]] = {"keypoint_id": keypoint_id}
+        if rule is not None:
+            json["rule"] = rule
+        response = self._requests(requests.post, url, json=json)
         (analysis_id,) = self._parse_response(response, ("id",))
         return analysis_id
 
@@ -261,10 +262,10 @@ class Client(object):
             raise InvalidFileType(message)
 
     def _is_movie(self, path: Path) -> bool:
-        return True if path.suffix in MOVIE_SUFFIXES else False
+        return True if path.suffix.lower() in MOVIE_SUFFIXES else False
 
     def _is_image(self, path: Path) -> bool:
-        return True if path.suffix in IMAGE_SUFFIXES else False
+        return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
     @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
