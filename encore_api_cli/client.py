@@ -152,7 +152,7 @@ class Client(object):
         response = self._requests(requests.get, url)
         return response.json()
 
-    @spin(text="Retrieving...")
+    # @spin(text="Retrieving...")
     def _get_list(self, url: str) -> List[dict]:
         data: List[dict] = []
         while url:
@@ -276,15 +276,21 @@ class Client(object):
     def _is_image(self, path: Path) -> bool:
         return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
-    # TODO: when verbose
-    @spin(text="Processing...")
     def _wait_for_done(self, url: str) -> str:
-        for _ in range(self._max_steps):
-            response = self._requests(requests.get, url)
-            (status,) = self._parse_response(response, ("execStatus",))
-            if status in ["SUCCESS", "FAILURE"]:
-                break
-            time.sleep(self._interval)
+        def _loop(url: str) -> str:
+            for _ in range(self._max_steps):
+                response = self._requests(requests.get, url)
+                (status,) = self._parse_response(response, ("execStatus",))
+                if status in ["SUCCESS", "FAILURE"]:
+                    break
+                time.sleep(self._interval)
+            else:
+                status = "TIMEOUT"
+            return status
+
+        if self._verbose:
+            status = _loop(url)
         else:
-            status = "TIMEOUT"
+            with spin(text="Processing..."):
+                status = _loop(url)
         return status
