@@ -2,7 +2,7 @@
 
 ## 0.6.4
 
-Unreleased
+Released 2020-01-21
 
 - Made it possible to use uppercase extensions.
 - Added rule-file option in `analyze` and `draw` commands.
