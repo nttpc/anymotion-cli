@@ -27,6 +27,7 @@ class Client(object):
     ):
         self._client_id = client_id
         self._client_secret = client_secret
+        self._token = None
 
         self._oauth_url = urljoin(base_url, "v1/oauth/accesstokens")
         self._api_url = urljoin(base_url, "anymotion/v1/")
@@ -35,6 +36,11 @@ class Client(object):
         self._max_steps = max(1, timeout // interval)
 
         self._verbose = verbose
+
+    @property
+    def token(self) -> str:
+        """Return access token."""
+        return self._token or self._get_token()
 
     def get_info(
         self, endpoint: str, endpoint_id: int = None
@@ -226,8 +232,7 @@ class Client(object):
 
     def _get_headers(self, with_content_type: bool = True) -> dict:
         """Generate Authorization and Content-Type headers."""
-        token = self._get_token()
-        headers = {"Authorization": f"Bearer {token}"}
+        headers = {"Authorization": f"Bearer {self.token}"}
         if with_content_type:
             headers["Content-Type"] = "application/json"
         return headers
@@ -247,6 +252,7 @@ class Client(object):
         )
         (token,) = self._parse_response(response, ("accessToken",))
 
+        self._token = token
         return token
 
     def _parse_response(self, response: requests.models.Response, keys: tuple) -> tuple:
