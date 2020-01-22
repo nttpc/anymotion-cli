@@ -2,9 +2,9 @@
 
 ## 0.6.5
 
-Unreleased
+Released 2020-01-22
 
-- Added output with `--verbose` option.
+- Improved output with `--verbose` option.
 - Avoided unnecessary requests to get access token.
 
 ## 0.6.4
