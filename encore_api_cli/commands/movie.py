@@ -24,7 +24,7 @@ def movie() -> None:
 def show(state: State, movie_id: int) -> None:
     """Show movie information."""
     c = get_client(state)
-    echo_json(c.get_info("movies", movie_id), sort_keys=False)
+    echo_json(c.get_info("movies", movie_id))
 
 
 @movie.command()
@@ -33,4 +33,4 @@ def show(state: State, movie_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all movies."""
     c = get_client(state)
-    echo_json(c.get_info("movies"), sort_keys=False)
+    echo_json(c.get_info("movies"))

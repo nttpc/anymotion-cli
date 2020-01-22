@@ -36,7 +36,7 @@ def show(state: State, analysis_id: int) -> None:
         if not isinstance(result, str):
             # TODO: catch error
             raise
-        echo_json(json.loads(result), sort_keys=False)
+        echo_json(json.loads(result))
     else:
         echo("Status is not SUCCESS.")
 
@@ -47,4 +47,4 @@ def show(state: State, analysis_id: int) -> None:
 def list(state: State) -> None:
     """Show analysis list."""
     client = get_client(state)
-    echo_json(client.get_info("analyses"), sort_keys=False)
+    echo_json(client.get_info("analyses"))

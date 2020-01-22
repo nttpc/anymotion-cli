@@ -24,7 +24,7 @@ def image() -> None:
 def show(state: State, image_id: int) -> None:
     """Show image information."""
     c = get_client(state)
-    echo_json(c.get_info("images", image_id), sort_keys=False)
+    echo_json(c.get_info("images", image_id))
 
 
 @image.command()
@@ -33,4 +33,4 @@ def show(state: State, image_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all images."""
     c = get_client(state)
-    echo_json(c.get_info("images"), sort_keys=False)
+    echo_json(c.get_info("images"))
