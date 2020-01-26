@@ -25,7 +25,7 @@ def analysis() -> None:
 def show(state: State, analysis_id: int) -> None:
     """Show analysis result."""
     client = get_client(state)
-    response = client.get_info("analyses", analysis_id)
+    response = client.get_one_data("analyses", analysis_id)
     if not isinstance(response, dict):
         # TODO: catch error
         raise
@@ -47,4 +47,4 @@ def show(state: State, analysis_id: int) -> None:
 def list(state: State) -> None:
     """Show analysis list."""
     client = get_client(state)
-    echo_json(client.get_info("analyses"))
+    echo_json(client.get_list_data("analyses"))
