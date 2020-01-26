@@ -124,8 +124,8 @@ class TestDraw(object):
                 "Error: Rule format is invalid. Must be in JSON format.\n",
             ),
             (
-                ["draw", "1", "--rule", "{}"],
-                "Error: Rule format is invalid. Must be in list format.\n",
+                ["draw", "1", "--rule", "1"],
+                "Error: Rule format is invalid. Must be in list or object format.\n",
             ),
         ],
     )

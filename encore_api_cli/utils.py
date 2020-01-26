@@ -14,6 +14,7 @@ def get_client(state: State) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
     if not settings.is_ok():
+        # FIXME: use prog instead of "encore"
         message = (
             "The credentials is invalid or not set. "
             'Run "encore configure" to set credentials.'
@@ -49,8 +50,10 @@ def parse_rule(rule: Optional[str]) -> Optional[list]:
     except json.decoder.JSONDecodeError:
         raise ClickException("Rule format is invalid. Must be in JSON format.")
 
-    if not isinstance(rule, list):
-        raise ClickException("Rule format is invalid. Must be in list format.")
+    if not isinstance(rule, (list, dict)):
+        raise ClickException(
+            "Rule format is invalid. Must be in list or object format."
+        )
 
     return rule
 
