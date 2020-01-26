@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.6.6
+
+Unreleased
+
 ## 0.6.5
 
 Released 2020-01-22
@@ -12,21 +16,21 @@ Released 2020-01-22
 Released 2020-01-21
 
 - Made it possible to use uppercase extensions.
-- Added rule-file option in `analyze` and `draw` commands.
-- Fixed bug without rule option in `analyze` command.
+- Added `--rule-file` option in `analyze` and `draw` commands.
+- Fixed bug without `--rule` option in `analyze` command.
 
 ## 0.6.3
 
 Released 2020-01-20
 
-- Fixed bug without rule option in `draw` command.
+- Fixed bug without `--rule` option in `draw` command.
 
 ## 0.6.2
 
 Released 2020-01-20
 
 - Added alias command `amcli`.
-- Added rule option in `analyze` and `draw` commands.
+- Added `--rule` option in `analyze` and `draw` commands.
 
 ## 0.6.1
 
