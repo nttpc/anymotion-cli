@@ -33,7 +33,7 @@ class Client(object):
         self._api_url = urljoin(base_url, "anymotion/v1/")
 
         self._interval = max(1, interval)
-        self._max_steps = max(1, timeout // interval)
+        self._max_steps = max(1, timeout // self._interval)
 
         self._verbose = verbose
 
