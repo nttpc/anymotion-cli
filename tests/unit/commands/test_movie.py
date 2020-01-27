@@ -73,7 +73,9 @@ class TestMovieList(object):
         )
 
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_list_data.return_value = [{"id": 1, "name": "movie"}]
+        client_mock.return_value.get_list_data.return_value = [
+            {"id": 1, "name": "movie"}
+        ]
         mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
 
         runner = CliRunner()
