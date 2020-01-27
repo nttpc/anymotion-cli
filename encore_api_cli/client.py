@@ -33,7 +33,7 @@ class Client(object):
         self._api_url = urljoin(base_url, "anymotion/v1/")
 
         self._interval = max(1, interval)
-        self._max_steps = max(1, timeout // interval)
+        self._max_steps = max(1, timeout // self._interval)
 
         self._verbose = verbose
 
@@ -42,16 +42,22 @@ class Client(object):
         """Return access token."""
         return self._token or self._get_token()
 
-    def get_info(
-        self, endpoint: str, endpoint_id: int = None
-    ) -> Union[List[dict], dict]:
-        """Get infomation."""
-        if endpoint_id is None:
-            url = urljoin(self._api_url, f"{endpoint}/")
-            return self._get_list(url)
-        else:
-            url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
-            return self._get_one(url)
+    def get_one_data(self, endpoint: str, endpoint_id: int) -> dict:
+        """Get one piece of data from AnyMotion API."""
+        url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
+        response = self._requests(requests.get, url)
+        return response.json()
+
+    # @spin(text="Retrieving...")
+    def get_list_data(self, endpoint: str) -> List[dict]:
+        """Get list data from AnyMotion API."""
+        url = urljoin(self._api_url, f"{endpoint}/")
+        data: List[dict] = []
+        while url:
+            response = self._requests(requests.get, url)
+            sub_data, url = self._parse_response(response, ("data", "next"))
+            data += sub_data
+        return data
 
     def upload_to_s3(self, path: Union[str, Path]) -> Tuple[int, str]:
         """Upload movie or image to Amazon S3.
@@ -154,19 +160,6 @@ class Client(object):
             content_md5 = encoded_content_md5.decode()
         return content_md5
 
-    def _get_one(self, url: str) -> dict:
-        response = self._requests(requests.get, url)
-        return response.json()
-
-    # @spin(text="Retrieving...")
-    def _get_list(self, url: str) -> List[dict]:
-        data: List[dict] = []
-        while url:
-            response = self._requests(requests.get, url)
-            sub_data, url = self._parse_response(response, ("data", "next"))
-            data += sub_data
-        return data
-
     def _extract_keypoint(self, data: dict) -> int:
         """Extract keypoint.
 
@@ -264,9 +257,9 @@ class Client(object):
         return tuple(res[k] for k in keys)
 
     def _get_media_type(self, path: Path) -> str:
-        if self._is_movie(path):
+        if path.suffix.lower() in MOVIE_SUFFIXES:
             return "movie"
-        elif self._is_image(path):
+        elif path.suffix.lower() in IMAGE_SUFFIXES:
             return "image"
         else:
             suffix = MOVIE_SUFFIXES + IMAGE_SUFFIXES
@@ -275,12 +268,6 @@ class Client(object):
                 f"{', '.join(suffix[:-1])} or {suffix[-1]}."
             )
             raise InvalidFileType(message)
-
-    def _is_movie(self, path: Path) -> bool:
-        return True if path.suffix.lower() in MOVIE_SUFFIXES else False
-
-    def _is_image(self, path: Path) -> bool:
-        return True if path.suffix.lower() in IMAGE_SUFFIXES else False
 
     def _wait_for_done(self, url: str) -> str:
         def _loop(url: str) -> str:

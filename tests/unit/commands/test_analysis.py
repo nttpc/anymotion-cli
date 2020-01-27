@@ -23,7 +23,7 @@ class TestAnalysisShow(object):
     )
     def test_valid(self, mocker, response, expected):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = response
+        client_mock.return_value.get_one_data.return_value = response
         mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
 
         runner = CliRunner()
@@ -61,7 +61,7 @@ class TestAnalysisList(object):
         )
 
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = [{"id": 1}]
+        client_mock.return_value.get_list_data.return_value = [{"id": 1}]
         mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
 
         runner = CliRunner()

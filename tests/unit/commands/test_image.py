@@ -52,7 +52,7 @@ class TestImageShow(object):
 
     def _get_client_mock(self, mocker):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = {"id": 1, "name": "image"}
+        client_mock.return_value.get_one_data.return_value = {"id": 1, "name": "image"}
         mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
         return client_mock
 
@@ -73,7 +73,9 @@ class TestImageList(object):
         )
 
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = [{"id": 1, "name": "image"}]
+        client_mock.return_value.get_list_data.return_value = [
+            {"id": 1, "name": "image"}
+        ]
         mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
 
         runner = CliRunner()

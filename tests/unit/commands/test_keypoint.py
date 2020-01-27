@@ -17,7 +17,7 @@ class TestKeypointShow(object):
     @pytest.fixture
     def client_mock(self, mocker):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = {
+        client_mock.return_value.get_one_data.return_value = {
             "id": 111,
             "keypoint": '[{"1": [143, 195]}]',
             "execStatus": "SUCCESS",
@@ -49,7 +49,7 @@ class TestKeypointShow(object):
 
     def test_valid_not_success(self, mocker):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = {
+        client_mock.return_value.get_one_data.return_value = {
             "id": 111,
             "keypoint": None,
             "execStatus": "FAILURE",
@@ -84,7 +84,7 @@ class TestKeypointList(object):
     @pytest.fixture
     def client_mock(self, mocker):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.get_info.return_value = [
+        client_mock.return_value.get_list_data.return_value = [
             {"id": 111, "keypoint": '[{"1": [143, 195]}]', "execStatus": "SUCCESS"}
         ]
         mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)

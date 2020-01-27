@@ -23,8 +23,8 @@ def movie() -> None:
 @pass_state
 def show(state: State, movie_id: int) -> None:
     """Show movie information."""
-    c = get_client(state)
-    echo_json(c.get_info("movies", movie_id))
+    client = get_client(state)
+    echo_json(client.get_one_data("movies", movie_id))
 
 
 @movie.command()
@@ -32,5 +32,5 @@ def show(state: State, movie_id: int) -> None:
 @pass_state
 def list(state: State) -> None:
     """Show a list of information for all movies."""
-    c = get_client(state)
-    echo_json(c.get_info("movies"))
+    client = get_client(state)
+    echo_json(client.get_list_data("movies"))
