@@ -41,7 +41,7 @@ class TestParseRule(object):
         result = parse_rule(rule)
         assert result == expected
 
-    @pytest.mark.parametrize("rule", ['{"1": 2}', "[1: 2]"])
+    @pytest.mark.parametrize("rule", ['"1"', "[1: 2]"])
     def test_invalid(self, rule):
         with pytest.raises(click.ClickException):
             parse_rule(rule)

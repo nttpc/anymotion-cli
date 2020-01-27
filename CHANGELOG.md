@@ -4,6 +4,7 @@
 
 Unreleased
 
+- Allowed object types in rule format.
 - Fixed a bug when interval is less than 1.
 
 ## 0.6.5
