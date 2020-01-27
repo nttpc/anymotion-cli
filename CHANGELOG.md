@@ -4,6 +4,8 @@
 
 Unreleased
 
+- Allowed object types in rule format.
+
 ## 0.6.5
 
 Released 2020-01-22
