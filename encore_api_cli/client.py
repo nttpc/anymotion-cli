@@ -16,6 +16,16 @@ IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
 
 
 class Client(object):
+    """API Client for the AnyMotion API.
+
+    All HTTP requests for the AnyMotion API (including Amazon S3) are handled by this
+    class.
+    The acquired data should not be displayed. Should be displayed for each command.
+
+    Attributes:
+        token (str): access token for authentication.
+    """
+
     def __init__(
         self,
         client_id: str,
@@ -98,27 +108,37 @@ class Client(object):
         return media_id, media_type
 
     def extract_keypoint_from_image(self, image_id: int) -> int:
-        """Start keypoint extraction for image_id."""
+        """Start keypoint extraction for image_id.
+
+        Returns:
+            keypoint_id.
+        """
         return self._extract_keypoint({"image_id": image_id})
 
     def extract_keypoint_from_movie(self, movie_id: int) -> int:
-        """Start keypoint extraction for movie_id."""
+        """Start keypoint extraction for movie_id.
+
+        Returns:
+            keypoint_id.
+        """
         return self._extract_keypoint({"movie_id": movie_id})
 
-    def draw_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
+    def draw_keypoint(
+        self, keypoint_id: int, rule: Optional[Union[list, dict]] = None
+    ) -> int:
         """Start drawing for keypoint_id."""
         url = urljoin(self._api_url, f"drawings/")
-        json: Dict[str, Union[int, list]] = {"keypoint_id": keypoint_id}
+        json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
         (drawing_id,) = self._parse_response(response, ("id",))
         return drawing_id
 
-    def analyze_keypoint(self, keypoint_id: int, rule: Optional[list] = None) -> int:
+    def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
         """Start analyze for keypoint_id."""
         url = urljoin(self._api_url, f"analyses/")
-        json: Dict[str, Union[int, list]] = {"keypoint_id": keypoint_id}
+        json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
@@ -161,7 +181,7 @@ class Client(object):
         return content_md5
 
     def _extract_keypoint(self, data: dict) -> int:
-        """Extract keypoint.
+        """Start keypoint extraction.
 
         Raises:
             RequestsError: Exception raised in _requests function.
@@ -179,7 +199,7 @@ class Client(object):
         data: Optional[object] = None,
         headers: Optional[dict] = None,
     ) -> requests.models.Response:
-        """Make a requests to AnyMotion API or Amazon S3.
+        """Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
 
         Raises:
             RequestsError

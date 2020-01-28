@@ -25,11 +25,10 @@ class TestAnalyze(object):
     @pytest.mark.parametrize(
         "args, show_mock_count",
         [
-            (["analyze", "1"], 0),
             (["analyze", "--rule", "[]", "1"], 0),
             (["analyze", "1", "--rule", "[]"], 0),
-            (["analyze", "--show_result", "1"], 1),
-            (["analyze", "1", "--show_result"], 1),
+            (["analyze", "--rule", "[]", "--show_result", "1"], 1),
+            (["analyze", "--rule", "[]", "1", "--show_result"], 1),
         ],
     )
     def test_valid(self, client_mock, show_mock, args, show_mock_count):
@@ -58,7 +57,7 @@ class TestAnalyze(object):
         mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
 
         runner = CliRunner()
-        result = runner.invoke(cli, ["analyze", "1"])
+        result = runner.invoke(cli, ["analyze", "1", "--rule", "[]"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0

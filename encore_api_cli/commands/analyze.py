@@ -38,6 +38,10 @@ def analyze(
         raise click.UsageError(
             '"rule" and "rule_file" options cannot be used at the same time.'
         )
+    if rule_str is None and rule_file is None:
+        raise click.UsageError(
+            'Either "rule" or "rule_file" options is required.'
+        )
 
     rule = None
     if rule_str is not None:
@@ -45,8 +49,11 @@ def analyze(
     elif rule_file is not None:
         rule = parse_rule(rule_file.read())
 
+    if rule is None:
+        raise
+
     client = get_client(state)
-    analysis_id = client.analyze_keypoint(keypoint_id, rule=rule)
+    analysis_id = client.analyze_keypoint(keypoint_id, rule)
     echo(f"Analysis started. (analysis_id: {color_id(analysis_id)})")
 
     status = client.wait_for_analysis(analysis_id)
