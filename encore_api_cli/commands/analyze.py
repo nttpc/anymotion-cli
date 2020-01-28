@@ -39,9 +39,7 @@ def analyze(
             '"rule" and "rule_file" options cannot be used at the same time.'
         )
     if rule_str is None and rule_file is None:
-        raise click.UsageError(
-            'Either "rule" or "rule_file" options is required.'
-        )
+        raise click.UsageError('Either "rule" or "rule_file" options is required.')
 
     rule = None
     if rule_str is not None:
