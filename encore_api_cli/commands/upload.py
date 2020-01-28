@@ -18,10 +18,10 @@ def cli() -> None:  # noqa: D103
 @pass_state
 def upload(state: State, path: str) -> None:
     """Upload the local movie or image file to the cloud storage."""
-    c = get_client(state)
+    client = get_client(state)
 
     try:
-        media_id, media_type = c.upload_to_s3(path)
+        media_id, media_type = client.upload_to_s3(path)
     except InvalidFileType as e:
         raise click.BadParameter(str(e))
     except RequestsError as e:

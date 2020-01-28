@@ -140,11 +140,12 @@ class TestAnalysisKeypoint(object):
     def test_キーポイント解析を開始できること(self, requests_mock, client):
         keypoint_id = 111
         expected_analysis_id = 222
+        rule = []
         requests_mock.post(
             f"{client._api_url}analyses/", json={"id": expected_analysis_id}
         )
 
-        analysis_id = client.analyze_keypoint(keypoint_id)
+        analysis_id = client.analyze_keypoint(keypoint_id, rule)
 
         assert analysis_id == expected_analysis_id
 

@@ -25,11 +25,10 @@ class TestAnalyze(object):
     @pytest.mark.parametrize(
         "args, show_mock_count",
         [
-            (["analyze", "1"], 0),
             (["analyze", "--rule", "[]", "1"], 0),
             (["analyze", "1", "--rule", "[]"], 0),
-            (["analyze", "--show_result", "1"], 1),
-            (["analyze", "1", "--show_result"], 1),
+            (["analyze", "--rule", "[]", "--show_result", "1"], 1),
+            (["analyze", "--rule", "[]", "1", "--show_result"], 1),
         ],
     )
     def test_valid(self, client_mock, show_mock, args, show_mock_count):
@@ -58,7 +57,7 @@ class TestAnalyze(object):
         mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
 
         runner = CliRunner()
-        result = runner.invoke(cli, ["analyze", "1"])
+        result = runner.invoke(cli, ["analyze", "1", "--rule", "[]"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
@@ -114,49 +113,43 @@ class TestAnalyze(object):
         assert result.exit_code == 1
         assert result.output == expected
 
-    @pytest.mark.parametrize("args", [["analyze", "invalid_id"]])
-    def test_invalid_params(self, client_mock, args):
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (["analyze", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
+            (["analyze"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "--show_result"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "--rule"], "Error: --rule option requires an argument"),
+            (["analyze", "1", "--rule"], "Error: --rule option requires an argument"),
+            (["analyze", "1"], 'Either "rule" or "rule_file" options is required.'),
+        ],
+    )
+    def test_invalid_params(self, client_mock, args, expected):
         runner = CliRunner()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert 'Error: Invalid value for "KEYPOINT_ID"' in result.output
+        assert expected in result.output
 
     @pytest.mark.parametrize(
-        "args", [["analyze"], ["analyze", "--rule", "1"], ["analyze", "--show_result"]]
+        "args, expected",
+        [
+            (
+                ["analyze", "1", "--rule", "[]", "--rule-file", "<RULE_FILE>"],
+                '"rule" and "rule_file" options cannot be used at the same time.',
+            ),
+        ],
     )
-    def test_missing_args(self, client_mock, args):
-        runner = CliRunner()
-        result = runner.invoke(cli, args)
-
-        assert client_mock.call_count == 0
-        assert result.exit_code == 2
-        assert 'Error: Missing argument "KEYPOINT_ID"' in result.output
-
-    @pytest.mark.parametrize(
-        "args", [["analyze", "--rule"], ["analyze", "1", "--rule"]]
-    )
-    def test_missing_params(self, client_mock, args):
-        runner = CliRunner()
-        result = runner.invoke(cli, args)
-
-        assert client_mock.call_count == 0
-        assert result.exit_code == 2
-        assert "Error: --rule option requires an argument" in result.output
-
-    def test_invalid_params_both_rule(self, tmp_path, client_mock):
+    def test_invalid_params_with_rule_file(self, tmp_path, client_mock, args, expected):
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
+        args = map(lambda x: rule_file if x == "<RULE_FILE>" else x, args)
 
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["analyze", "1", "--rule", "[]", "--rule-file", rule_file]
-        )
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert (
-            '"rule" and "rule_file" options cannot be used at the same time.'
-            in result.output
-        )
+        assert expected in result.output
