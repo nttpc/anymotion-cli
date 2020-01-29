@@ -1,5 +1,4 @@
 import io
-import json
 from typing import Optional
 
 import click
@@ -37,11 +36,7 @@ def show(state: State, keypoint_id: int) -> None:
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
-        keypoint = response.get("keypoint")
-        if not isinstance(keypoint, str):
-            # TODO: catch error
-            raise
-        echo_json(json.loads(keypoint))
+        echo_json(response.get("keypoint"))
     else:
         echo("Status is not SUCCESS.")
 

@@ -1,5 +1,3 @@
-import json
-
 import click
 
 from encore_api_cli.options import common_options
@@ -32,11 +30,7 @@ def show(state: State, analysis_id: int) -> None:
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
-        result = response.get("result")
-        if not isinstance(result, str):
-            # TODO: catch error
-            raise
-        echo_json(json.loads(result))
+        echo_json(response.get("result"))
     else:
         echo("Status is not SUCCESS.")
 
