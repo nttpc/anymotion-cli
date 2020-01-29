@@ -2,9 +2,10 @@
 
 ## 0.6.6
 
-Unreleased
+Released 2020-01-29
 
 - Allowed object types in rule format.
+- Added a restriction that either `--rule` or `--rule-file` option is required in `analyze` command.
 - Fixed a bug when interval is less than 1.
 
 ## 0.6.5
