@@ -29,8 +29,8 @@ def keypoint() -> None:
 @pass_state
 def show(state: State, keypoint_id: int) -> None:
     """Show extracted keypoint data."""
-    c = get_client(state)
-    response = c.get_info("keypoints", keypoint_id)
+    client = get_client(state)
+    response = client.get_one_data("keypoints", keypoint_id)
     if not isinstance(response, dict):
         # TODO: catch error
         raise
@@ -51,8 +51,8 @@ def show(state: State, keypoint_id: int) -> None:
 @pass_state
 def list(state: State) -> None:
     """Show a list of information for all keypoints."""
-    c = get_client(state)
-    echo_json(c.get_info("keypoints"))
+    client = get_client(state)
+    echo_json(client.get_list_data("keypoints"))
 
 
 @keypoint.command()
@@ -91,15 +91,15 @@ def extract(
     if [movie_id, image_id].count(None) in [0, 2]:
         raise click.UsageError('Either "movie_id" or "image_id" is required.')
 
-    c = get_client(state)
+    client = get_client(state)
     try:
         if movie_id is not None:
-            keypoint_id = c.extract_keypoint_from_movie(movie_id)
+            keypoint_id = client.extract_keypoint_from_movie(movie_id)
         elif image_id is not None:
-            keypoint_id = c.extract_keypoint_from_image(image_id)
+            keypoint_id = client.extract_keypoint_from_image(image_id)
 
         echo(f"Keypoint extraction started. (keypoint_id: {color_id(keypoint_id)})")
-        status = c.wait_for_extraction(keypoint_id)
+        status = client.wait_for_extraction(keypoint_id)
     except RequestsError as e:
         raise click.ClickException(str(e))
 

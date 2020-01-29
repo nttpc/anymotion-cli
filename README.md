@@ -93,7 +93,7 @@ Commands:
   analyze    Analyze the extracted keypoint data.
   configure  Configure your AnyMotion Credentials.
   download   Download the drawn file.
-  draw       Draw keypoints on uploaded movie or image.
+  draw       Draw points and/or lines on uploaded movie or image.
   image      Show the information of the uploaded images.
   keypoint   Extract keypoints and show the list.
   movie      Show the information of the uploaded movies.

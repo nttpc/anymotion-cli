@@ -33,13 +33,13 @@ def download(
     ctx: click.core.Context, state: State, drawing_id: int, out_dir: str
 ) -> None:
     """Download the drawn file."""
-    c = get_client(state)
-    status, url = c.wait_for_drawing(drawing_id)
+    client = get_client(state)
+    status, url = client.wait_for_drawing(drawing_id)
 
     if status == "SUCCESS" and url is not None:
         is_ok, message, path = check_download(out_dir, url)
         if is_ok:
-            c.download(url, path)
+            client.download(url, path)
         else:
             prog = ctx.find_root().info_name
             message = message % {"prog": prog, "drawing_id": drawing_id}

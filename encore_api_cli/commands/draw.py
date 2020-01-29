@@ -48,7 +48,7 @@ def draw(
     rule_file: Optional[io.TextIOWrapper],
     no_download: bool,
 ) -> None:
-    """Draw keypoints on uploaded movie or image."""
+    """Draw points and/or lines on uploaded movie or image."""
     if rule_str is not None and rule_file is not None:
         raise click.UsageError(
             '"rule" and "rule_file" options cannot be used at the same time.'

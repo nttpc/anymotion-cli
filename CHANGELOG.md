@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.6.6
+
+Released 2020-01-29
+
+- Allowed object types in rule format.
+- Added a restriction that either `--rule` or `--rule-file` option is required in `analyze` command.
+- Fixed a bug when interval is less than 1.
+
 ## 0.6.5
 
 Released 2020-01-22
@@ -12,21 +20,21 @@ Released 2020-01-22
 Released 2020-01-21
 
 - Made it possible to use uppercase extensions.
-- Added rule-file option in `analyze` and `draw` commands.
-- Fixed bug without rule option in `analyze` command.
+- Added `--rule-file` option in `analyze` and `draw` commands.
+- Fixed a bug without `--rule` option in `analyze` command.
 
 ## 0.6.3
 
 Released 2020-01-20
 
-- Fixed bug without rule option in `draw` command.
+- Fixed a bug without `--rule` option in `draw` command.
 
 ## 0.6.2
 
 Released 2020-01-20
 
 - Added alias command `amcli`.
-- Added rule option in `analyze` and `draw` commands.
+- Added `--rule` option in `analyze` and `draw` commands.
 
 ## 0.6.1
 
@@ -68,7 +76,26 @@ Released 2019-12-23
 
 Released 2019-12-23
 
-- Changed to an authentication format that uses a client id and secret.
+- Used client id and secret instead of token for authentication.
+
+## 0.4.0
+
+Released 2019-07-19
+
+- Added `analyze` and `draw` commands.
+
+## 0.3.0
+
+Released 2019-07-19
+
+- Added `configure` command.
+
+## 0.2.0
+
+Released 2019-07-18
+
+- Added `analysis` command.
+- Added `list` subcommand.
 
 ## 0.1.0
 
