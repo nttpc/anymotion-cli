@@ -2,7 +2,7 @@
 
 ## 0.6.7
 
-Unreleased
+Released 2020-01-29
 
 - Added support for AnyMotion API whose keypoint and result response changed from string to json.
 
