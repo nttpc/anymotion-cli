@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.6.7
+
+Released 2020-01-29
+
+- Added support for AnyMotion API whose keypoint and result response changed from string to json.
+
 ## 0.6.6
 
 Released 2020-01-29

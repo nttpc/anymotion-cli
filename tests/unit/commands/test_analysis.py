@@ -17,7 +17,7 @@ class TestAnalysisShow(object):
     @pytest.mark.parametrize(
         "response, expected",
         [
-            ({"result": "[]", "execStatus": "SUCCESS"}, "\n[]\n\n"),
+            ({"result": [], "execStatus": "SUCCESS"}, "\n[]\n\n"),
             ({"execStatus": "FAILURE"}, "Status is not SUCCESS.\n"),
         ],
     )

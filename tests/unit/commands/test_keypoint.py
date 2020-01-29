@@ -19,7 +19,7 @@ class TestKeypointShow(object):
         client_mock = mocker.MagicMock()
         client_mock.return_value.get_one_data.return_value = {
             "id": 111,
-            "keypoint": '[{"1": [143, 195]}]',
+            "keypoint": [{"1": [143, 195]}],
             "execStatus": "SUCCESS",
         }
         mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
