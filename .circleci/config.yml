@@ -98,6 +98,13 @@ jobs:
           command: |
             aws s3 sync dist s3://encore-api-cli
             aws s3 cp README.md s3://encore-api-cli
+            aws s3 cp CHANGELOG.md s3://encore-api-cli
+      - run:
+          name: Notify slack
+          command: |
+            curl -X POST \
+              --data-urlencode "payload={\"username\": \"AnyMotion\",\"text\": \"encore-api-cli ${CIRCLE_TAG} をリリースしました。\", \"icon_emoji\": \":anymotion:\" }" \
+              ${SLACK_WEB_HOOK}
 
 workflows:
   build-and-test:
