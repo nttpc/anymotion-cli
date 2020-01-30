@@ -8,8 +8,11 @@ from urllib.parse import urljoin
 
 import requests
 
-from encore_api_cli.exceptions import InvalidFileType, RequestsError
-from encore_api_cli.output import echo_request, echo_response, spin
+from encore_api_cli.sdk.exceptions import (
+    InvalidFileType,
+    InvalidResponse,
+    RequestsError,
+)
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -30,10 +33,13 @@ class Client(object):
         self,
         client_id: str,
         client_secret: str,
-        base_url: str,
-        interval: int,
-        timeout: int,
+        base_url: str = "https://api.customer.jp/",
+        interval: int = 5,
+        timeout: int = 600,
         verbose: bool = False,
+        echo_request: Optional[Callable] = None,
+        echo_response: Optional[Callable] = None,
+        echo_spin: Optional[Callable] = None,
     ):
         self._client_id = client_id
         self._client_secret = client_secret
@@ -46,6 +52,9 @@ class Client(object):
         self._max_steps = max(1, timeout // self._interval)
 
         self._verbose = verbose
+        self._echo_request = echo_request
+        self._echo_response = echo_response
+        self._echo_spin = echo_spin
 
     @property
     def token(self) -> str:
@@ -58,7 +67,6 @@ class Client(object):
         response = self._requests(requests.get, url)
         return response.json()
 
-    # @spin(text="Retrieving...")
     def get_list_data(self, endpoint: str) -> List[dict]:
         """Get list data from AnyMotion API."""
         url = urljoin(self._api_url, f"{endpoint}/")
@@ -210,8 +218,8 @@ class Client(object):
         if headers is None:
             headers = self._get_headers(with_content_type=is_json)
 
-        if self._verbose:
-            echo_request(url, method, headers, json)
+        if self._verbose and self._echo_request:
+            self._echo_request(url, method, headers, json)
 
         try:
             if is_json:
@@ -222,8 +230,8 @@ class Client(object):
             message = f"{method} {url} is failed."
             raise RequestsError(message)
 
-        if self._verbose:
-            echo_response(
+        if self._verbose and self._echo_response:
+            self._echo_response(
                 response.status_code,
                 response.reason,
                 response.raw.version,
@@ -271,9 +279,13 @@ class Client(object):
     def _parse_response(self, response: requests.models.Response, keys: tuple) -> tuple:
         res = response.json()
         if not all(k in res for k in keys):
-            print(f"Response does NOT contain {keys}")
-            print(f"response: {res}")
-            raise Exception("Invalid response")
+            message = dedent(
+                f"""\
+                    Response does NOT contain {keys}
+                    response: {res}
+                """
+            )
+            raise InvalidResponse(message)
         return tuple(res[k] for k in keys)
 
     def _get_media_type(self, path: Path) -> str:
@@ -301,9 +313,10 @@ class Client(object):
                 status = "TIMEOUT"
             return status
 
-        if self._verbose:
+        if self._verbose or not self._echo_spin:
             status = _loop(url)
         else:
-            with spin(text="Processing..."):
+            # TODO: move to each commands
+            with self._echo_spin(text="Processing..."):
                 status = _loop(url)
         return status
