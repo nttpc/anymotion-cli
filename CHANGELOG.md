@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.7.0
+
+Unreleased
+
+- Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
+
 ## 0.6.7
 
 Released 2020-01-29

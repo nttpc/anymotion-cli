@@ -3,8 +3,8 @@ from urllib.parse import urljoin
 
 import pytest
 
-from encore_api_cli.client import Client
-from encore_api_cli.exceptions import InvalidFileType
+from encore_api_cli.sdk.client import Client
+from encore_api_cli.sdk.exceptions import InvalidFileType
 
 
 @pytest.fixture

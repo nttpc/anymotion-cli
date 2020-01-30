@@ -4,8 +4,9 @@ from typing import Optional, Union
 
 import click
 
-from encore_api_cli.client import Client
 from encore_api_cli.exceptions import ClickException, SettingsValueError
+from encore_api_cli.output import echo_request, echo_response, spin
+from encore_api_cli.sdk.client import Client
 from encore_api_cli.settings import Settings
 from encore_api_cli.state import State
 
@@ -24,10 +25,13 @@ def get_client(state: State) -> Client:
     return Client(
         str(settings.client_id),
         str(settings.client_secret),
-        settings.base_url,
-        settings.interval,
-        settings.timeout,
+        base_url=settings.base_url,
+        interval=settings.interval,
+        timeout=settings.timeout,
         verbose=state.verbose,
+        echo_request=echo_request,
+        echo_response=echo_response,
+        echo_spin=spin,
     )
 
 
