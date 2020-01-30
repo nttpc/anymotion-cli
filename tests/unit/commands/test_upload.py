@@ -1,7 +1,7 @@
 from click.testing import CliRunner
 
 from encore_api_cli.commands.upload import cli
-from encore_api_cli.exceptions import InvalidFileType, RequestsError
+from encore_api_cli.sdk.exceptions import InvalidFileType, RequestsError
 
 
 def test_upload(mocker, tmp_path):

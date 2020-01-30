@@ -1,6 +1,6 @@
 import click
 
-from encore_api_cli.exceptions import InvalidFileType, RequestsError
+from encore_api_cli.sdk.exceptions import InvalidFileType, RequestsError
 from encore_api_cli.options import common_options
 from encore_api_cli.output import echo_success
 from encore_api_cli.state import State, pass_state

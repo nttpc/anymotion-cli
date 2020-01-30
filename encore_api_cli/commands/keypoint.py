@@ -4,7 +4,7 @@ from typing import Optional
 import click
 
 from encore_api_cli.commands.draw import draw, draw_options
-from encore_api_cli.exceptions import RequestsError
+from encore_api_cli.sdk.exceptions import RequestsError
 from encore_api_cli.options import common_options
 from encore_api_cli.output import echo, echo_json, echo_success
 from encore_api_cli.state import State, pass_state
