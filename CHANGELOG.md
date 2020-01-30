@@ -2,6 +2,7 @@
 
 ## 0.7.0
 
+- Added new `drawing` command.
 - Moved `keypoint extract` subcommand to `extract` command.
 
 ## 0.6.7

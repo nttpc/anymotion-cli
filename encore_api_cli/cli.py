@@ -6,6 +6,7 @@ from encore_api_cli.commands.analyze import cli as analyze
 from encore_api_cli.commands.configure import cli as configure
 from encore_api_cli.commands.download import cli as download
 from encore_api_cli.commands.draw import cli as draw
+from encore_api_cli.commands.drawing import cli as drawing
 from encore_api_cli.commands.extract import cli as extract
 from encore_api_cli.commands.image import cli as image
 from encore_api_cli.commands.keypoint import cli as keypoint
@@ -21,6 +22,7 @@ from encore_api_cli.commands.upload import cli as upload
         configure,
         download,
         draw,
+        drawing,
         extract,
         image,
         keypoint,
