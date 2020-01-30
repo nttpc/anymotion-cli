@@ -63,10 +63,7 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (
-                ["extract"],
-                'Error: Either "movie_id" or "image_id" is required',
-            ),
+            (["extract"], 'Error: Either "movie_id" or "image_id" is required',),
             (
                 ["extract", "--image_id", "1", "--movie_id", "1"],
                 'Error: Either "movie_id" or "image_id" is required',
@@ -123,9 +120,7 @@ def test_keypoint_extract_with_drawing(mocker):
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["extract", "--image_id", image_id, "--with_drawing"]
-    )
+    result = runner.invoke(cli, ["extract", "--image_id", image_id, "--with_drawing"])
 
     assert client_mock.call_count == 2
     assert extract_keypoint_mock.call_count == 1
