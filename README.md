@@ -1,6 +1,6 @@
 # Encore API CLI
 
-[![CircleCI](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84)](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master) [![codecov](https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN)](https://codecov.io/bb/nttpc-datascience/encore-api-cli)
+[![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
 This package provides a command line interface to AnyMotion.
 
@@ -94,6 +94,7 @@ Commands:
   configure  Configure your AnyMotion Credentials.
   download   Download the drawn file.
   draw       Draw points and/or lines on uploaded movie or image.
+  drawing    Show the information of the drawn images or movies.
   extract    Extract keypoints from uploaded images or movies.
   image      Show the information of the uploaded images.
   keypoint   Show the extracted keypoints.
@@ -193,3 +194,8 @@ $ pipenv install --dev
 ```sh
 $ pipenv run tox
 ```
+
+[ci]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master
+[ci-status]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84
+[codecov]: https://codecov.io/bb/nttpc-datascience/encore-api-cli
+[codecov-status]: https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN
