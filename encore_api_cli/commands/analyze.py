@@ -21,7 +21,7 @@ def cli() -> None:  # noqa: D103
 @click.option(
     "--rule-file", type=click.File(), help="Analysis rules file in JSON format."
 )
-@click.option("--show_result", is_flag=True)
+@click.option("--show-result", is_flag=True)
 @common_options
 @pass_state
 @click.pass_context
@@ -36,10 +36,10 @@ def analyze(
     """Analyze the extracted keypoint data."""
     if rule_str is not None and rule_file is not None:
         raise click.UsageError(
-            '"rule" and "rule_file" options cannot be used at the same time.'
+            '"rule" and "rule-file" options cannot be used at the same time.'
         )
     if rule_str is None and rule_file is None:
-        raise click.UsageError('Either "rule" or "rule_file" options is required.')
+        raise click.UsageError('Either "rule" or "rule-file" options is required.')
 
     rule = None
     if rule_str is not None:
@@ -52,7 +52,7 @@ def analyze(
 
     client = get_client(state)
     analysis_id = client.analyze_keypoint(keypoint_id, rule)
-    echo(f"Analysis started. (analysis_id: {color_id(analysis_id)})")
+    echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
 
     status = client.wait_for_analysis(analysis_id)
     if status == "SUCCESS":

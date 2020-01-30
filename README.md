@@ -124,28 +124,28 @@ First, upload the image file.
 
 ```sh
 $ amcli upload image.jpg
-Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
+Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
+When the upload is complete, you get an `image id`. Extract keypoints using this `image id`.
 
 ```sh
-$ amcli extract --image_id 111
-Keypoint extraction started. (keypoint_id: 222)
+$ amcli extract --image-id 111
+Keypoint extraction started. (keypoint id: 222)
 Success: Keypoint extraction is complete.
 ```
 
-Draw points/lines to image using `keypoint_id`.
+Draw points/lines to image using `keypoint id`.
 
 ```sh
 $ amcli draw 222
-Drawing is started. (drawing_id: 333)
+Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
-To save to a specific directory, use the `--out_dir` option.
+To save to a specific directory, use the `--out-dir` option.
 
 ### Tips
 

@@ -18,18 +18,18 @@ def cli() -> None:  # noqa: D103
 
 @cli.command()
 @click.option(
-    "--movie_id",
+    "--movie-id",
     type=int,
-    help="ID of movie to extrat, either movie_id or image_id is required.",
+    help='ID of movie to extrat, either "--movie-id" or "--image-id" is required.',
 )
 @click.option(
-    "--image_id",
+    "--image-id",
     type=int,
-    help="ID of image to extrat, either movie_id or image_id is required.",
+    help='ID of image to extrat, either "--movie-id" or "--image-id" is required.',
 )
 @click.option(
     "-d",
-    "--with_drawing",
+    "--with-drawing",
     is_flag=True,
     help="Flag for whether to draw at the same time.",
 )
@@ -50,7 +50,7 @@ def extract(
 ) -> None:
     """Extract keypoints from uploaded images or movies."""
     if [movie_id, image_id].count(None) in [0, 2]:
-        raise click.UsageError('Either "movie_id" or "image_id" is required.')
+        raise click.UsageError('Either "--movie-id" or "--image-id" is required.')
 
     client = get_client(state)
     try:
@@ -59,7 +59,7 @@ def extract(
         elif image_id is not None:
             keypoint_id = client.extract_keypoint_from_image(image_id)
 
-        echo(f"Keypoint extraction started. (keypoint_id: {color_id(keypoint_id)})")
+        echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
         status = client.wait_for_extraction(keypoint_id)
     except RequestsError as e:
         raise click.ClickException(str(e))

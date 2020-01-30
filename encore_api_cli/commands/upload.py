@@ -29,4 +29,4 @@ def upload(state: State, path: str) -> None:
 
     cpath = color_path(path)
     cid = color_id(media_id)
-    echo_success(f"Uploaded {cpath} to the cloud storage. ({media_type}_id: {cid})")
+    echo_success(f"Uploaded {cpath} to the cloud storage. ({media_type} id: {cid})")
