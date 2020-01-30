@@ -14,6 +14,7 @@ from encore_api_cli.cli import cli
         "configure",
         "download",
         "draw",
+        "extract",
         "image",
         "keypoint",
         "movie",

@@ -94,11 +94,26 @@ Commands:
   configure  Configure your AnyMotion Credentials.
   download   Download the drawn file.
   draw       Draw points and/or lines on uploaded movie or image.
+  extract    Extract keypoints from uploaded images or movies.
   image      Show the information of the uploaded images.
-  keypoint   Extract keypoints and show the list.
+  keypoint   Show the extracted keypoints.
   movie      Show the information of the uploaded movies.
   upload     Upload the local movie or image file to the cloud storage.
 ```
+
+- Commands to process something (verb commands)
+  - upload
+  - download
+  - extract
+  - draw
+  - analyze
+
+- Commands to show something (noun commands)
+  - image
+  - movie
+  - keypoint
+  - drawing
+  - analysis
 
 ### Examples
 
@@ -114,10 +129,12 @@ Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
 When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
 
 ```sh
-$ amcli keypoint extract --image_id 111
+$ amcli extract --image_id 111
 Keypoint extraction started. (keypoint_id: 222)
 Success: Keypoint extraction is complete.
 ```
+
+Draw points/lines to image using `keypoint_id`.
 
 ```sh
 $ amcli draw 222

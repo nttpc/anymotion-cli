@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.0
+
+- Moved `keypoint extract` subcommand to `extract` command.
+
 ## 0.6.7
 
 Released 2020-01-29
