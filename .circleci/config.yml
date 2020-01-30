@@ -102,9 +102,8 @@ jobs:
       - run:
           name: Notify slack
           command: |
-            curl -X POST \
-              --data-urlencode "payload={\"username\": \"AnyMotion\",\"text\": \"encore-api-cli ${CIRCLE_TAG} をリリースしました。\", \"icon_emoji\": \":anymotion:\" }" \
-              ${SLACK_WEB_HOOK}
+            sed -e "s/<version>/${CIRCLE_TAG}/" .circleci/slack-message.json > message.json
+            curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
 
 workflows:
   build-and-test:
