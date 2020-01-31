@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
+import pkg_resources
 
 from encore_api_cli.exceptions import ClickException, SettingsValueError
 from encore_api_cli.output import echo_request, echo_response, spin
@@ -70,3 +71,8 @@ def color_id(number: int) -> str:
 def color_path(path: Union[str, Path]) -> str:
     """Set color to path."""
     return click.style(str(path), fg="blue")
+
+
+def get_version():
+    """Get package version."""
+    return pkg_resources.get_distribution("encore_api_cli").version

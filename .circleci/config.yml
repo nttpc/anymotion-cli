@@ -127,7 +127,7 @@ workflows:
             tags:
               only: /^\d.*/
           requires:
-            - setup-py38
+            - test-py38
       - check-syntax:
           filters:
             tags:
