@@ -27,8 +27,8 @@ class TestAnalyze(object):
         [
             (["analyze", "--rule", "[]", "1"], 0),
             (["analyze", "1", "--rule", "[]"], 0),
-            (["analyze", "--rule", "[]", "--show_result", "1"], 1),
-            (["analyze", "--rule", "[]", "1", "--show_result"], 1),
+            (["analyze", "--rule", "[]", "--show-result", "1"], 1),
+            (["analyze", "--rule", "[]", "1", "--show-result"], 1),
         ],
     )
     def test_valid(self, client_mock, show_mock, args, show_mock_count):
@@ -40,7 +40,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 Success: Analysis is complete.
             """
         )
@@ -63,7 +63,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 {message}
             """
         )
@@ -79,7 +79,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 Success: Analysis is complete.
             """
         )
@@ -119,10 +119,10 @@ class TestAnalyze(object):
             (["analyze", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
             (["analyze"], 'Error: Missing argument "KEYPOINT_ID"'),
             (["analyze", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["analyze", "--show_result"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "--show-result"], 'Error: Missing argument "KEYPOINT_ID"'),
             (["analyze", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1", "--rule"], "Error: --rule option requires an argument"),
-            (["analyze", "1"], 'Either "rule" or "rule_file" options is required.'),
+            (["analyze", "1"], 'Either "rule" or "rule-file" options is required.'),
         ],
     )
     def test_invalid_params(self, client_mock, args, expected):
@@ -138,7 +138,7 @@ class TestAnalyze(object):
         [
             (
                 ["analyze", "1", "--rule", "[]", "--rule-file", "<RULE_FILE>"],
-                '"rule" and "rule_file" options cannot be used at the same time.',
+                '"rule" and "rule-file" options cannot be used at the same time.',
             ),
         ],
     )

@@ -1,6 +1,6 @@
 # Encore API CLI
 
-[![CircleCI](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84)](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master) [![codecov](https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN)](https://codecov.io/bb/nttpc-datascience/encore-api-cli)
+[![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
 This package provides a command line interface to AnyMotion.
 
@@ -94,11 +94,27 @@ Commands:
   configure  Configure your AnyMotion Credentials.
   download   Download the drawn file.
   draw       Draw points and/or lines on uploaded movie or image.
+  drawing    Show the information of the drawn images or movies.
+  extract    Extract keypoints from uploaded images or movies.
   image      Show the information of the uploaded images.
-  keypoint   Extract keypoints and show the list.
+  keypoint   Show the extracted keypoints.
   movie      Show the information of the uploaded movies.
   upload     Upload the local movie or image file to the cloud storage.
 ```
+
+- Commands to process something (verb commands)
+  - upload
+  - download
+  - extract
+  - draw
+  - analyze
+
+- Commands to show something (noun commands)
+  - image
+  - movie
+  - keypoint
+  - drawing
+  - analysis
 
 ### Examples
 
@@ -108,26 +124,28 @@ First, upload the image file.
 
 ```sh
 $ amcli upload image.jpg
-Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
+Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
+When the upload is complete, you get an `image id`. Extract keypoints using this `image id`.
 
 ```sh
-$ amcli keypoint extract --image_id 111
-Keypoint extraction started. (keypoint_id: 222)
+$ amcli extract --image-id 111
+Keypoint extraction started. (keypoint id: 222)
 Success: Keypoint extraction is complete.
 ```
 
+Draw points/lines to image using `keypoint id`.
+
 ```sh
 $ amcli draw 222
-Drawing is started. (drawing_id: 333)
+Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
-To save to a specific directory, use the `--out_dir` option.
+To save to a specific directory, use the `--out-dir` option.
 
 ### Tips
 
@@ -176,3 +194,8 @@ $ pipenv install --dev
 ```sh
 $ pipenv run tox
 ```
+
+[ci]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master
+[ci-status]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84
+[codecov]: https://codecov.io/bb/nttpc-datascience/encore-api-cli
+[codecov-status]: https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN

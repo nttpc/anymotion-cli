@@ -19,7 +19,7 @@ def draw_options(f: Callable) -> Callable:
     )(f)
     f = click.option(
         "-o",
-        "--out_dir",
+        "--out-dir",
         default=".",
         type=click.Path(),
         show_default=True,
@@ -51,7 +51,7 @@ def draw(
     """Draw points and/or lines on uploaded movie or image."""
     if rule_str is not None and rule_file is not None:
         raise click.UsageError(
-            '"rule" and "rule_file" options cannot be used at the same time.'
+            '"rule" and "rule-file" options cannot be used at the same time.'
         )
 
     rule = None
@@ -62,7 +62,7 @@ def draw(
 
     client = get_client(state)
     drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
-    echo(f"Drawing started. (drawing_id: {color_id(drawing_id)})")
+    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
 
     status, url = client.wait_for_drawing(drawing_id)
     if status == "SUCCESS" and url is not None:

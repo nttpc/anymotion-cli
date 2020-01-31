@@ -20,7 +20,7 @@ def cli() -> None:  # noqa: D103
 @click.argument("drawing_id", type=int)
 @click.option(
     "-o",
-    "--out_dir",
+    "--out-dir",
     default=".",
     type=click.Path(exists=True),
     show_default=True,

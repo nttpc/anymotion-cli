@@ -30,7 +30,7 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Drawing started. (drawing_id: 111)
+                Drawing started. (drawing id: 111)
                 Success: Drawing is complete.
                 Downloaded the file to image.jpg.
             """
@@ -47,7 +47,7 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing_id: 111)
+                Drawing started. (drawing id: 111)
                 Success: Drawing is complete.
             """
         )
@@ -70,7 +70,7 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert (
             result.output
-            == "Drawing started. (drawing_id: 111)\n"
+            == "Drawing started. (drawing id: 111)\n"
             + "Success: Drawing is complete.\n"
             + message % {"prog": "cli", "drawing_id": "111"}
             + "\n"
@@ -94,7 +94,7 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing_id: 111)
+                Drawing started. (drawing id: 111)
                 {message}
             """
         )
@@ -110,7 +110,7 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Drawing started. (drawing_id: 111)
+                Drawing started. (drawing id: 111)
                 Success: Drawing is complete.
                 Downloaded the file to image.jpg.
             """
@@ -168,6 +168,6 @@ class TestDraw(object):
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert (
-            '"rule" and "rule_file" options cannot be used at the same time.'
+            '"rule" and "rule-file" options cannot be used at the same time.'
             in result.output
         )
