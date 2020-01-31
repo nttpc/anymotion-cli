@@ -14,10 +14,8 @@ mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
-pytest-watch = "*"
 requests-mock = "*"
 tox = "*"
-mkdocs-material = "*"
 
 [packages]
 click = ">=7.0"
