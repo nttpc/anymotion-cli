@@ -34,8 +34,8 @@ requests-mock = "^1.7.0"
 tox = "^3.14.3"
 
 [tool.poetry.scripts]
-amcli = "encore_api_cli.cli:cli"
-encore = "encore_api_cli.cli:cli"
+amcli = "encore_api_cli.core:cli"
+encore = "encore_api_cli.core:cli"
 
 [tool.coverage.run]
 source = ["encore_api_cli"]

@@ -3,7 +3,7 @@ import re
 import pytest
 from click.testing import CliRunner
 
-from encore_api_cli.cli import cli
+from encore_api_cli.core import cli
 
 
 @pytest.mark.parametrize(
