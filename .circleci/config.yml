@@ -121,7 +121,7 @@ jobs:
       - aws-cli/setup
       - run:
           name: Build
-          command: poetry run build
+          command: poetry build
       - run:
           name: Upload build file to S3
           command: |
@@ -182,7 +182,6 @@ workflows:
           requires:
             - test-py36
             - test-py37
-            - test-py38
             - measure-coverage
             - check-syntax
             - check-security
