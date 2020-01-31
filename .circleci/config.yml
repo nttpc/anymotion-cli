@@ -6,11 +6,24 @@ orbs:
 commands:
   install_python:
     steps:
+      - restore_cache:
+          keys:
+            - deps-{{ checksum "poetry.lock" }}
       - run:
           name: Install python packages
           command: poetry install
+      - save_cache:
+          key: deps-{{ checksum "poetry.lock" }}
+          paths:
+            - /home/circleci/.cache/pypoetry/virtualenvs
 
 jobs:
+  setup-py38:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - install_python
   test-py38: &test-template
     docker:
       - image: circleci/python:3.8
@@ -91,6 +104,10 @@ jobs:
 workflows:
   build-and-test:
     jobs:
+      - setup-py38:
+        filters:
+          tags:
+            only: /^\d.*/
       - test-py36:
           filters:
             tags:
@@ -103,18 +120,26 @@ workflows:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - measure-coverage:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - check-syntax:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - check-security:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - build-and-upload:
           filters:
             tags:
