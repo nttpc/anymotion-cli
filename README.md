@@ -186,13 +186,13 @@ $ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 - Install all development dependencies using:
 
 ```sh
-$ pipenv install --dev
+$ poetry install
 ```
 
 - Before submitting pull requests, run tests with:
 
 ```sh
-$ pipenv run tox
+$ poetry run tox
 ```
 
 [ci]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master
