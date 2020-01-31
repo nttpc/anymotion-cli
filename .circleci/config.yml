@@ -3,35 +3,34 @@ orbs:
   codecov: codecov/codecov@1.0.5
   aws-cli: circleci/aws-cli@0.1.19
 
+executors:
+  python:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
+    docker:
+      - image: circleci/python:<< parameters.version >>
+
 commands:
   setup_python:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
     steps:
       - restore_cache:
           keys:
-            - deps-{{ checksum "poetry.lock" }}
+            - deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install python packages
           command: poetry install
       - save_cache:
-          key: deps-{{ checksum "poetry.lock" }}
+          key: deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
           paths:
             - /home/circleci/.cache/pypoetry/virtualenvs
-
-jobs:
-  setup-py38:
-    docker:
-      - image: circleci/python:3.8
+  run_test:
     steps:
-      - checkout
-      - setup_python
-  test-py38: &test-template
-    docker:
-      - image: circleci/python:3.8
-    steps:
-      - checkout
-      - run:
-          name: Install python packages
-          command: poetry install
       - run:
           name: Run unit test with pytest
           command: |
@@ -39,17 +38,46 @@ jobs:
             poetry run pytest -v --junitxml=test-reports/junit.xml
       - store_test_results:
           path: test-reports
+
+jobs:
+  setup-py38:
+    executor:
+      name: python
+    steps:
+      - checkout
+      - setup_python
+
+  test-py38:
+    executor:
+      name: python
+    steps:
+      - checkout
+      - setup_python
+      - run_test
+
   test-py37:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.7
+    executor:
+      name: python
+      version: "3.7"
+    steps:
+      - checkout
+      - setup_python:
+          version: "3.7"
+      - run_test
+
   test-py36:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.6
+    executor:
+      name: python
+      version: "3.6"
+    steps:
+      - checkout
+      - setup_python:
+          version: "3.6"
+      - run_test
+
   measure-coverage:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
       - setup_python
@@ -58,9 +86,10 @@ jobs:
           command: poetry run pytest --cov --cov-report=xml
       - codecov/upload:
           flags: unittest
+
   check-syntax:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
       - setup_python
@@ -73,24 +102,26 @@ jobs:
       - run:
           name: Lint with mypy
           command: poetry run mypy
+
   check-security:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
       - setup_python
       - run:
           name: Check security with bandit
           command: poetry run bandit -r encore_api_cli -s B303
+
   build-and-upload:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
       - aws-cli/setup
       - run:
           name: Build
-          command: poetry run build
+          command: poetry build
       - run:
           name: Upload build file to S3
           command: |
@@ -151,7 +182,6 @@ workflows:
           requires:
             - test-py36
             - test-py37
-            - test-py38
             - measure-coverage
             - check-syntax
             - check-security
