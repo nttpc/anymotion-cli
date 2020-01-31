@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "05dac417f71f19af480d2299aa5dacf65bbc1447369e8ee586d285bec357ad7a"
+            "sha256": "42304c0c7a38329682bd6d6b475a75ad811ecccd177dbae0486e4cf9eef9b88d"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -135,13 +135,6 @@
             "index": "pypi",
             "version": "==7.0"
         },
-        "colorama": {
-            "hashes": [
-                "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff",
-                "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"
-            ],
-            "version": "==0.4.3"
-        },
         "coverage": {
             "hashes": [
                 "sha256:15cf13a6896048d6d947bf7d222f36e4809ab926894beb748fc9caa14605d9c3",
@@ -177,12 +170,6 @@
                 "sha256:fca1669d464f0c9831fd10be2eef6b86f5ebd76c724d1e0706ebdff86bb4adf0"
             ],
             "version": "==5.0.3"
-        },
-        "docopt": {
-            "hashes": [
-                "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"
-            ],
-            "version": "==0.6.2"
         },
         "encore-api-cli": {
             "editable": true,
@@ -302,12 +289,6 @@
             ],
             "version": "==0.7.0"
         },
-        "pathtools": {
-            "hashes": [
-                "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"
-            ],
-            "version": "==0.1.2"
-        },
         "pbr": {
             "hashes": [
                 "sha256:139d2625547dbfa5fb0b81daebb39601c478c21956dc57e2e07b74450a8c506b",
@@ -358,33 +339,6 @@
             "index": "pypi",
             "version": "==2.5.2"
         },
-        "pyobjc-core": {
-            "hashes": [
-                "sha256:1a0fbf012fb575e0adf8c18cfd4453e657cc2c0deb2660c529bf524ba4c9149a",
-                "sha256:470ccd754efb468a59426942673dfc3c5c59f33a5b8cae8a7fc1be975c2d4128",
-                "sha256:751cdeb436cb181af2e2413015b072075590577c410c7f345080a38dd028b8ec",
-                "sha256:8ccf44511cbe438fa6562c423c0c5f1dad7cfc0eadd6d8f112840f8845b44fda"
-            ],
-            "version": "==6.1"
-        },
-        "pyobjc-framework-cocoa": {
-            "hashes": [
-                "sha256:1dc428f867d35007ddf9de5b24eff5bfdf65c58b1d610abcb08bebd94c343312",
-                "sha256:245e19156739f8068db474ad9561079cc698f08ef525e299b8eedc5531e02801",
-                "sha256:32ba4d0ce811e2088bf0fc360c9545c06586934e895f7133655b8f2182e7019a",
-                "sha256:c4077d2e6f96e4f3fd9780d66778cf51d27f414822498b24410e9df7a6a4d531"
-            ],
-            "version": "==6.1"
-        },
-        "pyobjc-framework-fsevents": {
-            "hashes": [
-                "sha256:3a403ce5997cc01f23f1a70f8b4c919311b9a6b1fdd3c3d02d19079d711f954c",
-                "sha256:7a635c86af744a1d17f0c6c3913bef87b5fd146e0311c03229eba9e512b81520",
-                "sha256:94c6953774b6d69e59d9781951f05ef57e352b3c530d4c236f463444852c3a88",
-                "sha256:d2ae8748d1791dc9e3d19b41d3873283ac34ed17ff8fca70f1a199336a0477b5"
-            ],
-            "version": "==6.1"
-        },
         "pyparsing": {
             "hashes": [
                 "sha256:4c830582a84fb022400b85429791bc551f1f4871c33f23e44f353119e92f969f",
@@ -415,13 +369,6 @@
             ],
             "index": "pypi",
             "version": "==2.0.0"
-        },
-        "pytest-watch": {
-            "hashes": [
-                "sha256:06136f03d5b361718b8d0d234042f7b2f203910d8568f63df2f866b547b3d4b9"
-            ],
-            "index": "pypi",
-            "version": "==4.2.0"
         },
         "pyyaml": {
             "hashes": [
@@ -578,12 +525,6 @@
                 "sha256:9a87270123622593ad454a81055b771a8898590ff3d6f3abbe48c4111ff49e79"
             ],
             "version": "==20.0.0b1"
-        },
-        "watchdog": {
-            "hashes": [
-                "sha256:8e800496cdfb921cfdc62b58a11966d0d2203a35dc005b4b5b8e1ab3097b2eb5"
-            ],
-            "version": "==0.10.0"
         },
         "wcwidth": {
             "hashes": [
