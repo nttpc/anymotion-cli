@@ -4,7 +4,7 @@ orbs:
   aws-cli: circleci/aws-cli@0.1.19
 
 commands:
-  install_python:
+  setup_python:
     steps:
       - restore_cache:
           keys:
@@ -23,13 +23,15 @@ jobs:
       - image: circleci/python:3.8
     steps:
       - checkout
-      - install_python
+      - setup_python
   test-py38: &test-template
     docker:
       - image: circleci/python:3.8
     steps:
       - checkout
-      - install_python
+      - run:
+          name: Install python packages
+          command: poetry install
       - run:
           name: Run unit test with pytest
           command: |
@@ -50,10 +52,10 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - install_python
+      - setup_python
       - run:
           name: Run unit test with pytest
-          command: poetry run pytest --cov=encore_api_cli --cov-report=xml
+          command: poetry run pytest --cov --cov-report=xml
       - codecov/upload:
           flags: unittest
   check-syntax:
@@ -61,7 +63,7 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - install_python
+      - setup_python
       - run:
           name: Lint with flake8
           command: poetry run flake8
@@ -76,7 +78,7 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - install_python
+      - setup_python
       - run:
           name: Check security with bandit
           command: poetry run bandit -r encore_api_cli -s B303
@@ -102,7 +104,7 @@ jobs:
             curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
 
 workflows:
-  build-and-test:
+  workflow:
     jobs:
       - setup-py38:
         filters:
