@@ -55,7 +55,7 @@ class TestExtract(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Keypoint extraction started. (keypoint_id: {keypoint_id})
+                Keypoint extraction started. (keypoint id: {keypoint_id})
                 {expected}
             """
         )

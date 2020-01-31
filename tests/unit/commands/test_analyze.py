@@ -40,7 +40,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 Success: Analysis is complete.
             """
         )
@@ -63,7 +63,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 {message}
             """
         )
@@ -79,7 +79,7 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis_id: 111)
+                Analysis started. (analysis id: 111)
                 Success: Analysis is complete.
             """
         )
