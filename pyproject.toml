@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "encore-api-cli"
+version = "0.6.7"
+description = "Command Line Interface for AnyMotion API."
+authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
+readme = "README.md"
+include = ["CHANGELOG.md"]
+classifiers = [
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+click = "^7.0"
+pygments = "^2.5.2"
+requests = "^2.22.0"
+tabulate = "^0.8.6"
+yaspin = "^0.16.0"
+
+[tool.poetry.dev-dependencies]
+bandit = "^1.6.2"
+black = "^19.10b0"
+flake8 = "^3.7.9"
+flake8-docstrings = "^1.5.0"
+isort = "^4.3.21"
+mypy = "^0.761"
+pytest = "^5.3.5"
+pytest-cov = "^2.8.1"
+pytest-mock = "^2.0.0"
+requests-mock = "^1.7.0"
+tox = "^3.14.3"
+
+[tool.poetry.scripts]
+amcli = "encore_api_cli.cli:cli"
+encore = "encore_api_cli.cli:cli"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

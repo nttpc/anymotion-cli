@@ -3,25 +3,25 @@ orbs:
   codecov: codecov/codecov@1.0.5
   aws-cli: circleci/aws-cli@0.1.19
 
+commands:
+  install_python:
+    steps:
+      - run:
+          name: Install python packages
+          command: poetry install
+
 jobs:
   test-py38: &test-template
     docker:
       - image: circleci/python:3.8
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync
-            rm Pipfile.lock
-            pipenv install --dev
+      - install_python
       - run:
           name: Run unit test with pytest
           command: |
             mkdir test-reports
-            pipenv run pytest -v \
-              --junitxml=test-reports/junit.xml
+            poetry run pytest -v --junitxml=test-reports/junit.xml
       - store_test_results:
           path: test-reports
   test-py37:
@@ -37,14 +37,10 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - install_python
       - run:
           name: Run unit test with pytest
-          command: pipenv run pytest --cov=encore_api_cli --cov-report=xml
+          command: poetry run pytest --cov=encore_api_cli --cov-report=xml
       - codecov/upload:
           flags: unittest
   check-syntax:
@@ -52,33 +48,25 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - install_python
       - run:
           name: Lint with flake8
-          command: pipenv run flake8
+          command: poetry run flake8
       - run:
           name: Lint with black
-          command: pipenv run black . --check
+          command: poetry run black . --check
       - run:
           name: Lint with mypy
-          command: pipenv run mypy
+          command: poetry run mypy
   check-security:
     docker:
       - image: circleci/python:3
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - install_python
       - run:
           name: Check security with bandit
-          command: pipenv run bandit -r encore_api_cli -s B303
+          command: poetry run bandit -r encore_api_cli -s B303
   build-and-upload:
     docker:
       - image: circleci/python:3
@@ -86,13 +74,8 @@ jobs:
       - checkout
       - aws-cli/setup
       - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync
-      - run:
           name: Build
-          command: pipenv run build
+          command: poetry run build
       - run:
           name: Upload build file to S3
           command: |

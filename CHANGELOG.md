@@ -8,6 +8,7 @@ Unreleased
 - Moved `keypoint extract` subcommand to `extract` command.
 - Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
 - Changed all option names to kebab cases.
+- Changed package management from pipenv to poetry.
 
 ## 0.6.7
 
