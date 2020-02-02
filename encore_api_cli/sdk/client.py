@@ -8,11 +8,8 @@ from urllib.parse import urljoin
 
 import requests
 
-from encore_api_cli.sdk.exceptions import (
-    InvalidFileType,
-    InvalidResponse,
-    RequestsError,
-)
+from . import InvalidFileType, RequestsError
+from .response import Response
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -65,7 +62,7 @@ class Client(object):
         """Get one piece of data from AnyMotion API."""
         url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
         response = self._requests(requests.get, url)
-        return response.json()
+        return response.json
 
     def get_list_data(self, endpoint: str) -> List[dict]:
         """Get list data from AnyMotion API."""
@@ -73,7 +70,7 @@ class Client(object):
         data: List[dict] = []
         while url:
             response = self._requests(requests.get, url)
-            sub_data, url = self._parse_response(response, ("data", "next"))
+            sub_data, url = response.get(("data", "next"))
             data += sub_data
         return data
 
@@ -103,7 +100,7 @@ class Client(object):
             urljoin(self._api_url, f"{media_type}s/"),
             json={"origin_key": path.name, "content_md5": content_md5},
         )
-        media_id, upload_url = self._parse_response(response, ("id", "uploadUrl"))
+        media_id, upload_url = response.get(("id", "uploadUrl"))
 
         # Upload to S3
         self._requests(
@@ -140,7 +137,7 @@ class Client(object):
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
-        (drawing_id,) = self._parse_response(response, ("id",))
+        (drawing_id,) = response.get(("id",))
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
@@ -150,36 +147,35 @@ class Client(object):
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
-        (analysis_id,) = self._parse_response(response, ("id",))
+        (analysis_id,) = response.get(("id",))
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> str:
         """Wait for extraction."""
         url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
-        status = self._wait_for_done(url)
-        return status
+        response = self._wait_for_done(url)
+        return response.status
 
     def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
         """Wait for drawing."""
         url = urljoin(self._api_url, f"drawings/{drawing_id}/")
-        status = self._wait_for_done(url)
+        response = self._wait_for_done(url)
         drawing_url = None
-        if status == "SUCCESS":
-            response = self._requests(requests.get, url)
-            (drawing_url,) = self._parse_response(response, ("drawingUrl",))
-        return status, drawing_url
+        if response.status == "SUCCESS":
+            (drawing_url,) = response.get(("drawingUrl",))
+        return response.status, drawing_url
 
     def wait_for_analysis(self, analysis_id: int) -> str:
         """Wait for analysis."""
         url = urljoin(self._api_url, f"analyses/{analysis_id}/")
-        status = self._wait_for_done(url)
-        return status
+        response = self._wait_for_done(url)
+        return response.status
 
     def download(self, url: str, path: Path) -> None:
         """Download file from url."""
         response = self._requests(requests.get, url, headers={})
         with path.open("wb") as f:
-            f.write(response.content)
+            f.write(response.raw.content)
 
     def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:
@@ -196,7 +192,7 @@ class Client(object):
         """
         url = urljoin(self._api_url, "keypoints/")
         response = self._requests(requests.post, url, json=data)
-        (keypoint_id,) = self._parse_response(response, ("id",))
+        (keypoint_id,) = response.get(("id",))
         return keypoint_id
 
     def _requests(
@@ -206,7 +202,7 @@ class Client(object):
         json: Optional[dict] = None,
         data: Optional[object] = None,
         headers: Optional[dict] = None,
-    ) -> requests.models.Response:
+    ) -> Response:
         """Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
 
         Raises:
@@ -249,7 +245,7 @@ class Client(object):
             )
             raise RequestsError(message)
 
-        return response
+        return Response(response)
 
     def _get_headers(self, with_content_type: bool = True) -> dict:
         """Generate Authorization and Content-Type headers."""
@@ -271,22 +267,10 @@ class Client(object):
             json=data,
             headers={"Content-Type": "application/json"},
         )
-        (token,) = self._parse_response(response, ("accessToken",))
+        (token,) = response.get(("accessToken",))
 
         self._token = token
         return token
-
-    def _parse_response(self, response: requests.models.Response, keys: tuple) -> tuple:
-        res = response.json()
-        if not all(k in res for k in keys):
-            message = dedent(
-                f"""\
-                    Response does NOT contain {keys}
-                    response: {res}
-                """
-            )
-            raise InvalidResponse(message)
-        return tuple(res[k] for k in keys)
 
     def _get_media_type(self, path: Path) -> str:
         if path.suffix.lower() in MOVIE_SUFFIXES:
@@ -301,22 +285,21 @@ class Client(object):
             )
             raise InvalidFileType(message)
 
-    def _wait_for_done(self, url: str) -> str:
-        def _loop(url: str) -> str:
+    def _wait_for_done(self, url: str) -> Response:
+        def _loop(url: str) -> Response:
             for _ in range(self._max_steps):
                 response = self._requests(requests.get, url)
-                (status,) = self._parse_response(response, ("execStatus",))
-                if status in ["SUCCESS", "FAILURE"]:
+                if response.status in ["SUCCESS", "FAILURE"]:
                     break
                 time.sleep(self._interval)
             else:
-                status = "TIMEOUT"
-            return status
+                response.status = "TIMEOUT"
+            return response
 
         if self._verbose or not self._echo_spin:
-            status = _loop(url)
+            response = _loop(url)
         else:
             # TODO: move to each commands
             with self._echo_spin(text="Processing..."):
-                status = _loop(url)
-        return status
+                response = _loop(url)
+        return response
