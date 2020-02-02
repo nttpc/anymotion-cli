@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import requests
 
@@ -14,7 +14,7 @@ class Response(object):
         self._status = ""
 
     @property
-    def json(self):
+    def json(self) -> Any:
         """Get json data."""
         return self.raw.json()
 
@@ -27,7 +27,7 @@ class Response(object):
         return self._status
 
     @status.setter
-    def status(self, value):
+    def status(self, value) -> None:
         self._status = value
 
     @property

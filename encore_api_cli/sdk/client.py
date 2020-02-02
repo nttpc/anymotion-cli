@@ -137,7 +137,7 @@ class Client(object):
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
-        (drawing_id,) = response.get(("id",))
+        (drawing_id,) = response.get("id")
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
@@ -147,7 +147,7 @@ class Client(object):
         if rule is not None:
             json["rule"] = rule
         response = self._requests(requests.post, url, json=json)
-        (analysis_id,) = response.get(("id",))
+        (analysis_id,) = response.get("id")
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> str:
@@ -162,14 +162,14 @@ class Client(object):
         response = self._wait_for_done(url)
         drawing_url = None
         if response.status == "SUCCESS":
-            (drawing_url,) = response.get(("drawingUrl",))
+            (drawing_url,) = response.get("drawingUrl")
         return response.status, drawing_url
 
-    def wait_for_analysis(self, analysis_id: int) -> str:
+    def wait_for_analysis(self, analysis_id: int) -> Response:
         """Wait for analysis."""
         url = urljoin(self._api_url, f"analyses/{analysis_id}/")
         response = self._wait_for_done(url)
-        return response.status
+        return response
 
     def download(self, url: str, path: Path) -> None:
         """Download file from url."""
@@ -192,7 +192,7 @@ class Client(object):
         """
         url = urljoin(self._api_url, "keypoints/")
         response = self._requests(requests.post, url, json=data)
-        (keypoint_id,) = response.get(("id",))
+        (keypoint_id,) = response.get("id")
         return keypoint_id
 
     def _requests(
@@ -267,7 +267,7 @@ class Client(object):
             json=data,
             headers={"Content-Type": "application/json"},
         )
-        (token,) = response.get(("accessToken",))
+        (token,) = response.get("accessToken")
 
         self._token = token
         return token
