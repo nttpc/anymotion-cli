@@ -2,6 +2,7 @@ import io
 from typing import Optional
 
 import click
+from yaspin import yaspin
 
 from encore_api_cli.commands.analysis import show
 from encore_api_cli.options import common_options
@@ -52,9 +53,14 @@ def analyze(
 
     client = get_client(state)
     analysis_id = client.analyze_keypoint(keypoint_id, rule)
-    echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
 
-    response = client.wait_for_analysis(analysis_id)
+    echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
+    if state.use_spinner:
+        with yaspin(text="Processing..."):
+            response = client.wait_for_analysis(analysis_id)
+    else:
+        response = client.wait_for_analysis(analysis_id)
+
     if response.status == "SUCCESS":
         echo_success("Analysis is complete.")
         if show_result:

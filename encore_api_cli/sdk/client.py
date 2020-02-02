@@ -36,7 +36,6 @@ class Client(object):
         verbose: bool = False,
         echo_request: Optional[Callable] = None,
         echo_response: Optional[Callable] = None,
-        echo_spin: Optional[Callable] = None,
     ):
         self._client_id = client_id
         self._client_secret = client_secret
@@ -51,7 +50,6 @@ class Client(object):
         self._verbose = verbose
         self._echo_request = echo_request
         self._echo_response = echo_response
-        self._echo_spin = echo_spin
 
     @property
     def token(self) -> str:
@@ -286,20 +284,11 @@ class Client(object):
             raise InvalidFileType(message)
 
     def _wait_for_done(self, url: str) -> Response:
-        def _loop(url: str) -> Response:
-            for _ in range(self._max_steps):
-                response = self._requests(requests.get, url)
-                if response.status in ["SUCCESS", "FAILURE"]:
-                    break
-                time.sleep(self._interval)
-            else:
-                response.status = "TIMEOUT"
-            return response
-
-        if self._verbose or not self._echo_spin:
-            response = _loop(url)
+        for _ in range(self._max_steps):
+            response = self._requests(requests.get, url)
+            if response.status in ["SUCCESS", "FAILURE"]:
+                break
+            time.sleep(self._interval)
         else:
-            # TODO: move to each commands
-            with self._echo_spin(text="Processing..."):
-                response = _loop(url)
+            response.status = "TIMEOUT"
         return response

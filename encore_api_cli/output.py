@@ -1,32 +1,28 @@
-import functools
 import json
-import os
 import sys
-from distutils.util import strtobool
-from typing import Any, Callable, Optional, Union
+from typing import Optional
 
 import click
 from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
-from yaspin.core import Yaspin
 
 
 def echo(message: Optional[str] = None) -> None:
     """Output message."""
-    if _is_show():
+    if is_show():
         click.echo(message)
 
 
 def echo_success(message: str) -> None:
     """Output success message."""
-    if _is_show():
+    if is_show():
         echo(f"{click.style('Success', fg='green')}: {message}")
 
 
 def echo_json(data: object, sort_keys: bool = False) -> None:
     """Output json data."""
-    if _is_show():
+    if is_show():
         click.echo()
 
     body = json.dumps(data, sort_keys=sort_keys, indent=2)
@@ -83,41 +79,12 @@ def echo_response(
     click.echo()
 
 
-class Nospin(object):
-    def __init__(self, *args: Any, **kwargs: Any):
-        pass
+def is_show() -> bool:
+    """Flag to show.
 
-    def __enter__(self) -> None:
-        pass
+    It is True for terminals and False for pipes.
+    If an environment variable has been set, its value is returned.
+    """
+    from encore_api_cli.utils import get_bool_env
 
-    def __exit__(self, *exc: Any) -> None:
-        pass
-
-    def __call__(self, fn: Callable) -> Callable:
-        """Call."""
-
-        @functools.wraps(fn)
-        def inner(*args: Any, **kwargs: Any) -> Callable:
-            with self:
-                return fn(*args, **kwargs)
-
-        return inner
-
-
-def spin(*args: Any, **kwargs: Any) -> Union[Yaspin, Nospin]:
-    """Display spinner in terminal."""
-    if _is_show():
-        return Yaspin(*args, **kwargs)
-    else:
-        return Nospin()
-
-
-def _is_show() -> bool:
-    env = os.getenv("STDOUT_ISSHOW")
-    if env is None:
-        return sys.stdout.isatty()
-    else:
-        try:
-            return bool(strtobool(env))
-        except ValueError:
-            return sys.stdout.isatty()
+    return get_bool_env("STDOUT_ISSHOW", sys.stdout.isatty())

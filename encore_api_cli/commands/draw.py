@@ -2,6 +2,7 @@ import io
 from typing import Callable, Optional
 
 import click
+from yaspin import yaspin
 
 from encore_api_cli.commands.download import check_download
 from encore_api_cli.options import common_options
@@ -62,9 +63,14 @@ def draw(
 
     client = get_client(state)
     drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
-    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
 
-    status, url = client.wait_for_drawing(drawing_id)
+    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
+    if state.use_spinner:
+        with yaspin(text="Processing..."):
+            status, url = client.wait_for_drawing(drawing_id)
+    else:
+        status, url = client.wait_for_drawing(drawing_id)
+
     if status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
         if no_download:
