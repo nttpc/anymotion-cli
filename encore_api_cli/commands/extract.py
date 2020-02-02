@@ -39,7 +39,7 @@ def cli() -> None:  # noqa: D103
 @pass_state
 @click.pass_context
 def extract(
-    ctx: click.core.Context,
+    ctx: click.Context,
     state: State,
     movie_id: Optional[int],
     image_id: Optional[int],

@@ -72,7 +72,7 @@ class TestDraw(object):
             result.output
             == "Drawing started. (drawing id: 111)\n"
             + "Success: Drawing is complete.\n"
-            + message % {"prog": "cli", "drawing_id": "111"}
+            + message % {"prog": "amcli", "drawing_id": "111"}
             + "\n"
         )
 

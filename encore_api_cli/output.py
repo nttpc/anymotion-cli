@@ -17,7 +17,7 @@ def echo(message: Optional[str] = None) -> None:
 def echo_success(message: str) -> None:
     """Output success message."""
     if is_show():
-        echo(f"{click.style('Success', fg='green')}: {message}")
+        click.echo(f"{click.style('Success', fg='green')}: {message}")
 
 
 def echo_json(data: object, sort_keys: bool = False) -> None:

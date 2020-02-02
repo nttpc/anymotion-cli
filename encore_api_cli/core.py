@@ -12,6 +12,7 @@ from encore_api_cli.commands.image import cli as image
 from encore_api_cli.commands.keypoint import cli as keypoint
 from encore_api_cli.commands.movie import cli as movie
 from encore_api_cli.commands.upload import cli as upload
+from encore_api_cli.state import State, pass_state
 
 
 @click.command(
@@ -30,7 +31,22 @@ from encore_api_cli.commands.upload import cli as upload
         upload,
     ],  # type: ignore
 )
-@click.version_option(version=click.style(__version__, fg="cyan"))
-def cli():
+@click.version_option(
+    version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
+)
+@pass_state
+@click.pass_context
+def cli(ctx: click.Context, state: State) -> None:
     """Command Line Interface for AnyMotion API."""
-    pass
+    state.cli_name = str(ctx.find_root().info_name)
+
+    # TODO: future warning
+    # if state.cli_name != "amcli":
+    #     warning = click.style("Warning", fg="yellow")
+    #     old_cmd = click.style(state.cli_name, fg="cyan")
+    #     new_cmd = click.style("amcli", fg="cyan")
+    #     click.echo(
+    #         f'{warning}: {old_cmd} command is deprecated. Use {new_cmd} command.',
+    #         err=True,
+    #     )
+    #     click.echo()

@@ -27,7 +27,7 @@ def cli() -> None:  # noqa: D103
 @pass_state
 @click.pass_context
 def analyze(
-    ctx: click.core.Context,
+    ctx: click.Context,
     state: State,
     keypoint_id: int,
     rule_str: Optional[str],

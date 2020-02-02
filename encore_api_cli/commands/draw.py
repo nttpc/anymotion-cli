@@ -39,9 +39,7 @@ def cli() -> None:  # noqa: D103
 @draw_options
 @common_options
 @pass_state
-@click.pass_context
 def draw(
-    ctx: click.core.Context,
     state: State,
     keypoint_id: int,
     out_dir: str,
@@ -80,8 +78,7 @@ def draw(
         if is_ok:
             client.download(url, path)
         else:
-            prog = ctx.find_root().info_name
-            message = message % {"prog": prog, "drawing_id": drawing_id}
+            message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     elif status == "TIMEOUT":
         echo("Drawing is timed out.")

@@ -8,6 +8,7 @@ class State(object):
     def __init__(self) -> None:
         self.verbose = False
         self.profile = "default"
+        self.cli_name = "amcli"
 
     @property
     def use_spinner(self) -> bool:

@@ -14,17 +14,17 @@ from encore_api_cli.settings import Settings
 # from encore_api_cli.state import State
 
 
-# TODO: use profile, verbose instead of state
+# TODO: use profile, verbose, cli_name instead of state
 def get_client(state: Any) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
     if not settings.is_ok():
-        # FIXME: use prog instead of "encore"
+        command = click.style(f"{state.cli_name} configure", fg="cyan")
         message = (
             "The credentials is invalid or not set. "
-            'Run "encore configure" to set credentials.'
+            f"Run {command} to set credentials."
         )
-        raise click.ClickException(message)
+        raise ClickException(message)
 
     return Client(
         str(settings.client_id),
