@@ -150,11 +150,11 @@ class Client(object):
         (analysis_id,) = response.get("id")
         return analysis_id
 
-    def wait_for_extraction(self, keypoint_id: int) -> str:
+    def wait_for_extraction(self, keypoint_id: int) -> Response:
         """Wait for extraction."""
         url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
         response = self._wait_for_done(url)
-        return response.status
+        return response
 
     def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
         """Wait for drawing."""

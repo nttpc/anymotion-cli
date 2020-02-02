@@ -52,3 +52,27 @@ class Response(object):
             )
             raise InvalidResponse(message)
         return tuple(self.json[k] for k in keys)
+
+
+# TODO: use status class
+# class Status(object):
+#     """Processing Status."""
+
+#     def __init__(self, name, failure_detail=None, drawing_url=None):
+#         self._name = name
+#         self._failure_detail = failure_detail
+#         self._drawing_url = drawing_url
+
+#     def __repr__(self):
+#         return f"<Status [{self._name}]>"
+
+#     def __str__(self):
+#         return self._name
+
+#     @property
+#     def failure_detail(self):
+#         return self._failure_detail
+
+#     @property
+#     def drawing_url(self):
+#         return self._drawing_url

@@ -33,12 +33,12 @@ class TestExtract(object):
             (
                 ["extract", "--movie-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed.",
+                "Keypoint extraction failed: message",
             ),
             (
                 ["extract", "--image-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed.",
+                "Keypoint extraction failed: message",
             ),
         ],
     )
@@ -97,7 +97,10 @@ class TestExtract(object):
 
     def _get_client_mock(self, mocker, status="SUCCESS", keypoint_id=111):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.wait_for_extraction.return_value = status
+        client_mock.return_value.wait_for_extraction.return_value.status = status
+        client_mock.return_value.wait_for_extraction.return_value.failure_detail = (
+            "message"
+        )
         client_mock.return_value.extract_keypoint_from_movie.return_value = keypoint_id
         client_mock.return_value.extract_keypoint_from_image.return_value = keypoint_id
         mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
@@ -110,7 +113,7 @@ def test_keypoint_extract_with_drawing(mocker):
     keypoint_id = 222
 
     client_mock = mocker.MagicMock()
-    client_mock.return_value.wait_for_extraction.return_value = "SUCCESS"
+    client_mock.return_value.wait_for_extraction.return_value.status = "SUCCESS"
     extract_keypoint_mock = client_mock.return_value.extract_keypoint_from_image
     extract_keypoint_mock.return_value = keypoint_id
     client_mock.return_value.draw_keypoint.return_value = 333
