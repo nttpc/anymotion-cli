@@ -29,15 +29,6 @@ commands:
           key: deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
           paths:
             - /home/circleci/.cache/pypoetry/virtualenvs
-  run_test:
-    steps:
-      - run:
-          name: Run unit test with pytest
-          command: |
-            mkdir test-reports
-            poetry run pytest -v --junitxml=test-reports/junit.xml
-      - store_test_results:
-          path: test-reports
 
 jobs:
   setup-py38:
@@ -47,33 +38,25 @@ jobs:
       - checkout
       - setup_python
 
-  test-py38:
+  test:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
     executor:
       name: python
-    steps:
-      - checkout
-      - setup_python
-      - run_test
-
-  test-py37:
-    executor:
-      name: python
-      version: "3.7"
+      version: << parameters.version >>
     steps:
       - checkout
       - setup_python:
-          version: "3.7"
-      - run_test
-
-  test-py36:
-    executor:
-      name: python
-      version: "3.6"
-    steps:
-      - checkout
-      - setup_python:
-          version: "3.6"
-      - run_test
+          version: << parameters.version >>
+      - run:
+          name: Run unit test with pytest
+          command: |
+            mkdir test-reports
+            poetry run pytest -v --junitxml=test-reports/junit.xml
+      - store_test_results:
+          path: test-reports
 
   measure-coverage:
     executor:
@@ -138,18 +121,23 @@ workflows:
   workflow:
     jobs:
       - setup-py38:
-        filters:
-          tags:
-            only: /^\d.*/
-      - test-py36:
           filters:
             tags:
               only: /^\d.*/
-      - test-py37:
+      - test:
+          name: test-py36
           filters:
             tags:
               only: /^\d.*/
-      - test-py38:
+          version: "3.6"
+      - test:
+          name: test-py37
+          filters:
+            tags:
+              only: /^\d.*/
+          version: "3.7"
+      - test:
+          name: test-py38
           filters:
             tags:
               only: /^\d.*/
