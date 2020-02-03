@@ -1,27 +1,30 @@
 import json
+import os
+from distutils.util import strtobool
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import click
-import pkg_resources
 
 from encore_api_cli.exceptions import ClickException, SettingsValueError
-from encore_api_cli.output import echo_request, echo_response, spin
+from encore_api_cli.output import echo_request, echo_response
 from encore_api_cli.sdk.client import Client
 from encore_api_cli.settings import Settings
-from encore_api_cli.state import State
+
+# from encore_api_cli.state import State
 
 
-def get_client(state: State) -> Client:
+# TODO: use profile, verbose, cli_name instead of state
+def get_client(state: Any) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
     if not settings.is_ok():
-        # FIXME: use prog instead of "encore"
+        command = click.style(f"{state.cli_name} configure", fg="cyan")
         message = (
             "The credentials is invalid or not set. "
-            'Run "encore configure" to set credentials.'
+            f"Run {command} to set credentials."
         )
-        raise click.ClickException(message)
+        raise ClickException(message)
 
     return Client(
         str(settings.client_id),
@@ -32,7 +35,6 @@ def get_client(state: State) -> Client:
         verbose=state.verbose,
         echo_request=echo_request,
         echo_response=echo_response,
-        echo_spin=spin,
     )
 
 
@@ -41,7 +43,7 @@ def get_settings(profile: str, use_env: bool = True) -> Settings:
     try:
         settings = Settings(profile, use_env=use_env)
     except SettingsValueError as e:
-        raise click.ClickException(str(e))
+        raise ClickException(str(e))
     return settings
 
 
@@ -56,9 +58,8 @@ def parse_rule(rule: Optional[str]) -> Optional[list]:
         raise ClickException("Rule format is invalid. Must be in JSON format.")
 
     if not isinstance(rule, (list, dict)):
-        raise ClickException(
-            "Rule format is invalid. Must be in list or object format."
-        )
+        message = "Rule format is invalid. Must be in list or object format."
+        raise ClickException(message)
 
     return rule
 
@@ -73,6 +74,14 @@ def color_path(path: Union[str, Path]) -> str:
     return click.style(str(path), fg="blue")
 
 
-def get_version():
-    """Get package version."""
-    return pkg_resources.get_distribution("encore_api_cli").version
+def get_bool_env(key: str, default: bool) -> bool:
+    """Get boolean environment variable."""
+    str_env = os.getenv(key)
+    if str_env:
+        try:
+            bool_env = bool(strtobool(str_env))
+        except ValueError:
+            bool_env = default
+    else:
+        bool_env = default
+    return bool_env

@@ -28,10 +28,7 @@ def cli() -> None:  # noqa: D103
 )
 @common_options
 @pass_state
-@click.pass_context
-def download(
-    ctx: click.core.Context, state: State, drawing_id: int, out_dir: str
-) -> None:
+def download(state: State, drawing_id: int, out_dir: str) -> None:
     """Download the drawn file."""
     client = get_client(state)
     status, url = client.wait_for_drawing(drawing_id)
@@ -41,8 +38,7 @@ def download(
         if is_ok:
             client.download(url, path)
         else:
-            prog = ctx.find_root().info_name
-            message = message % {"prog": prog, "drawing_id": drawing_id}
+            message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     else:
         echo("Unable to download because drawing failed.")

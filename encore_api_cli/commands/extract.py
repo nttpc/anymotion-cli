@@ -2,6 +2,7 @@ import io
 from typing import Optional
 
 import click
+from yaspin import yaspin
 
 from encore_api_cli.commands.draw import draw, draw_options
 from encore_api_cli.options import common_options
@@ -38,7 +39,7 @@ def cli() -> None:  # noqa: D103
 @pass_state
 @click.pass_context
 def extract(
-    ctx: click.core.Context,
+    ctx: click.Context,
     state: State,
     movie_id: Optional[int],
     image_id: Optional[int],
@@ -60,7 +61,11 @@ def extract(
             keypoint_id = client.extract_keypoint_from_image(image_id)
 
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
-        response = client.wait_for_extraction(keypoint_id)
+        if state.use_spinner:
+            with yaspin(text="Processing..."):
+                response = client.wait_for_extraction(keypoint_id)
+        else:
+            response = client.wait_for_extraction(keypoint_id)
     except RequestsError as e:
         raise click.ClickException(str(e))
 

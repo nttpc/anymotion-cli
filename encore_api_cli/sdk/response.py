@@ -27,7 +27,7 @@ class Response(object):
         return self._status
 
     @status.setter
-    def status(self, value) -> None:
+    def status(self, value: str) -> None:
         self._status = value
 
     @property

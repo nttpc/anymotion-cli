@@ -2,6 +2,7 @@ import io
 from typing import Callable, Optional
 
 import click
+from yaspin import yaspin
 
 from encore_api_cli.commands.download import check_download
 from encore_api_cli.options import common_options
@@ -38,9 +39,7 @@ def cli() -> None:  # noqa: D103
 @draw_options
 @common_options
 @pass_state
-@click.pass_context
 def draw(
-    ctx: click.core.Context,
     state: State,
     keypoint_id: int,
     out_dir: str,
@@ -62,9 +61,14 @@ def draw(
 
     client = get_client(state)
     drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
-    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
 
-    status, url = client.wait_for_drawing(drawing_id)
+    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
+    if state.use_spinner:
+        with yaspin(text="Processing..."):
+            status, url = client.wait_for_drawing(drawing_id)
+    else:
+        status, url = client.wait_for_drawing(drawing_id)
+
     if status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
         if no_download:
@@ -74,8 +78,7 @@ def draw(
         if is_ok:
             client.download(url, path)
         else:
-            prog = ctx.find_root().info_name
-            message = message % {"prog": prog, "drawing_id": drawing_id}
+            message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     elif status == "TIMEOUT":
         echo("Drawing is timed out.")

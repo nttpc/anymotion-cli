@@ -17,7 +17,7 @@ def cli() -> None:  # noqa: D103
 @common_options
 @pass_state
 @click.pass_context
-def configure(ctx: click.core.Context, state: State) -> None:
+def configure(ctx: click.Context, state: State) -> None:
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
         settings = get_settings(state.profile, use_env=False)
@@ -60,5 +60,6 @@ def list(state: State) -> None:
     click.echo(table)
 
     if client_id == none or client_secret == none:
+        # TODO: use echo_warning
         message = "\nWarning: client_id and/or client_secret not set."
         click.secho(message, fg="yellow")
