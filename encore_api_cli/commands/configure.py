@@ -3,9 +3,9 @@ from typing import Optional
 import click
 from tabulate import tabulate
 
-from encore_api_cli.options import common_options
-from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import get_settings
+from ..options import common_options
+from ..state import State, pass_state
+from ..utils import get_settings
 
 
 @click.group()

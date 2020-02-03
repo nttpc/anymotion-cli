@@ -5,10 +5,10 @@ from urllib.parse import urlparse
 
 import click
 
-from encore_api_cli.options import common_options
-from encore_api_cli.output import echo
-from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import color_path, get_client
+from ..options import common_options
+from ..output import echo
+from ..state import State, pass_state
+from ..utils import color_path, get_client
 
 
 @click.group()

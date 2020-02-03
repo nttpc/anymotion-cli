@@ -6,10 +6,10 @@ from typing import Any, Optional, Union
 
 import click
 
-from encore_api_cli.exceptions import ClickException, SettingsValueError
-from encore_api_cli.output import echo_request, echo_response
-from encore_api_cli.sdk.client import Client
-from encore_api_cli.settings import Settings
+from .exceptions import ClickException, SettingsValueError
+from .output import echo_request, echo_response
+from .sdk.client import Client
+from .settings import Settings
 
 # from encore_api_cli.state import State
 

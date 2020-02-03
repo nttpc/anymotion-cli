@@ -4,12 +4,12 @@ from typing import Optional
 import click
 from yaspin import yaspin
 
-from encore_api_cli.commands.draw import draw, draw_options
-from encore_api_cli.options import common_options
-from encore_api_cli.output import echo, echo_success
-from encore_api_cli.sdk.exceptions import RequestsError
-from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import color_id, get_client
+from ..options import common_options
+from ..output import echo, echo_success
+from ..sdk.exceptions import RequestsError
+from ..state import State, pass_state
+from ..utils import color_id, get_client
+from .draw import draw, draw_options
 
 
 @click.group()

@@ -4,11 +4,11 @@ from typing import Callable, Optional
 import click
 from yaspin import yaspin
 
-from encore_api_cli.commands.download import check_download
-from encore_api_cli.options import common_options
-from encore_api_cli.output import echo, echo_success
-from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import color_id, get_client, parse_rule
+from ..options import common_options
+from ..output import echo, echo_success
+from ..state import State, pass_state
+from ..utils import color_id, get_client, parse_rule
+from .download import check_download
 
 
 def draw_options(f: Callable) -> Callable:
