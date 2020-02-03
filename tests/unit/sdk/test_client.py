@@ -105,9 +105,9 @@ class TestExtractKeypoint(object):
             json={"execStatus": "SUCCESS"},
         )
 
-        status = client.wait_for_extraction(keypoint_id)
+        response = client.wait_for_extraction(keypoint_id)
 
-        assert status == "SUCCESS"
+        assert response.status == "SUCCESS"
 
 
 class TestDrawingKeypoint(object):
@@ -156,9 +156,9 @@ class TestAnalysisKeypoint(object):
             json={"execStatus": "SUCCESS", "result": "[]"},
         )
 
-        status = client.wait_for_analysis(analysis_id)
+        response = client.wait_for_analysis(analysis_id)
 
-        assert status == "SUCCESS"
+        assert response.status == "SUCCESS"
 
 
 def test_ファイルをダウンロードできること(mocker, requests_mock, client, tmpdir):

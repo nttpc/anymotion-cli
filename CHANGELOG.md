@@ -5,6 +5,7 @@
 Unreleased
 
 - Added new `drawing` command.
+- Added the display of failure details when processing fails.
 - Moved `keypoint extract` subcommand to `extract` command.
 - Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
 - Changed all option names to kebab cases.

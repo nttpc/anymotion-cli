@@ -54,12 +54,12 @@ def analyze(
     analysis_id = client.analyze_keypoint(keypoint_id, rule)
     echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
 
-    status = client.wait_for_analysis(analysis_id)
-    if status == "SUCCESS":
+    response = client.wait_for_analysis(analysis_id)
+    if response.status == "SUCCESS":
         echo_success("Analysis is complete.")
         if show_result:
             ctx.invoke(show, analysis_id=analysis_id)
-    elif status == "TIMEOUT":
+    elif response.status == "TIMEOUT":
         echo("Analysis is timed out.")
     else:
-        echo("Analysis failed.")
+        echo(f"Analysis failed: {response.failure_detail}")

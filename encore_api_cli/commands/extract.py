@@ -60,16 +60,16 @@ def extract(
             keypoint_id = client.extract_keypoint_from_image(image_id)
 
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
-        status = client.wait_for_extraction(keypoint_id)
+        response = client.wait_for_extraction(keypoint_id)
     except RequestsError as e:
         raise click.ClickException(str(e))
 
-    if status == "SUCCESS":
+    if response.status == "SUCCESS":
         echo_success("Keypoint extraction is complete.")
-    elif status == "TIMEOUT":
+    elif response.status == "TIMEOUT":
         echo("Keypoint extraction is timed out.")
     else:
-        echo("Keypoint extraction failed.")
+        echo(f"Keypoint extraction failed: {response.failure_detail}")
 
     if with_drawing:
         echo()
