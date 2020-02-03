@@ -75,46 +75,39 @@ and place it in `~/.anymotion/credentials`.
 
 ## Usage
 
-```sh
-$ amcli --help
-```
+You can use `amcli`.
 
 ```text
-Usage: amcli [OPTIONS] COMMAND [ARGS]...
-
-  Command Line Interface for AnyMotion API.
-
-Options:
-  --version  Show the version and exit.
-  --help     Show this message and exit.
-
-Commands:
-  analysis   Show analysis results.
-  analyze    Analyze the extracted keypoint data.
-  configure  Configure your AnyMotion Credentials.
-  download   Download the drawn file.
-  draw       Draw points and/or lines on uploaded movie or image.
-  drawing    Show the information of the drawn images or movies.
-  extract    Extract keypoints from uploaded images or movies.
-  image      Show the information of the uploaded images.
-  keypoint   Show the extracted keypoints.
-  movie      Show the information of the uploaded movies.
-  upload     Upload the local movie or image file to the cloud storage.
+amcli [OPTIONS] COMMAND [ARGS]...
 ```
 
-- Commands to process something (verb commands)
-  - upload
-  - download
-  - extract
-  - draw
-  - analyze
+More information, see below tables or run with `--help` option.
 
-- Commands to show something (noun commands)
-  - image
-  - movie
-  - keypoint
-  - drawing
-  - analysis
+### Commands to process something (verb commands)
+
+| command name | description |
+| -- | -- |
+| upload | Upload the local movie or image file to the cloud storage. |
+| download | Download the drawn file. |
+| extract | Extract keypoints from uploaded images or movies. |
+| draw | Draw points and/or lines on uploaded movie or image. |
+| analyze | Analyze the extracted keypoint data. |
+
+### Commands to show something (noun commands)
+
+| command name | description |
+| -- | -- |
+| image | Show the information of the uploaded images. |
+| movie | Show the information of the uploaded movies. |
+| keypoint | Show the extracted keypoints. |
+| drawing | Show the information of the drawn images or movies. |
+| analysis | Show the analysis results. |
+
+### Other commands
+
+| command name | description |
+| -- | -- |
+| configure | Configure your AnyMotion Credentials. |
 
 ### Examples
 
@@ -177,6 +170,10 @@ For zsh users add this to your `.zshrc`:
 ```sh
 $ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 ```
+
+## Change Log
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 

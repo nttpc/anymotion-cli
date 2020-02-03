@@ -13,7 +13,7 @@ def cli() -> None:  # noqa: D103
 
 @cli.group()
 def analysis() -> None:
-    """Show analysis results."""
+    """Show the analysis results."""
 
 
 @analysis.command()
@@ -21,7 +21,7 @@ def analysis() -> None:
 @common_options
 @pass_state
 def show(state: State, analysis_id: int) -> None:
-    """Show analysis result."""
+    """Show the analysis result."""
     client = get_client(state)
     response = client.get_one_data("analyses", analysis_id)
     if not isinstance(response, dict):
@@ -39,6 +39,6 @@ def show(state: State, analysis_id: int) -> None:
 @common_options
 @pass_state
 def list(state: State) -> None:
-    """Show analysis list."""
+    """Show the analysis list."""
     client = get_client(state)
     echo_json(client.get_list_data("analyses"))
