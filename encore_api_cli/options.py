@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 import click
 
-from encore_api_cli.state import State
+from .state import State
 
 
 def verbose_option(f: Callable) -> Callable:

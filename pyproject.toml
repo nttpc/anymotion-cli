@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "encore-api-cli"
-version = "0.7.0b1"
+version = "0.7.0b2"
 description = "Command Line Interface for AnyMotion API."
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
