@@ -43,4 +43,4 @@ def test_versionが表示されること():
     result = runner.invoke(cli, ["--version"])
 
     assert result.exit_code == 0
-    assert re.match(r"^\w+, version \d+.\d+.\d+$", result.output)
+    assert re.match(r"^\w+, version \d+.\d+.\d+([a|b|rc]\d+)?$", result.output)
