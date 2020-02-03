@@ -90,10 +90,34 @@ class TestKeypointList(object):
         mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
         yield client_mock
 
-    def test_valid(self, client_mock):
+    @pytest.mark.parametrize(
+        "args", [["keypoint", "list"], ["keypoint", "list", "--status", "SUCCESS"]]
+    )
+    def test_valid(self, client_mock, args):
         runner = CliRunner()
-        result = runner.invoke(cli, ["keypoint", "list"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         # TODO: check output
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (
+                ["keypoint", "list", "--status"],
+                "Error: --status option requires an argument",
+            ),
+            (
+                ["keypoint", "list", "--status", "INVALID_STATUS"],
+                'Error: Invalid value for "--status": invalid choice',
+            )
+        ],
+    )
+    def test_invalid_params(self, client_mock, args, expected):
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert expected in result.output

@@ -4,8 +4,9 @@
 
 Unreleased
 
-- Added new `drawing` command.
+- Added `drawing` command.
 - Added the display of failure details when processing fails.
+- Added `--status` option to `analysis`, `drawing` and `keypoint` commands.
 - Moved `keypoint extract` subcommand to `extract` command.
 - Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
 - Changed all option names to kebab cases.
@@ -37,7 +38,7 @@ Released 2020-01-22
 Released 2020-01-21
 
 - Made it possible to use uppercase extensions.
-- Added `--rule-file` option in `analyze` and `draw` commands.
+- Added `--rule-file` option to `analyze` and `draw` commands.
 - Fixed a bug without `--rule` option in `analyze` command.
 
 ## 0.6.3
@@ -51,7 +52,7 @@ Released 2020-01-20
 Released 2020-01-20
 
 - Added alias command `amcli`.
-- Added `--rule` option in `analyze` and `draw` commands.
+- Added `--rule` option to `analyze` and `draw` commands.
 
 ## 0.6.1
 
@@ -74,7 +75,7 @@ Released 2020-01-07
 
 Released 2019-12-26
 
-- Added `--with_drawing` option to keypoint extract command.
+- Added `--with_drawing` option to `keypoint extract` command.
 - Dropped support for Python 3.5.
 
 ## 0.5.2

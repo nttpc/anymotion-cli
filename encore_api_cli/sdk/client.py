@@ -62,12 +62,12 @@ class Client(object):
         response = self._requests(requests.get, url)
         return response.json
 
-    def get_list_data(self, endpoint: str) -> List[dict]:
+    def get_list_data(self, endpoint: str, params: Optional[dict] = None) -> List[dict]:
         """Get list data from AnyMotion API."""
         url = urljoin(self._api_url, f"{endpoint}/")
         data: List[dict] = []
         while url:
-            response = self._requests(requests.get, url)
+            response = self._requests(requests.get, url, params=params)
             sub_data, url = response.get(("data", "next"))
             data += sub_data
         return data
@@ -197,6 +197,7 @@ class Client(object):
         self,
         requests_func: Callable,
         url: str,
+        params: Optional[dict] = None,
         json: Optional[dict] = None,
         data: Optional[object] = None,
         headers: Optional[dict] = None,
@@ -213,13 +214,14 @@ class Client(object):
             headers = self._get_headers(with_content_type=is_json)
 
         if self._verbose and self._echo_request:
+            # TODO: add params
             self._echo_request(url, method, headers, json)
 
         try:
             if is_json:
-                response = requests_func(url, json=json, headers=headers)
+                response = requests_func(url, params=params, json=json, headers=headers)
             else:
-                response = requests_func(url, data=data, headers=headers)
+                response = requests_func(url, params=params, data=data, headers=headers)
         except requests.exceptions.ConnectionError:
             message = f"{method} {url} is failed."
             raise RequestsError(message)

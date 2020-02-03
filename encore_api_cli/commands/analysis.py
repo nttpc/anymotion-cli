@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from ..options import common_options
@@ -36,9 +38,18 @@ def show(state: State, analysis_id: int) -> None:
 
 
 @analysis.command()
+@click.option(
+    "--status",
+    type=click.Choice(["SUCCESS", "FAILURE", "PROCESSING", "UNPROCESSED"]),
+    help="Get data for the specified status only.",
+)
 @common_options
 @pass_state
-def list(state: State) -> None:
+def list(state: State, status: Optional[str]) -> None:
     """Show the analysis list."""
     client = get_client(state)
-    echo_json(client.get_list_data("analyses"))
+    params = None
+    if status is not None:
+        params = {"execStatus": status}
+    # TODO: catch error
+    echo_json(client.get_list_data("analyses", params=params))
