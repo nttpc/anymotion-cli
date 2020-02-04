@@ -96,7 +96,7 @@ class TestDrawingList(object):
             (
                 ["drawing", "list", "--status", "INVALID_STATUS"],
                 'Error: Invalid value for "--status": invalid choice',
-            )
+            ),
         ],
     )
     def test_invalid_params(self, mocker, args, expected):

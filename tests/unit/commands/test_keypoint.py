@@ -111,7 +111,7 @@ class TestKeypointList(object):
             (
                 ["keypoint", "list", "--status", "INVALID_STATUS"],
                 'Error: Invalid value for "--status": invalid choice',
-            )
+            ),
         ],
     )
     def test_invalid_params(self, client_mock, args, expected):

@@ -81,7 +81,7 @@ class TestAnalysisList(object):
             (
                 ["analysis", "list", "--status", "INVALID_STATUS"],
                 'Error: Invalid value for "--status": invalid choice',
-            )
+            ),
         ],
     )
     def test_invalid_params(self, mocker, args, expected):
