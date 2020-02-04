@@ -5,6 +5,7 @@
 Unreleased
 
 - Added `drawing` command.
+- Added alias command `enimo`.
 - Added the display of failure details when processing fails.
 - Added `--status` option to `analysis`, `drawing` and `keypoint` commands.
 - Moved `keypoint extract` subcommand to `extract` command.
