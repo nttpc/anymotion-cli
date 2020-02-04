@@ -35,6 +35,7 @@ tox = "^3.14.3"
 
 [tool.poetry.scripts]
 amcli = "encore_api_cli.core:cli"
+enimo = "encore_api_cli.core:cli"
 encore = "encore_api_cli.core:cli"
 
 [tool.coverage.run]
