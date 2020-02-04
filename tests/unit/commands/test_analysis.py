@@ -47,7 +47,11 @@ class TestAnalysisShow(object):
 
 
 class TestAnalysisList(object):
-    def test_valid(self, mocker):
+    @pytest.mark.parametrize(
+        "args", [["analysis", "list"], ["analysis", "list", "--status", "SUCCESS"]]
+    )
+    def test_valid(self, mocker, args):
+        client_mock = self._client_mock(mocker)
         expected = dedent(
             """\
 
@@ -60,13 +64,38 @@ class TestAnalysisList(object):
             """
         )
 
-        client_mock = mocker.MagicMock()
-        client_mock.return_value.get_list_data.return_value = [{"id": 1}]
-        mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
-
         runner = CliRunner()
-        result = runner.invoke(cli, ["analysis", "list"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (
+                ["analysis", "list", "--status"],
+                "Error: --status option requires an argument",
+            ),
+            (
+                ["analysis", "list", "--status", "INVALID_STATUS"],
+                'Error: Invalid value for "--status": invalid choice',
+            ),
+        ],
+    )
+    def test_invalid_params(self, mocker, args, expected):
+        client_mock = self._client_mock(mocker)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 0
+        assert result.exit_code == 2
+        assert expected in result.output
+
+    def _client_mock(self, mocker):
+        client_mock = mocker.MagicMock()
+        client_mock.return_value.get_list_data.return_value = [{"id": 1}]
+        mocker.patch("encore_api_cli.commands.analysis.get_client", client_mock)
+        return client_mock
