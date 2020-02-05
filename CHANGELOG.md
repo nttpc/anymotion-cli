@@ -2,7 +2,7 @@
 
 ## 0.7.0
 
-Unreleased
+Released 2020-02-06
 
 - Added `drawing` command.
 - Added alias command `enimo`.
