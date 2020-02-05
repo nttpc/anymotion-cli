@@ -1,7 +1,7 @@
 import click
 import pytest
 
-from encore_api_cli.client import Client
+from encore_api_cli.sdk.client import Client
 from encore_api_cli.state import State
 from encore_api_cli.utils import get_client, parse_rule
 

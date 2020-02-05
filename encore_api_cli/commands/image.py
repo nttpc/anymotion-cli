@@ -1,9 +1,9 @@
 import click
 
-from encore_api_cli.options import common_options
-from encore_api_cli.output import echo_json
-from encore_api_cli.state import State, pass_state
-from encore_api_cli.utils import get_client
+from ..options import common_options
+from ..output import echo_json
+from ..state import State, pass_state
+from ..utils import get_client
 
 
 @click.group()

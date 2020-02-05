@@ -1,0 +1,18 @@
+{
+  "username": "AnyMotion",
+  "icon_emoji": ":anymotion:",
+  "attachments": [
+    {
+      "fallback": ":tada: New Release!",
+      "pretext": ":tada: New Release!",
+      "color": "good",
+      "fields": [
+        {
+          "title": "encore-api-cli <version> is released",
+          "value": "Release note is <https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/CHANGELOG.md|here>.\nHow to install:\n```pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-<version>-py3-none-any.whl```"
+        }
+      ],
+      "footer": "<https://bitbucket.org/nttpc-datascience/encore-api-cli|encore-api-cli>"
+    }
+  ]
+}

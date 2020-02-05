@@ -3,7 +3,7 @@ import re
 import pytest
 from click.testing import CliRunner
 
-from encore_api_cli.cli import cli
+from encore_api_cli.core import cli
 
 
 @pytest.mark.parametrize(
@@ -14,6 +14,8 @@ from encore_api_cli.cli import cli
         "configure",
         "download",
         "draw",
+        "drawing",
+        "extract",
         "image",
         "keypoint",
         "movie",
@@ -41,4 +43,4 @@ def test_versionが表示されること():
     result = runner.invoke(cli, ["--version"])
 
     assert result.exit_code == 0
-    assert re.match(r"^\w+, version \d+.\d+.\d+$", result.output)
+    assert re.match(r"^\w+ version \d+.\d+.\d+([a|b|rc]\d+)?$", result.output)

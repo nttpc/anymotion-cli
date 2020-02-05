@@ -1,6 +1,6 @@
 # Encore API CLI
 
-[![CircleCI](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84)](https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master) [![codecov](https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN)](https://codecov.io/bb/nttpc-datascience/encore-api-cli)
+[![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
 This package provides a command line interface to AnyMotion.
 
@@ -75,30 +75,39 @@ and place it in `~/.anymotion/credentials`.
 
 ## Usage
 
-```sh
-$ amcli --help
-```
+You can use `amcli`.
 
 ```text
-Usage: amcli [OPTIONS] COMMAND [ARGS]...
-
-  Command Line Interface for AnyMotion API.
-
-Options:
-  --version  Show the version and exit.
-  --help     Show this message and exit.
-
-Commands:
-  analysis   Show analysis results.
-  analyze    Analyze the extracted keypoint data.
-  configure  Configure your AnyMotion Credentials.
-  download   Download the drawn file.
-  draw       Draw points and/or lines on uploaded movie or image.
-  image      Show the information of the uploaded images.
-  keypoint   Extract keypoints and show the list.
-  movie      Show the information of the uploaded movies.
-  upload     Upload the local movie or image file to the cloud storage.
+amcli [OPTIONS] COMMAND [ARGS]...
 ```
+
+More information, see below tables or run with `--help` option.
+
+### Commands to process something (verb commands)
+
+| command name | description |
+| -- | -- |
+| upload | Upload the local movie or image file to the cloud storage. |
+| download | Download the drawn file. |
+| extract | Extract keypoints from uploaded images or movies. |
+| draw | Draw points and/or lines on uploaded movie or image. |
+| analyze | Analyze the extracted keypoint data. |
+
+### Commands to show something (noun commands)
+
+| command name | description |
+| -- | -- |
+| image | Show the information of the uploaded images. |
+| movie | Show the information of the uploaded movies. |
+| keypoint | Show the extracted keypoints. |
+| drawing | Show the information of the drawn images or movies. |
+| analysis | Show the analysis results. |
+
+### Other commands
+
+| command name | description |
+| -- | -- |
+| configure | Configure your AnyMotion Credentials. |
 
 ### Examples
 
@@ -108,26 +117,28 @@ First, upload the image file.
 
 ```sh
 $ amcli upload image.jpg
-Success: Uploaded image.jpg to the cloud storage. (image_id: 111)
+Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image_id`. Extract keypoints using this `image_id`.
+When the upload is complete, you get an `image id`. Extract keypoints using this `image id`.
 
 ```sh
-$ amcli keypoint extract --image_id 111
-Keypoint extraction started. (keypoint_id: 222)
+$ amcli extract --image-id 111
+Keypoint extraction started. (keypoint id: 222)
 Success: Keypoint extraction is complete.
 ```
 
+Draw points/lines to image using `keypoint id`.
+
 ```sh
 $ amcli draw 222
-Drawing is started. (drawing_id: 333)
+Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
 Downloaded the file to image_xxx.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
-To save to a specific directory, use the `--out_dir` option.
+To save to a specific directory, use the `--out-dir` option.
 
 ### Tips
 
@@ -160,6 +171,10 @@ For zsh users add this to your `.zshrc`:
 $ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 ```
 
+## Change Log
+
+See [CHANGELOG.md](CHANGELOG.md).
+
 ## Contributing
 
 - Code must work on Python 3.6 and higher.
@@ -168,11 +183,16 @@ $ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 - Install all development dependencies using:
 
 ```sh
-$ pipenv install --dev
+$ poetry install
 ```
 
 - Before submitting pull requests, run tests with:
 
 ```sh
-$ pipenv run tox
+$ poetry run tox
 ```
+
+[ci]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master
+[ci-status]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84
+[codecov]: https://codecov.io/bb/nttpc-datascience/encore-api-cli
+[codecov-status]: https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN

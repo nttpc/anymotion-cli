@@ -62,7 +62,7 @@ class TestDownload(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == message % {"prog": "cli", "drawing_id": "111"} + "\n"
+        assert result.output == message % {"prog": "amcli", "drawing_id": "111"} + "\n"
 
     def test_missing_args(self, client_mock):
         runner = CliRunner()

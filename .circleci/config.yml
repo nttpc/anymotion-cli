@@ -3,96 +3,108 @@ orbs:
   codecov: codecov/codecov@1.0.5
   aws-cli: circleci/aws-cli@0.1.19
 
-jobs:
-  test-py38: &test-template
+executors:
+  python:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:<< parameters.version >>
+
+commands:
+  setup_python:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
     steps:
-      - checkout
+      - restore_cache:
+          keys:
+            - deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync
-            rm Pipfile.lock
-            pipenv install --dev
+          command: poetry install
+      - save_cache:
+          key: deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
+          paths:
+            - /home/circleci/.cache/pypoetry/virtualenvs
+
+jobs:
+  setup-py38:
+    executor:
+      name: python
+    steps:
+      - checkout
+      - setup_python
+
+  test:
+    parameters:
+      version:
+        type: string
+        default: "3.8"
+    executor:
+      name: python
+      version: << parameters.version >>
+    steps:
+      - checkout
+      - setup_python:
+          version: << parameters.version >>
       - run:
           name: Run unit test with pytest
           command: |
             mkdir test-reports
-            pipenv run pytest -v \
-              --junitxml=test-reports/junit.xml
+            poetry run pytest -v --junitxml=test-reports/junit.xml
       - store_test_results:
           path: test-reports
-  test-py37:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.7
-  test-py36:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.6
+
   measure-coverage:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - setup_python
       - run:
           name: Run unit test with pytest
-          command: pipenv run pytest --cov=encore_api_cli --cov-report=xml
+          command: poetry run pytest --cov --cov-report=xml
       - codecov/upload:
           flags: unittest
+
   check-syntax:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - setup_python
       - run:
           name: Lint with flake8
-          command: pipenv run flake8
+          command: poetry run flake8
       - run:
           name: Lint with black
-          command: pipenv run black . --check
+          command: poetry run black . --check
       - run:
           name: Lint with mypy
-          command: pipenv run mypy
+          command: poetry run mypy
+
   check-security:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
-      - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync --dev
+      - setup_python
       - run:
           name: Check security with bandit
-          command: pipenv run bandit -r encore_api_cli -s B303
+          command: poetry run bandit -r encore_api_cli -s B303
+
   build-and-upload:
-    docker:
-      - image: circleci/python:3
+    executor:
+      name: python
     steps:
       - checkout
       - aws-cli/setup
       - run:
-          name: Install python packages
-          command: |
-            sudo pip install pipenv
-            pipenv sync
-      - run:
           name: Build
-          command: pipenv run build
+          command: poetry build
       - run:
           name: Upload build file to S3
           command: |
@@ -102,37 +114,53 @@ jobs:
       - run:
           name: Notify slack
           command: |
-            curl -X POST \
-              --data-urlencode "payload={\"username\": \"AnyMotion\",\"text\": \"encore-api-cli ${CIRCLE_TAG} をリリースしました。\", \"icon_emoji\": \":anymotion:\" }" \
-              ${SLACK_WEB_HOOK}
+            sed -e "s/<version>/${CIRCLE_TAG}/" .circleci/slack-message.json > message.json
+            curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
 
 workflows:
-  build-and-test:
+  workflow:
     jobs:
-      - test-py36:
+      - setup-py38:
           filters:
             tags:
               only: /^\d.*/
-      - test-py37:
+      - test:
+          name: test-py36
           filters:
             tags:
               only: /^\d.*/
-      - test-py38:
+          version: "3.6"
+      - test:
+          name: test-py37
           filters:
             tags:
               only: /^\d.*/
+          version: "3.7"
+      - test:
+          name: test-py38
+          filters:
+            tags:
+              only: /^\d.*/
+          requires:
+            - setup-py38
       - measure-coverage:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - test-py38
       - check-syntax:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - check-security:
           filters:
             tags:
               only: /^\d.*/
+          requires:
+            - setup-py38
       - build-and-upload:
           filters:
             tags:
@@ -142,7 +170,6 @@ workflows:
           requires:
             - test-py36
             - test-py37
-            - test-py38
             - measure-coverage
             - check-syntax
             - check-security

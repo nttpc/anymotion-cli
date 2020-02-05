@@ -3,7 +3,7 @@ from configparser import ConfigParser, SectionProxy
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
-from encore_api_cli.exceptions import SettingsValueError
+from .exceptions import SettingsValueError
 
 # default values
 BASE_URL = "https://api.customer.jp/"

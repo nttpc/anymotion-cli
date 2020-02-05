@@ -6,4 +6,5 @@ def unset_env(monkeypatch):
     monkeypatch.delenv("ANYMOTION_ROOT", raising=False)
     monkeypatch.delenv("ANYMOTION_CLIENT_ID", raising=False)
     monkeypatch.delenv("ANYMOTION_CLIENT_SECRET", raising=False)
+    monkeypatch.setenv("ANYMOTION_USE_SPINNER", "false")
     monkeypatch.setenv("STDOUT_ISSHOW", "True")

@@ -1,3 +1,8 @@
 """Command Line Interface for AnyMotion API."""
 
-__version__ = "0.6.7"
+import pkg_resources
+
+from . import exceptions  # noqa: F401
+from . import utils  # noqa: F401
+
+__version__ = pkg_resources.get_distribution("encore_api_cli").version
