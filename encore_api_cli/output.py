@@ -20,14 +20,18 @@ def echo_success(message: str) -> None:
         click.echo(f"{click.style('Success', fg='green')}: {message}")
 
 
-def echo_json(data: object, sort_keys: bool = False) -> None:
+def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> None:
     """Output json data."""
     if is_show():
         click.echo()
 
     body = json.dumps(data, sort_keys=sort_keys, indent=2)
     body = highlight(body, JsonLexer(), TerminalFormatter())
-    click.echo(body)
+
+    if pager:
+        click.echo_via_pager(body)
+    else:
+        click.echo(body)
 
 
 def echo_request(

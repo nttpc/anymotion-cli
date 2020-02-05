@@ -51,6 +51,8 @@ class Client(object):
         self._echo_request = echo_request
         self._echo_response = echo_response
 
+        self._page_size = 1000
+
     @property
     def token(self) -> str:
         """Return access token."""
@@ -62,9 +64,10 @@ class Client(object):
         response = self._requests(requests.get, url)
         return response.json
 
-    def get_list_data(self, endpoint: str, params: Optional[dict] = None) -> List[dict]:
+    def get_list_data(self, endpoint: str, params: dict = {}) -> List[dict]:
         """Get list data from AnyMotion API."""
         url = urljoin(self._api_url, f"{endpoint}/")
+        params["size"] = self._page_size
         data: List[dict] = []
         while url:
             response = self._requests(requests.get, url, params=params)
