@@ -29,7 +29,7 @@ def get_client(state: Any) -> Client:
     return Client(
         str(settings.client_id),
         str(settings.client_secret),
-        base_url=settings.base_url,
+        api_url=settings.api_url,
         interval=settings.interval,
         timeout=settings.timeout,
         verbose=state.verbose,

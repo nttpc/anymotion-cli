@@ -41,7 +41,7 @@ class Test_設定ファイルが存在しない場合(object):
 
         assert settings.interval == 5
         assert settings.timeout == 600
-        assert settings.base_url == "https://api.customer.jp/"
+        assert settings.api_url == "https://api.customer.jp/anymotion/v1/"
         assert settings.client_id is None
         assert settings.client_secret is None
 
@@ -51,11 +51,11 @@ class Test_設定ファイルが存在しない場合(object):
         assert not config_file_path.exists()
 
         settings = Settings("default")
-        settings.write_config("https://api.customer.jp/")
+        settings.write_config("https://api.customer.jp/anymotion/v1/")
 
         assert not config_file_path.exists()
 
-    def test_base_urlがNoneの場合configファイルを作成しないこと(self, mocker_home):
+    def test_api_urlがNoneの場合configファイルを作成しないこと(self, mocker_home):
         config_file_path = mocker_home / ".anymotion" / "config"
 
         assert not config_file_path.exists()
@@ -72,7 +72,7 @@ class Test_設定ファイルが存在しない場合(object):
         assert not config_file_path.exists()
 
         settings = Settings("default")
-        settings.write_config("http://api.example.com/")
+        settings.write_config("http://api.example.com/anymotion/v1/")
 
         assert config_file_path.exists()
 
@@ -88,11 +88,11 @@ class Test_設定ファイルが存在しない場合(object):
 
     def test_configファイルを更新できること(self, mocker_home):
         settings1 = Settings("default")
-        settings1.write_config("http://api.example.com/")
+        settings1.write_config("http://api.example.com/anymotion/v1/")
 
         settings2 = Settings("default")
 
-        assert settings2.base_url == "http://api.example.com/"
+        assert settings2.api_url == "http://api.example.com/anymotion/v1/"
 
     def test_credentialsファイルを更新できること(self, mocker_home):
         settings1 = Settings("default")
@@ -117,7 +117,7 @@ class Test_設定ファイルが存在する場合(object):
             dedent(
                 """\
                 [default]
-                anymotion_api_url = http://api.example.com/
+                anymotion_api_url = http://api.example.com/anymotion/v1/
                 polling_interval = 20
                 timeout = 300
             """
@@ -126,7 +126,7 @@ class Test_設定ファイルが存在する場合(object):
 
         settings = Settings("default")
 
-        assert settings.base_url == "http://api.example.com/"
+        assert settings.api_url == "http://api.example.com/anymotion/v1/"
         assert settings.interval == 20
         assert settings.timeout == 300
 
@@ -138,7 +138,7 @@ class Test_設定ファイルが存在する場合(object):
             dedent(
                 f"""\
                 [default]
-                anymotion_api_url = http://api.example.com/
+                anymotion_api_url = http://api.example.com/anymotion/v1/
                 polling_interval = {interval}
                 timeout = {timeout}
             """

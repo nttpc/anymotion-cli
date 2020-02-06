@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from textwrap import dedent
 from typing import Callable, Dict, List, Optional, Tuple, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 
@@ -30,7 +30,7 @@ class Client(object):
         self,
         client_id: str,
         client_secret: str,
-        base_url: str = "https://api.customer.jp/",
+        api_url: str = "https://api.customer.jp/anymotion/v1/",
         interval: int = 5,
         timeout: int = 600,
         verbose: bool = False,
@@ -41,8 +41,7 @@ class Client(object):
         self._client_secret = client_secret
         self._token = None
 
-        self._oauth_url = urljoin(base_url, "v1/oauth/accesstokens")
-        self._api_url = urljoin(base_url, "anymotion/v1/")
+        self._set_url(api_url)
 
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
@@ -294,3 +293,15 @@ class Client(object):
         else:
             response.status = "TIMEOUT"
         return response
+
+    def _set_url(self, api_url: str) -> None:
+        parts = urlparse(api_url)
+
+        api_path = parts.path
+        if api_path[-1] != "/":
+            api_path += "/"
+
+        self._api_url = urlunparse((parts.scheme, parts.netloc, api_path, "", "", ""))
+        self._oauth_url = urlunparse(
+            (parts.scheme, parts.netloc, "v1/oauth/accesstokens", "", "", "")
+        )

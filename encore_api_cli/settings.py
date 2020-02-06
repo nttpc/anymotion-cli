@@ -6,7 +6,7 @@ from typing import Any, Optional, Tuple, Union
 from .exceptions import SettingsValueError
 
 # default values
-BASE_URL = "https://api.customer.jp/"
+API_URL = "https://api.customer.jp/anymotion/v1/"
 POLLING_INTERVAL = 5
 TIMEOUT = 600
 
@@ -17,7 +17,7 @@ class Settings(object):
     Attributes:
         client_id (Optional[str]): The value used for authentication.
         client_secret (Optional[str]): The value used for authentication.
-        base_url (str): The base URL to request.
+        api_url (str): The AnyMotion API URL to request.
         interval (int): The interval time(sec).
         timeout (int): The timeout period(sec).
 
@@ -38,17 +38,17 @@ class Settings(object):
         """Whether credentials are valid value."""
         return self.client_id is not None and self.client_secret is not None
 
-    def write_config(self, base_url: str) -> None:
+    def write_config(self, api_url: str) -> None:
         """Update config file.
 
         Update only when different from default value.
         """
-        if base_url == BASE_URL:
+        if api_url == API_URL:
             return
-        if base_url is None:
+        if api_url is None:
             raise ValueError("api_url is invald.")
 
-        self._config.anymotion_api_url = base_url
+        self._config.anymotion_api_url = api_url
         self._config.save()
 
     def write_credentials(self, client_id: str, client_secret: str) -> None:
@@ -75,12 +75,12 @@ class Settings(object):
         return value_from_env or value_from_file
 
     @property
-    def base_url(self) -> str:
-        """Return the base URL to request.
+    def api_url(self) -> str:
+        """Return the AnyMotion API URL to request.
 
         If not in config file, return the default value.
         """
-        return self._config.anymotion_api_url or BASE_URL
+        return self._config.anymotion_api_url or API_URL
 
     @property
     def interval(self) -> int:

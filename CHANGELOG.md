@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.7.1
+
+Released 2020-02-06
+
+- Changed API format in settings.
+
 ## 0.7.0
 
 Released 2020-02-06

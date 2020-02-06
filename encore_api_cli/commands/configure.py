@@ -21,12 +21,12 @@ def configure(ctx: click.Context, state: State) -> None:
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
         settings = get_settings(state.profile, use_env=False)
-        base_url = click.prompt("AnyMotion API URL", default=settings.base_url)
+        api_url = click.prompt("AnyMotion API URL", default=settings.api_url)
         client_id = click.prompt("AnyMotion Client ID", default=settings.client_id)
         client_secret = click.prompt(
             "AnyMotion Client Secret", default=settings.client_secret
         )
-        settings.write_config(base_url)
+        settings.write_config(api_url)
         settings.write_credentials(client_id, client_secret)
 
 
@@ -49,7 +49,7 @@ def list(state: State) -> None:
     table = tabulate(
         [
             ["profile", state.profile],
-            ["api_url", settings.base_url],
+            ["api_url", settings.api_url],
             ["client_id", client_id],
             ["client_secret", client_secret],
             ["polling_interval", settings.interval],
