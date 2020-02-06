@@ -301,6 +301,9 @@ class Client(object):
         parts = urlparse(api_url)
 
         api_path = parts.path
+        if "anymotion" not in api_path:
+            # TODO: use custom exception
+            raise Exception("Invalid API URL")
         if api_path[-1] != "/":
             api_path += "/"
 

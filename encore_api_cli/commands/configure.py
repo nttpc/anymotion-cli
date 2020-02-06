@@ -4,6 +4,7 @@ import click
 from tabulate import tabulate
 
 from ..options import common_options
+from ..settings import API_URL
 from ..state import State, pass_state
 from ..utils import get_settings
 
@@ -63,3 +64,13 @@ def list(state: State) -> None:
         # TODO: use echo_warning
         message = "\nWarning: client_id and/or client_secret not set."
         click.secho(message, fg="yellow")
+
+
+@configure.command()
+@common_options
+@pass_state
+def clear(state: State) -> None:
+    """Clear the configuration."""
+    settings = get_settings(state.profile)
+    settings.write_config(API_URL)
+    settings.write_credentials("", "")
