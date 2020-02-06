@@ -9,10 +9,17 @@ class State(object):
         self.verbose = False
         self.profile = "default"
         self.cli_name = "amcli"
+        self.pager_length = 10
 
     @property
     def use_spinner(self) -> bool:
-        """Flag to use spinner."""
+        """Flag to use spinner.
+
+        True if:
+            - verbose option is set
+            - output ot terminal
+            - ANYMOTION_USE_SPINNER is true or not set
+        """
         env = get_bool_env("ANYMOTION_USE_SPINNER", True)
         return not self.verbose and is_show() and env
 
