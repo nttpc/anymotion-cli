@@ -1,4 +1,5 @@
 import click
+from yaspin import yaspin
 
 from ..options import common_options
 from ..output import echo_json
@@ -33,4 +34,15 @@ def show(state: State, image_id: int) -> None:
 def list(state: State) -> None:
     """Show a list of information for all images."""
     client = get_client(state)
-    echo_json(client.get_list_data("images"))
+
+    # TODO: catch error in get_list_data
+    if state.use_spinner:
+        with yaspin(text="Retrieving..."):
+            data = client.get_list_data("images")
+    else:
+        data = client.get_list_data("images")
+
+    if len(data) < state.pager_length:
+        echo_json(data)
+    else:
+        echo_json(data, pager=True)

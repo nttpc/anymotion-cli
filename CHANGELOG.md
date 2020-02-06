@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.8.0
+
+Unreleased
+
+- Added pager (if the text to display is long, you can scroll).
+
 ## 0.7.1
 
 Released 2020-02-06

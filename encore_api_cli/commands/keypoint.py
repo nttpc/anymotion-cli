@@ -1,6 +1,7 @@
 from typing import Optional
 
 import click
+from yaspin import yaspin
 
 from ..options import common_options
 from ..output import echo, echo_json
@@ -33,7 +34,12 @@ def show(state: State, keypoint_id: int) -> None:
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
-        echo_json(response.get("keypoint"))
+        data = response.get("keypoint")
+        # TODO: remove type: ignore
+        if len(data) < state.pager_length:  # type: ignore
+            echo_json(data)
+        else:
+            echo_json(data, pager=True)
     else:
         echo("Status is not SUCCESS.")
 
@@ -41,7 +47,9 @@ def show(state: State, keypoint_id: int) -> None:
 @keypoint.command()
 @click.option(
     "--status",
-    type=click.Choice(["SUCCESS", "FAILURE", "PROCESSING", "UNPROCESSED"]),
+    type=click.Choice(
+        ["SUCCESS", "FAILURE", "PROCESSING", "UNPROCESSED"], case_sensitive=False
+    ),
     help="Get data for the specified status only.",
 )
 @common_options
@@ -49,8 +57,19 @@ def show(state: State, keypoint_id: int) -> None:
 def list(state: State, status: Optional[str]) -> None:
     """Show a list of information for all keypoints."""
     client = get_client(state)
-    params = None
-    if status is not None:
-        params = {"execStatus": status}
-    # TODO: catch error
-    echo_json(client.get_list_data("keypoints", params=params))
+
+    params = {}
+    if status:
+        params = {"execStatus": status.upper()}
+
+    # TODO: catch error in get_list_data
+    if state.use_spinner:
+        with yaspin(text="Retrieving..."):
+            data = client.get_list_data("keypoints", params=params)
+    else:
+        data = client.get_list_data("keypoints", params=params)
+
+    if len(data) < state.pager_length:
+        echo_json(data)
+    else:
+        echo_json(data, pager=True)
