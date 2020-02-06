@@ -29,8 +29,11 @@ class Settings(object):
         settings_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
         settings_dir.mkdir(exist_ok=True)
 
-        self._config = Profile(settings_dir / "config", profile_name)
-        self._credentials = Profile(settings_dir / "credentials", profile_name)
+        config_file = settings_dir / "config"
+        credentials_file = settings_dir / "credentials"
+
+        self._config = Profile(config_file, profile_name)
+        self._credentials = Profile(credentials_file, profile_name)
 
         self._env = Environment(use_env)
 
@@ -41,9 +44,9 @@ class Settings(object):
     def write_config(self, api_url: str) -> None:
         """Update config file.
 
-        Update only when different from default value.
+        Update only when different from current value.
         """
-        if api_url == API_URL:
+        if api_url == self.api_url:
             return
         if api_url is None or "anymotion" not in api_url:
             raise ValueError("api_url is invald.")

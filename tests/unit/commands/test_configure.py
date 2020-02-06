@@ -61,3 +61,35 @@ def test_configure_list(mocker, client_id, expected_client_id):
 
     assert result.exit_code == 0
     assert expected in result.output
+
+
+def test_configure_clear(mocker, tmpdir):
+    tmpdir = Path(tmpdir)
+    mocker.patch("pathlib.Path.home", mocker.MagicMock(return_value=tmpdir))
+
+    settings_dir = tmpdir / ".anymotion"
+    settings_dir.mkdir(exist_ok=True)
+
+    config_file = settings_dir / "config"
+    config_file.write_text(dedent(
+        """\
+        [default]
+        anymotion_api_url = https://api.example.jp/anymotion/v1/
+
+        """
+    ))
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["configure", "clear"])
+
+    assert result.exit_code == 0
+    assert result.output == ""
+
+    config = config_file.read_text()
+    assert config == dedent(
+        """\
+        [default]
+        anymotion_api_url = https://api.customer.jp/anymotion/v1/
+
+        """
+    )
