@@ -35,7 +35,8 @@ def show(state: State, keypoint_id: int) -> None:
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
         data = response.get("keypoint")
-        if len(data) < state.pager_length:
+        # TODO: remove type: ignore
+        if len(data) < state.pager_length:  # type: ignore
             echo_json(data)
         else:
             echo_json(data, pager=True)
