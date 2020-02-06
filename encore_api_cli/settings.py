@@ -45,7 +45,7 @@ class Settings(object):
         """
         if api_url == API_URL:
             return
-        if api_url is None:
+        if api_url is None or "anymotion" not in api_url:
             raise ValueError("api_url is invald.")
 
         self._config.anymotion_api_url = api_url
