@@ -34,7 +34,11 @@ def show(state: State, keypoint_id: int) -> None:
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
-        echo_json(response.get("keypoint"))
+        data = response.get("keypoint")
+        if len(data) < state.pager_length:
+            echo_json(data)
+        else:
+            echo_json(data, pager=True)
     else:
         echo("Status is not SUCCESS.")
 
