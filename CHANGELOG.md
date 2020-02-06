@@ -11,7 +11,7 @@ Unreleased
 
 Released 2020-02-06
 
-- Changed API format in settings.
+- Changed API URL format in settings.
 
 ## 0.7.0
 
