@@ -296,10 +296,12 @@ class Client(object):
 
     def _set_url(self, api_url: str) -> None:
         parts = urlparse(api_url)
-        if parts.path[-1] != "/":
-            parts.path += "/"
 
-        self._api_url = urlunparse((parts.scheme, parts.netloc, parts.path, "", "", ""))
+        api_path = parts.path
+        if api_path[-1] != "/":
+            api_path += "/"
+
+        self._api_url = urlunparse((parts.scheme, parts.netloc, api_path, "", "", ""))
         self._oauth_url = urlunparse(
             (parts.scheme, parts.netloc, "v1/oauth/accesstokens", "", "", "")
         )
