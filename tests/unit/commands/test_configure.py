@@ -71,13 +71,15 @@ def test_configure_clear(mocker, tmpdir):
     settings_dir.mkdir(exist_ok=True)
 
     config_file = settings_dir / "config"
-    config_file.write_text(dedent(
-        """\
-        [default]
-        anymotion_api_url = https://api.example.jp/anymotion/v1/
+    config_file.write_text(
+        dedent(
+            """\
+            [default]
+            anymotion_api_url = https://api.example.jp/anymotion/v1/
 
-        """
-    ))
+            """
+        )
+    )
 
     runner = CliRunner()
     result = runner.invoke(cli, ["configure", "clear"])
