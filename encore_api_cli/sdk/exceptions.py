@@ -1,5 +1,5 @@
 class ClientException(Exception):
-    """Base class for exceptions in the SDK module."""
+    """Base class for exceptions in the SDK package."""
 
 
 class FileTypeError(ClientException):

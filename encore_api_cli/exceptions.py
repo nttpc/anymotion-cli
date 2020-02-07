@@ -5,6 +5,8 @@ from click._compat import get_text_stderr
 
 
 class ClickException(click.ClickException):
+    """A click exception."""
+
     def show(self, file: Optional[Any] = None) -> None:
         """Show error message."""
         if file is None:
@@ -15,8 +17,8 @@ class ClickException(click.ClickException):
 
 
 class SettingsException(Exception):
-    pass
+    """Base class for exceptions in the Settings module."""
 
 
 class SettingsValueError(SettingsException):
-    pass
+    """Raised when settings value is invalid."""

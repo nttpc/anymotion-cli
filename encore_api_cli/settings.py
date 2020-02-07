@@ -32,10 +32,10 @@ class Settings(object):
         config_file = settings_dir / "config"
         credentials_file = settings_dir / "credentials"
 
-        self._config = Profile(config_file, profile_name)
-        self._credentials = Profile(credentials_file, profile_name)
+        self._config = _Profile(config_file, profile_name)
+        self._credentials = _Profile(credentials_file, profile_name)
 
-        self._env = Environment(use_env)
+        self._env = _Environment(use_env)
 
     def is_ok(self) -> bool:
         """Whether credentials are valid value."""
@@ -49,7 +49,7 @@ class Settings(object):
         if api_url == self.api_url:
             return
         if api_url is None or "anymotion" not in api_url:
-            raise ValueError("api_url is invald.")
+            raise SettingsValueError("api_url is invald.")
 
         self._config.anymotion_api_url = api_url
         self._config.save()
@@ -57,7 +57,7 @@ class Settings(object):
     def write_credentials(self, client_id: str, client_secret: str) -> None:
         """Update credentials file."""
         if client_id is None or client_secret is None:
-            raise ValueError("client_id or client_secret is invald.")
+            raise SettingsValueError("client_id or client_secret is invald.")
 
         self._credentials.anymotion_client_id = client_id
         self._credentials.anymotion_client_secret = client_secret
@@ -129,7 +129,7 @@ class Settings(object):
         return x
 
 
-class Profile(object):
+class _Profile(object):
     def __init__(self, file: Path, profile_name: str):
         self._file = file
         self._parser, self._section = self._read(file, profile_name)
@@ -162,7 +162,7 @@ class Profile(object):
         return parser, section
 
 
-class Environment(object):
+class _Environment(object):
     def __init__(self, use_env: bool):
         self._use_env = use_env
 

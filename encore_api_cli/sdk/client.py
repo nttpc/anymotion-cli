@@ -58,13 +58,21 @@ class Client(object):
         return self._token or self._get_token()
 
     def get_one_data(self, endpoint: str, endpoint_id: int) -> dict:
-        """Get one piece of data from AnyMotion API."""
+        """Get one piece of data from AnyMotion API.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
         response = self._requests(requests.get, url)
         return response.json
 
     def get_list_data(self, endpoint: str, params: dict = {}) -> List[dict]:
-        """Get list data from AnyMotion API."""
+        """Get list data from AnyMotion API.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"{endpoint}/")
         params["size"] = self._page_size
         data: List[dict] = []
@@ -85,8 +93,8 @@ class Client(object):
             movie_id. media_type is the string of "image" or "movie".
 
         Raises:
-            FileTypeError: Exception raised in _get_media_type function.
-            RequestsError: Exception raised in _requests function.
+            FileTypeError: Invalid file types.
+            RequestsError: HTTP request fails.
         """
         if isinstance(path, str):
             path = Path(path)
@@ -117,6 +125,9 @@ class Client(object):
 
         Returns:
             keypoint_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
         """
         return self._extract_keypoint({"image_id": image_id})
 
@@ -125,13 +136,23 @@ class Client(object):
 
         Returns:
             keypoint_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
         """
         return self._extract_keypoint({"movie_id": movie_id})
 
     def draw_keypoint(
         self, keypoint_id: int, rule: Optional[Union[list, dict]] = None
     ) -> int:
-        """Start drawing for keypoint_id."""
+        """Start drawing for keypoint_id.
+
+        Returns:
+            drawing_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"drawings/")
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
@@ -141,7 +162,14 @@ class Client(object):
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
-        """Start analyze for keypoint_id."""
+        """Start analyze for keypoint_id.
+
+        Returns:
+            drawing_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"analyses/")
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
@@ -151,13 +179,21 @@ class Client(object):
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> Response:
-        """Wait for extraction."""
+        """Wait for extraction.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
         response = self._wait_for_done(url)
         return response
 
     def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
-        """Wait for drawing."""
+        """Wait for drawing.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"drawings/{drawing_id}/")
         response = self._wait_for_done(url)
         drawing_url = None
@@ -166,13 +202,21 @@ class Client(object):
         return response.status, drawing_url
 
     def wait_for_analysis(self, analysis_id: int) -> Response:
-        """Wait for analysis."""
+        """Wait for analysis.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"analyses/{analysis_id}/")
         response = self._wait_for_done(url)
         return response
 
     def download(self, url: str, path: Path) -> None:
-        """Download file from url."""
+        """Download file from url.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         response = self._requests(requests.get, url, headers={})
         with path.open("wb") as f:
             f.write(response.raw.content)
@@ -185,11 +229,7 @@ class Client(object):
         return content_md5
 
     def _extract_keypoint(self, data: dict) -> int:
-        """Start keypoint extraction.
-
-        Raises:
-            RequestsError: Exception raised in _requests function.
-        """
+        """Start keypoint extraction."""
         url = urljoin(self._api_url, "keypoints/")
         response = self._requests(requests.post, url, json=data)
         (keypoint_id,) = response.get("id")
@@ -204,10 +244,9 @@ class Client(object):
         data: Optional[object] = None,
         headers: Optional[dict] = None,
     ) -> Response:
-        """Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
+        """Send an HTTP requests and receive a response.
 
-        Raises:
-            RequestsError
+        Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
         """
         method = requests_func.__name__.upper()
         is_json = json is not None
@@ -238,6 +277,7 @@ class Client(object):
             )
 
         if response.status_code not in [200, 201]:
+            # TODO: change message
             message = dedent(
                 f"""\
                     {method} {url} is failed.
