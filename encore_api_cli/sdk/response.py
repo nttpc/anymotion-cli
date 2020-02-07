@@ -3,7 +3,7 @@ from typing import Any, Optional, Union
 
 import requests
 
-from . import InvalidResponse
+from . import ResponseError
 
 
 class Response(object):
@@ -50,7 +50,7 @@ class Response(object):
                     response: {self.json}
                 """
             )
-            raise InvalidResponse(message)
+            raise ResponseError(message)
         return tuple(self.json[k] for k in keys)
 
 

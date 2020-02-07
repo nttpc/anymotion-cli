@@ -8,7 +8,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 
-from . import InvalidFileType, RequestsError
+from . import FileTypeError, RequestsError
 from .response import Response
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
@@ -85,7 +85,7 @@ class Client(object):
             movie_id. media_type is the string of "image" or "movie".
 
         Raises:
-            InvalidFileType: Exception raised in _get_media_type function.
+            FileTypeError: Exception raised in _get_media_type function.
             RequestsError: Exception raised in _requests function.
         """
         if isinstance(path, str):
@@ -224,7 +224,7 @@ class Client(object):
                 response = requests_func(url, params=params, json=json, headers=headers)
             else:
                 response = requests_func(url, params=params, data=data, headers=headers)
-        except requests.exceptions.ConnectionError:
+        except requests.ConnectionError:
             message = f"{method} {url} is failed."
             raise RequestsError(message)
 
@@ -285,7 +285,7 @@ class Client(object):
                 f"The extension of the file {path} must be"
                 f"{', '.join(suffix[:-1])} or {suffix[-1]}."
             )
-            raise InvalidFileType(message)
+            raise FileTypeError(message)
 
     def _wait_for_done(self, url: str) -> Response:
         for _ in range(self._max_steps):

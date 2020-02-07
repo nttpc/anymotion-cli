@@ -26,7 +26,8 @@ def get_client(state: Any) -> Client:
         )
         raise ClickException(message)
 
-    return Client(
+    # TODO: catch error, invalid api url
+    client = Client(
         str(settings.client_id),
         str(settings.client_secret),
         api_url=settings.api_url,
@@ -36,6 +37,7 @@ def get_client(state: Any) -> Client:
         echo_request=echo_request,
         echo_response=echo_response,
     )
+    return client
 
 
 def get_settings(profile: str, use_env: bool = True) -> Settings:

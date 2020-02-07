@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 import pytest
 
 from encore_api_cli.sdk.client import Client
-from encore_api_cli.sdk.exceptions import InvalidFileType
+from encore_api_cli.sdk.exceptions import FileTypeError
 
 
 @pytest.fixture
@@ -71,7 +71,7 @@ class TestUpload(object):
     def test_正しい拡張子でない場合アップロードできないこと(self, client):
         path = "test.text"
 
-        with pytest.raises(InvalidFileType):
+        with pytest.raises(FileTypeError):
             client.upload_to_s3(path)
 
 

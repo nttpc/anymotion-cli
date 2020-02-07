@@ -1,3 +1,3 @@
 """AnyMotion API SDK for Python."""
 
-from .exceptions import InvalidFileType, RequestsError, InvalidResponse  # noqa: F401
+from .exceptions import FileTypeError, RequestsError, ResponseError  # noqa: F401

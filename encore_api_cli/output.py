@@ -37,7 +37,16 @@ def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> Non
 def echo_request(
     url: str, method: str, headers: Optional[dict] = None, json: Optional[object] = None
 ) -> None:
-    """Output http request."""
+    """Output http request.
+
+    Examples:
+        POST http://example.com
+        Content-Type: application/json
+
+        {
+            "key": "value"
+        }
+    """
     url = click.style(url, fg="cyan")
     method = click.style(method, fg="green")
     click.echo(f"{method} {url}")
@@ -60,7 +69,16 @@ def echo_response(
     headers: Optional[dict],
     json: Optional[object],
 ) -> None:
-    """Output http response."""
+    """Output http response.
+
+    Examples:
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+
+        {
+            "id": 1
+        }
+    """
     status = click.style(str(status_code), fg="blue")
     reason = click.style(reason, fg="cyan")
     http_version = "HTTP"
