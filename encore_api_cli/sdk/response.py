@@ -3,7 +3,7 @@ from typing import Any, Optional, Union
 
 import requests
 
-from . import ResponseError
+from .exceptions import ResponseError
 
 
 class Response(object):

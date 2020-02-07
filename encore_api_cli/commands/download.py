@@ -5,8 +5,10 @@ from urllib.parse import urlparse
 
 import click
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo
+from ..output import echo, echo_error
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_path, get_client
 
@@ -31,17 +33,24 @@ def cli() -> None:  # noqa: D103
 def download(state: State, drawing_id: int, out_dir: str) -> None:
     """Download the drawn file."""
     client = get_client(state)
-    status, url = client.wait_for_drawing(drawing_id)
+
+    try:
+        status, url = client.wait_for_drawing(drawing_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if status == "SUCCESS" and url is not None:
         is_ok, message, path = check_download(out_dir, url)
         if is_ok:
-            client.download(url, path)
+            try:
+                client.download(url, path)
+            except RequestsError as e:
+                raise ClickException(str(e))
         else:
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     else:
-        echo("Unable to download because drawing failed.")
+        echo_error("Unable to download because drawing failed.")
 
 
 def check_download(out_dir: str, url: str) -> Tuple[bool, str, Path]:

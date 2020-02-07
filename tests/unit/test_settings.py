@@ -194,4 +194,4 @@ def test_is_ok(monkeypatch, mocker_home, client_id, client_secret, expected):
     monkeypatch.setattr(Settings, "client_secret", client_secret)
     settings = Settings("default")
 
-    assert settings.is_ok() is expected
+    assert settings.is_ok is expected

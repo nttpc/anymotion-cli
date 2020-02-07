@@ -26,9 +26,9 @@ class TestDownload(object):
                 ("SUCCESS", "http://example.com/image.jpg"),
                 "Downloaded the file to image.jpg.\n",
             ),
-            (("SUCCESS", None), "Unable to download because drawing failed.\n"),
-            (("FAILURE", None), "Unable to download because drawing failed.\n"),
-            (("TIMEOUT", None), "Unable to download because drawing failed.\n"),
+            (("SUCCESS", None), "Error: Unable to download because drawing failed.\n"),
+            (("FAILURE", None), "Error: Unable to download because drawing failed.\n"),
+            (("TIMEOUT", None), "Error: Unable to download because drawing failed.\n"),
         ],
     )
     def test_valid(self, mocker, wait_for_drawing_return, expected):

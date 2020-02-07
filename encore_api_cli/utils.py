@@ -8,7 +8,7 @@ import click
 
 from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response
-from .sdk.client import Client
+from .sdk import Client, ClientValueError
 from .settings import Settings
 
 # from encore_api_cli.state import State
@@ -18,7 +18,7 @@ from .settings import Settings
 def get_client(state: Any) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
-    if not settings.is_ok():
+    if settings.is_ok is False:
         command = click.style(f"{state.cli_name} configure", fg="cyan")
         message = (
             "The credentials is invalid or not set. "
@@ -26,17 +26,20 @@ def get_client(state: Any) -> Client:
         )
         raise ClickException(message)
 
-    # TODO: catch error, invalid api url
-    client = Client(
-        str(settings.client_id),
-        str(settings.client_secret),
-        api_url=settings.api_url,
-        interval=settings.interval,
-        timeout=settings.timeout,
-        verbose=state.verbose,
-        echo_request=echo_request,
-        echo_response=echo_response,
-    )
+    try:
+        client = Client(
+            str(settings.client_id),
+            str(settings.client_secret),
+            api_url=settings.api_url,
+            interval=settings.interval,
+            timeout=settings.timeout,
+            verbose=state.verbose,
+            echo_request=echo_request,
+            echo_response=echo_response,
+        )
+    except ClientValueError as e:
+        raise ClickException(str(e))
+
     return client
 
 

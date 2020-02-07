@@ -8,7 +8,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 
-from . import FileTypeError, RequestsError
+from .exceptions import ClientValueError, FileTypeError, RequestsError
 from .response import Response
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
@@ -37,11 +37,14 @@ class Client(object):
         echo_request: Optional[Callable] = None,
         echo_response: Optional[Callable] = None,
     ):
-        self._client_id = client_id
-        self._client_secret = client_secret
-        self._token = None
+        """Initialize the client.
 
+        Raises
+            ClientValueError: Invalid argument value.
+        """
+        self._set_credentials(client_id, client_secret)
         self._set_url(api_url)
+        self._token = None
 
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
@@ -337,13 +340,21 @@ class Client(object):
             response.status = "TIMEOUT"
         return response
 
+    def _set_credentials(self, client_id: str, client_secret: str) -> None:
+        if client_id is None or client_id == "":
+            raise ClientValueError(f"Invalid Client ID: {client_id}")
+        if client_secret is None or client_secret == "":
+            raise ClientValueError(f"Invalid Client Secret: {client_secret}")
+
+        self._client_id = client_id
+        self._client_secret = client_secret
+
     def _set_url(self, api_url: str) -> None:
         parts = urlparse(api_url)
 
         api_path = parts.path
         if "anymotion" not in api_path:
-            # TODO: use custom exception
-            raise Exception("Invalid API URL")
+            raise ClientValueError(f"Invalid API URL: {api_url}")
         if api_path[-1] != "/":
             api_path += "/"
 

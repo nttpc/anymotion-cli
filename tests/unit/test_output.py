@@ -16,9 +16,9 @@ from encore_api_cli.output import (
     [("True", "message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo(capfd, monkeypatch, is_show, expected):
-    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    monkeypatch.delenv("ANYMOTION_STDOUT_ISSHOW", raising=False)
     if is_show:
-        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
+        monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", is_show)
 
     echo("message")
 
@@ -32,9 +32,9 @@ def test_echo(capfd, monkeypatch, is_show, expected):
     [("True", "Success: message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo_success(capfd, monkeypatch, is_show, expected):
-    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    monkeypatch.delenv("ANYMOTION_STDOUT_ISSHOW", raising=False)
     if is_show:
-        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
+        monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", is_show)
 
     echo_success("message")
 
@@ -97,7 +97,7 @@ def test_echo_json(capfd):
     ],
 )
 def test_echo_request(capfd, monkeypatch, headers, json, expected):
-    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+    monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
     echo_request(
         "http://example.com", "POST", headers=headers, json=json,
@@ -166,7 +166,7 @@ def test_echo_request(capfd, monkeypatch, headers, json, expected):
 def test_echo_response(
     capfd, monkeypatch, status_code, reason, version, headers, json, expected
 ):
-    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+    monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
     echo_response(status_code, reason, version, headers, json)
 

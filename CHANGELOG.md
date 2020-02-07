@@ -6,6 +6,7 @@ Unreleased
 
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure clear` command.
+- Improved error message by catching exceptions.
 
 ## 0.7.1
 

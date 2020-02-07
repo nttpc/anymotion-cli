@@ -2,6 +2,10 @@ class ClientException(Exception):
     """Base class for exceptions in the SDK package."""
 
 
+class ClientValueError(ClientException):
+    """Raised for invalid value."""
+
+
 class FileTypeError(ClientException):
     """Raised when trying to use an unallowable file type."""
 

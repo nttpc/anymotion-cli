@@ -23,22 +23,22 @@ class TestExtract(object):
             (
                 ["extract", "--movie-id", "111"],
                 "TIMEOUT",
-                "Keypoint extraction is timed out.",
+                "Error: Keypoint extraction is timed out.",
             ),
             (
                 ["extract", "--image-id", "111"],
                 "TIMEOUT",
-                "Keypoint extraction is timed out.",
+                "Error: Keypoint extraction is timed out.",
             ),
             (
                 ["extract", "--movie-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed: message",
+                "Error: Keypoint extraction failed.\nmessage",
             ),
             (
                 ["extract", "--image-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed: message",
+                "Error: Keypoint extraction failed.\nmessage",
             ),
         ],
     )
@@ -53,11 +53,8 @@ class TestExtract(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == dedent(
-            f"""\
-                Keypoint extraction started. (keypoint id: {keypoint_id})
-                {expected}
-            """
+        assert result.output == (
+            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
         )
 
     @pytest.mark.parametrize(
