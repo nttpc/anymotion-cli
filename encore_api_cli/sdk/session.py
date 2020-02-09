@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Callable, List
+from typing import Any, Callable, List, Optional
 
 import requests
 
@@ -18,10 +18,11 @@ class HttpSession(object):
         self,
         url: str,
         method: str = "GET",
-        params=None,
-        data=None,
-        json=None,
-        headers=None,
+        params: Optional[dict] = None,
+        data: Any = None,
+        json: Any = None,
+        headers: Optional[dict] = None,
+        token: str = None,
     ) -> requests.Response:
         """Execute the request.
 
@@ -31,6 +32,12 @@ class HttpSession(object):
         method = method.upper()
         if method not in ["GET", "POST", "PUT", "DELETE"]:
             raise RequestsError("HTTP method is invalid.")
+
+        headers = headers or {}
+        if json:
+            headers["Content-Type"] = "application/json"
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
 
         request = requests.Request(
             method, url, params=params, data=data, json=json, headers=headers,

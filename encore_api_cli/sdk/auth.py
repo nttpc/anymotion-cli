@@ -20,12 +20,7 @@ def get_token(
         "clientId": client_id,
         "clientSecret": client_secret,
     }
-    response = session.request(
-        oauth_url,
-        method="POST",
-        json=data,
-        headers={"Content-Type": "application/json"},
-    )
+    response = session.request(oauth_url, method="POST", json=data)
     (token,) = Response(response).get("accessToken")
 
     return token

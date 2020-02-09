@@ -90,8 +90,8 @@ class Client(object):
             RequestsError: HTTP request fails.
         """
         url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
-        response = self._request(url)
-        return response.json
+        response = self.session.request(url, token=self.token)
+        return response.json()
 
     def get_list_data(self, endpoint: str, params: dict = {}) -> List[dict]:
         """Get list data from AnyMotion API.
@@ -103,8 +103,8 @@ class Client(object):
         params["size"] = self._page_size
         data: List[dict] = []
         while url:
-            response = self._request(url, params=params)
-            sub_data, url = response.get(("data", "next"))
+            response = self.session.request(url, params=params, token=self.token)
+            sub_data, url = Response(response).get(("data", "next"))
             data += sub_data
         return data
 
@@ -129,15 +129,16 @@ class Client(object):
         content_md5 = self._create_md5(path)
 
         # Register movie or image
-        response = self._request(
+        response = self.session.request(
             urljoin(self._api_url, f"{media_type}s/"),
             method="POST",
             json={"origin_key": path.name, "content_md5": content_md5},
+            token=self.token,
         )
-        media_id, upload_url = response.get(("id", "uploadUrl"))
+        media_id, upload_url = Response(response).get(("id", "uploadUrl"))
 
         # Upload to S3
-        self._request(
+        self.session.request(
             upload_url,
             method="PUT",
             data=path.open("rb"),
@@ -183,8 +184,8 @@ class Client(object):
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._request(url, method="POST", json=json)
-        (drawing_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=json, token=self.token)
+        (drawing_id,) = Response(response).get("id")
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
@@ -200,8 +201,8 @@ class Client(object):
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._request(url, method="POST", json=json)
-        (analysis_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=json, token=self.token)
+        (analysis_id,) = Response(response).get("id")
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> Response:
@@ -243,9 +244,9 @@ class Client(object):
         Raises:
             RequestsError: HTTP request fails.
         """
-        response = self._request(url, headers={})
+        response = self.session.request(url)
         with path.open("wb") as f:
-            f.write(response.raw.content)
+            f.write(response.content)
 
     def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:
@@ -257,31 +258,9 @@ class Client(object):
     def _extract_keypoint(self, data: dict) -> int:
         """Start keypoint extraction."""
         url = urljoin(self._api_url, "keypoints/")
-        response = self._request(url, method="POST", json=data)
-        (keypoint_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=data, token=self.token)
+        (keypoint_id,) = Response(response).get("id")
         return keypoint_id
-
-    def _request(
-        self,
-        url: str,
-        method: str = "GET",
-        params: Optional[dict] = None,
-        json: Optional[dict] = None,
-        data: Optional[object] = None,
-        headers: Optional[dict] = None,
-    ):
-        """Send an HTTP requests and receive a response."""
-        if headers is None:
-            headers = {"Authorization": f"Bearer {self.token}"}
-            # if json is not None:
-            if method == "POST":
-                headers["Content-Type"] = "application/json"
-
-        response = self.session.request(
-            url, method=method, params=params, data=data, json=json, headers=headers
-        )
-
-        return Response(response)
 
     def _get_media_type(self, path: Path) -> str:
         if path.suffix.lower() in MOVIE_SUFFIXES:
@@ -298,7 +277,7 @@ class Client(object):
 
     def _wait_for_done(self, url: str) -> Response:
         for _ in range(self._max_steps):
-            response = self._request(url)
+            response = Response(self.session.request(url, token=self.token))
             if response.status in ["SUCCESS", "FAILURE"]:
                 break
             time.sleep(self._interval)
