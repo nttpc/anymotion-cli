@@ -3,7 +3,9 @@ from typing import Optional
 import click
 from tabulate import tabulate
 
+from ..exceptions import ClickException, SettingsValueError
 from ..options import common_options
+from ..output import echo, echo_warning
 from ..settings import API_URL
 from ..state import State, pass_state
 from ..utils import get_settings
@@ -27,8 +29,12 @@ def configure(ctx: click.Context, state: State) -> None:
         client_secret = click.prompt(
             "AnyMotion Client Secret", default=settings.client_secret
         )
-        settings.write_config(api_url)
-        settings.write_credentials(client_id, client_secret)
+
+        try:
+            settings.write_config(api_url)
+            settings.write_credentials(client_id, client_secret)
+        except SettingsValueError as e:
+            raise ClickException(str(e))
 
 
 @configure.command()
@@ -58,12 +64,11 @@ def list(state: State) -> None:
         ],
         headers=["Name", "Value"],
     )
-    click.echo(table)
+    echo(table)
 
     if client_id == none or client_secret == none:
-        # TODO: use echo_warning
-        message = "\nWarning: client_id and/or client_secret not set."
-        click.secho(message, fg="yellow")
+        echo()
+        echo_warning("client_id and/or client_secret not set.")
 
 
 @configure.command()

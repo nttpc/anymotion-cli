@@ -5,18 +5,19 @@ from click._compat import get_text_stderr
 
 
 class ClickException(click.ClickException):
+    """A click exception."""
+
     def show(self, file: Optional[Any] = None) -> None:
         """Show error message."""
         if file is None:
             file = get_text_stderr()
-        click.echo(
-            f"{click.style('Error', fg='red')}: {self.format_message()}", file=file
-        )
+        error = click.style("Error", fg="red")
+        click.echo(f"{error}: {self.format_message()}", file=file)
 
 
 class SettingsException(Exception):
-    pass
+    """Base class for exceptions in the Settings module."""
 
 
 class SettingsValueError(SettingsException):
-    pass
+    """Raised when settings value is invalid."""

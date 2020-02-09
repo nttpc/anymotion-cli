@@ -20,6 +20,16 @@ def echo_success(message: str) -> None:
         click.echo(f"{click.style('Success', fg='green')}: {message}")
 
 
+def echo_warning(message: str) -> None:
+    """Output warning message."""
+    click.echo(f"{click.style('Warning', fg='yellow')}: {message}", err=True)
+
+
+def echo_error(message: str) -> None:
+    """Output error message."""
+    click.echo(f"{click.style('Error', fg='red')}: {message}", err=True)
+
+
 def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> None:
     """Output json data."""
     if is_show():
@@ -37,7 +47,16 @@ def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> Non
 def echo_request(
     url: str, method: str, headers: Optional[dict] = None, json: Optional[object] = None
 ) -> None:
-    """Output http request."""
+    """Output http request.
+
+    Examples:
+        POST http://example.com
+        Content-Type: application/json
+
+        {
+            "key": "value"
+        }
+    """
     url = click.style(url, fg="cyan")
     method = click.style(method, fg="green")
     click.echo(f"{method} {url}")
@@ -60,7 +79,16 @@ def echo_response(
     headers: Optional[dict],
     json: Optional[object],
 ) -> None:
-    """Output http response."""
+    """Output http response.
+
+    Examples:
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+
+        {
+            "id": 1
+        }
+    """
     status = click.style(str(status_code), fg="blue")
     reason = click.style(reason, fg="cyan")
     http_version = "HTTP"
@@ -91,4 +119,4 @@ def is_show() -> bool:
     """
     from encore_api_cli.utils import get_bool_env
 
-    return get_bool_env("STDOUT_ISSHOW", sys.stdout.isatty())
+    return get_bool_env("ANYMOTION_STDOUT_ISSHOW", sys.stdout.isatty())

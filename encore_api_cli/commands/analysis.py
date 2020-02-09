@@ -3,8 +3,10 @@ from typing import Optional
 import click
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_json
+from ..output import echo_error, echo_json
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -26,16 +28,19 @@ def analysis() -> None:
 def show(state: State, analysis_id: int) -> None:
     """Show the analysis result."""
     client = get_client(state)
-    response = client.get_one_data("analyses", analysis_id)
+
+    try:
+        response = client.get_one_data("analyses", analysis_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
     if not isinstance(response, dict):
-        # TODO: catch error
-        raise
+        raise Exception("response is invalid.")
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
         echo_json(response.get("result"))
     else:
-        echo("Status is not SUCCESS.")
+        echo_error("Status is not SUCCESS.")
 
 
 @analysis.command()
@@ -56,12 +61,14 @@ def list(state: State, status: Optional[str]) -> None:
     if status:
         params = {"execStatus": status.upper()}
 
-    # TODO: catch error in get_list_data
-    if state.use_spinner:
-        with yaspin(text="Retrieving..."):
+    try:
+        if state.use_spinner:
+            with yaspin(text="Retrieving..."):
+                data = client.get_list_data("analyses", params=params)
+        else:
             data = client.get_list_data("analyses", params=params)
-    else:
-        data = client.get_list_data("analyses", params=params)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if len(data) < state.pager_length:
         echo_json(data)

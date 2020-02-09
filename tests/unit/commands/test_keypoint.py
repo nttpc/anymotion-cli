@@ -61,7 +61,7 @@ class TestKeypointShow(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == "Status is not SUCCESS.\n"
+        assert result.output == "Error: Status is not SUCCESS.\n"
 
     def test_invalid_params(self, client_mock):
         runner = CliRunner()

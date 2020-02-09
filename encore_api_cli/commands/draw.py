@@ -4,8 +4,10 @@ from typing import Callable, Optional
 import click
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_success
+from ..output import echo, echo_error, echo_success
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
 from .download import check_download
@@ -60,14 +62,18 @@ def draw(
         rule = parse_rule(rule_file.read())
 
     client = get_client(state)
-    drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
 
-    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
-    if state.use_spinner:
-        with yaspin(text="Processing..."):
+    try:
+        drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
+        echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
+
+        if state.use_spinner:
+            with yaspin(text="Processing..."):
+                status, url = client.wait_for_drawing(drawing_id)
+        else:
             status, url = client.wait_for_drawing(drawing_id)
-    else:
-        status, url = client.wait_for_drawing(drawing_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
@@ -76,11 +82,14 @@ def draw(
 
         is_ok, message, path = check_download(out_dir, url)
         if is_ok:
-            client.download(url, path)
+            try:
+                client.download(url, path)
+            except RequestsError as e:
+                raise ClickException(str(e))
         else:
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     elif status == "TIMEOUT":
-        echo("Drawing is timed out.")
+        echo_error("Drawing is timed out.")
     else:
-        echo("Drawing failed.")
+        echo_error("Drawing failed.")
