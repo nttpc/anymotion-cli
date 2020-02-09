@@ -1,5 +1,3 @@
-from textwrap import dedent
-
 import pytest
 from click.testing import CliRunner
 

@@ -1,0 +1,67 @@
+from textwrap import dedent
+from typing import Callable, List
+
+import requests
+
+from .exceptions import RequestsError
+
+
+class HttpSession(object):
+    """Encapsulates a single HTTP request."""
+
+    def __init__(self):
+        self.session = requests.Session()
+
+        self.request_callbacks: List[Callable] = []
+        self.response_callbacks: List[Callable] = []
+
+    def request(
+        self,
+        url: str,
+        method: str = "GET",
+        params=None,
+        data=None,
+        json=None,
+        headers=None,
+    ) -> requests.Response:
+        """Execute the request.
+
+        Raises:
+            RequestsError
+        """
+        request = requests.Request(
+            method, url, params=params, data=data, json=json, headers=headers,
+        )
+        for callback in self.request_callbacks:
+            callback(request)
+        prepped = request.prepare()
+
+        try:
+            response = self.session.send(prepped)
+        except requests.ConnectionError:
+            message = f"{method} {url} is failed."
+            raise RequestsError(message)
+
+        for callback in self.response_callbacks:
+            callback(response)
+
+        if response.status_code not in [200, 201]:
+            # TODO: change message
+            message = dedent(
+                f"""\
+                    {method} {url} is failed.
+                    status code: {response.status_code}
+                    content: {response.content.decode()}
+                """
+            )
+            raise RequestsError(message)
+
+        return response
+
+    def add_request_callback(self, callback: Callable) -> None:
+        """Add request callback."""
+        self.request_callbacks.append(callback)
+
+    def add_response_callback(self, callback: Callable) -> None:
+        """Add response callback."""
+        self.response_callbacks.append(callback)

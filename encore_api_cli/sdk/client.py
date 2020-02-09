@@ -2,14 +2,12 @@ import base64
 import hashlib
 import time
 from pathlib import Path
-from textwrap import dedent
 from typing import Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
-import requests
-
-from .exceptions import ClientValueError, FileTypeError, RequestsError
+from .exceptions import ClientValueError, FileTypeError
 from .response import Response
+from .session import HttpSession
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -49,6 +47,13 @@ class Client(object):
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
 
+        # TODO: add add_callback method, remove verbose, echo_request, echo_response
+        self._session = HttpSession()
+        if verbose and echo_request:
+            self._session.add_request_callback(echo_request)
+        if verbose and echo_response:
+            self._session.add_response_callback(echo_response)
+
         self._verbose = verbose
         self._echo_request = echo_request
         self._echo_response = echo_response
@@ -67,7 +72,7 @@ class Client(object):
             RequestsError: HTTP request fails.
         """
         url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
-        response = self._requests(requests.get, url)
+        response = self._request(url)
         return response.json
 
     def get_list_data(self, endpoint: str, params: dict = {}) -> List[dict]:
@@ -80,7 +85,7 @@ class Client(object):
         params["size"] = self._page_size
         data: List[dict] = []
         while url:
-            response = self._requests(requests.get, url, params=params)
+            response = self._request(url, params=params)
             sub_data, url = response.get(("data", "next"))
             data += sub_data
         return data
@@ -106,17 +111,17 @@ class Client(object):
         content_md5 = self._create_md5(path)
 
         # Register movie or image
-        response = self._requests(
-            requests.post,
+        response = self._request(
             urljoin(self._api_url, f"{media_type}s/"),
+            method="POST",
             json={"origin_key": path.name, "content_md5": content_md5},
         )
         media_id, upload_url = response.get(("id", "uploadUrl"))
 
         # Upload to S3
-        self._requests(
-            requests.put,
+        self._request(
             upload_url,
+            method="PUT",
             data=path.open("rb"),
             headers={"Content-MD5": content_md5},
         )
@@ -160,7 +165,7 @@ class Client(object):
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._requests(requests.post, url, json=json)
+        response = self._request(url, method="POST", json=json)
         (drawing_id,) = response.get("id")
         return drawing_id
 
@@ -177,7 +182,7 @@ class Client(object):
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._requests(requests.post, url, json=json)
+        response = self._request(url, method="POST", json=json)
         (analysis_id,) = response.get("id")
         return analysis_id
 
@@ -220,7 +225,7 @@ class Client(object):
         Raises:
             RequestsError: HTTP request fails.
         """
-        response = self._requests(requests.get, url, headers={})
+        response = self._request(url, headers={})
         with path.open("wb") as f:
             f.write(response.raw.content)
 
@@ -234,70 +239,31 @@ class Client(object):
     def _extract_keypoint(self, data: dict) -> int:
         """Start keypoint extraction."""
         url = urljoin(self._api_url, "keypoints/")
-        response = self._requests(requests.post, url, json=data)
+        response = self._request(url, method="POST", json=data)
         (keypoint_id,) = response.get("id")
         return keypoint_id
 
-    def _requests(
+    def _request(
         self,
-        requests_func: Callable,
         url: str,
+        method: str = "GET",
         params: Optional[dict] = None,
         json: Optional[dict] = None,
         data: Optional[object] = None,
         headers: Optional[dict] = None,
-    ) -> Response:
-        """Send an HTTP requests and receive a response.
-
-        Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
-        """
-        method = requests_func.__name__.upper()
-        is_json = json is not None
-
+    ):
+        """Send an HTTP requests and receive a response."""
         if headers is None:
-            headers = self._get_headers(with_content_type=is_json)
+            headers = {"Authorization": f"Bearer {self.token}"}
+            # if json is not None:
+            if method == "POST":
+                headers["Content-Type"] = "application/json"
 
-        if self._verbose and self._echo_request:
-            # TODO: add params
-            self._echo_request(url, method, headers, json)
-
-        try:
-            if is_json:
-                response = requests_func(url, params=params, json=json, headers=headers)
-            else:
-                response = requests_func(url, params=params, data=data, headers=headers)
-        except requests.ConnectionError:
-            message = f"{method} {url} is failed."
-            raise RequestsError(message)
-
-        if self._verbose and self._echo_response:
-            self._echo_response(
-                response.status_code,
-                response.reason,
-                response.raw.version,
-                response.headers,
-                response.json(),
-            )
-
-        if response.status_code not in [200, 201]:
-            # TODO: change message
-            message = dedent(
-                f"""\
-                    {method} {url} is failed.
-                    status code: {response.status_code}
-                    content: {response.content.decode()}
-                """
-            )
-            raise RequestsError(message)
+        response = self._session.request(
+            url, method=method, params=params, data=data, json=json, headers=headers
+        )
 
         return Response(response)
-
-    def _get_headers(self, with_content_type: bool = True) -> dict:
-        """Generate Authorization and Content-Type headers."""
-        headers = {"Authorization": f"Bearer {self.token}"}
-        if with_content_type:
-            headers["Content-Type"] = "application/json"
-        return headers
 
     def _get_token(self) -> str:
         """Get a token using client ID and secret."""
@@ -306,9 +272,9 @@ class Client(object):
             "clientId": self._client_id,
             "clientSecret": self._client_secret,
         }
-        response = self._requests(
-            requests.post,
+        response = self._request(
             self._oauth_url,
+            method="POST",
             json=data,
             headers={"Content-Type": "application/json"},
         )
@@ -332,7 +298,7 @@ class Client(object):
 
     def _wait_for_done(self, url: str) -> Response:
         for _ in range(self._max_steps):
-            response = self._requests(requests.get, url)
+            response = self._request(url)
             if response.status in ["SUCCESS", "FAILURE"]:
                 break
             time.sleep(self._interval)
