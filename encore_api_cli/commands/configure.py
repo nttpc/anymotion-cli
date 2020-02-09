@@ -1,6 +1,7 @@
 from typing import Optional
 
 import click
+from click_help_colors import HelpColorsGroup
 from tabulate import tabulate
 
 from ..options import common_options
@@ -9,7 +10,7 @@ from ..state import State, pass_state
 from ..utils import get_settings
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 

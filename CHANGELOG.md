@@ -6,6 +6,7 @@ Unreleased
 
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure clear` command.
+- Added color to help display.
 
 ## 0.7.1
 

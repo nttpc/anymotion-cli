@@ -2,6 +2,7 @@ import io
 from typing import Optional
 
 import click
+from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
 from ..options import common_options
@@ -12,7 +13,7 @@ from ..utils import color_id, get_client
 from .draw import draw, draw_options
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 

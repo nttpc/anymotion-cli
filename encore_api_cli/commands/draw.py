@@ -2,6 +2,7 @@ import io
 from typing import Callable, Optional
 
 import click
+from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
 from ..options import common_options
@@ -29,7 +30,7 @@ def draw_options(f: Callable) -> Callable:
     return f
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 
