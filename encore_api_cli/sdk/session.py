@@ -28,8 +28,9 @@ class HttpSession(object):
         Raises:
             RequestsError
         """
+        method = method.upper()
         if method not in ["GET", "POST", "PUT", "DELETE"]:
-            raise Exception("method is invalid")
+            raise RequestsError("HTTP method is invalid.")
 
         request = requests.Request(
             method, url, params=params, data=data, json=json, headers=headers,
@@ -41,8 +42,7 @@ class HttpSession(object):
         try:
             response = self.session.send(prepped)
         except requests.ConnectionError:
-            message = f"{method} {url} is failed."
-            raise RequestsError(message)
+            raise RequestsError(f"{method} {url} is failed.")
 
         for callback in self.response_callbacks:
             callback(response)

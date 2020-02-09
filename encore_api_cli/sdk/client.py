@@ -3,7 +3,7 @@ import hashlib
 import os
 import time
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
 from .auth import get_token
@@ -24,11 +24,12 @@ class Client(object):
 
     Attributes:
         token (str): access token for authentication.
+        session (HttpSession)
 
     Examples:
         >>> client = Client()
         >>> client.get_one_data("images", 1)
-        {'id': 1, 'name': None, 'contentMd5': '/vtZRXU8pPhu/8qJaV+Ahw=='}
+        {'id': 1, 'name': None, 'contentMd5': '/vtARXU7pPhu/8qJaV+Ahw=='}
     """
 
     def __init__(
@@ -38,32 +39,35 @@ class Client(object):
         api_url: str = "https://api.customer.jp/anymotion/v1/",
         interval: int = 5,
         timeout: int = 600,
-        verbose: bool = False,
-        echo_request: Optional[Callable] = None,
-        echo_response: Optional[Callable] = None,
     ):
         """Initialize the client.
 
         Raises
             ClientValueError: Invalid argument value.
         """
-        self._set_credentials(client_id, client_secret)
-        self._set_url(api_url)
+        self.session = HttpSession()
+
+        if client_id is None or client_id == "":
+            raise ClientValueError(f"Invalid Client ID: {client_id}")
+        self.client_id = client_id
+
+        if client_secret is None or client_secret == "":
+            raise ClientValueError(f"Invalid Client Secret: {client_secret}")
+        self.client_secret = client_secret
+
+        parts = urlparse(api_url)
+        api_path = parts.path
+        if "anymotion" not in api_path:
+            raise ClientValueError(f"Invalid API URL: {api_url}")
+        if api_path[-1] != "/":
+            api_path += "/"
+
+        self._base_url = str(urlunparse((parts.scheme, parts.netloc, "", "", "", "")))
+        self._api_url = urljoin(self._base_url, api_path)
         self._token: Optional[str] = None
 
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
-
-        # TODO: add add_callback method, remove verbose, echo_request, echo_response
-        self._session = HttpSession()
-        if verbose and echo_request:
-            self._session.add_request_callback(echo_request)
-        if verbose and echo_response:
-            self._session.add_response_callback(echo_response)
-
-        self._verbose = verbose
-        self._echo_request = echo_request
-        self._echo_response = echo_response
 
         self._page_size = 1000
 
@@ -72,10 +76,10 @@ class Client(object):
         """Return access token."""
         if self._token is None:
             self._token = get_token(
-                self._client_id,
-                self._client_secret,
+                self.client_id,
+                self.client_secret,
                 base_url=self._base_url,
-                session=self._session,
+                session=self.session,
             )
         return self._token
 
@@ -273,7 +277,7 @@ class Client(object):
             if method == "POST":
                 headers["Content-Type"] = "application/json"
 
-        response = self._session.request(
+        response = self.session.request(
             url, method=method, params=params, data=data, json=json, headers=headers
         )
 
@@ -301,24 +305,3 @@ class Client(object):
         else:
             response.status = "TIMEOUT"
         return response
-
-    def _set_credentials(self, client_id: str, client_secret: str) -> None:
-        if client_id is None or client_id == "":
-            raise ClientValueError(f"Invalid Client ID: {client_id}")
-        if client_secret is None or client_secret == "":
-            raise ClientValueError(f"Invalid Client Secret: {client_secret}")
-
-        self._client_id = client_id
-        self._client_secret = client_secret
-
-    def _set_url(self, api_url: str) -> None:
-        parts = urlparse(api_url)
-        self._base_url = str(urlunparse((parts.scheme, parts.netloc, "", "", "", "")))
-
-        api_path = parts.path
-        if "anymotion" not in api_path:
-            raise ClientValueError(f"Invalid API URL: {api_url}")
-        if api_path[-1] != "/":
-            api_path += "/"
-
-        self._api_url = urljoin(self._base_url, api_path)
