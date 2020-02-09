@@ -1,7 +1,6 @@
 import click
 
 from .output import is_show
-from .utils import get_bool_env
 
 
 class State(object):
@@ -16,10 +15,12 @@ class State(object):
         """Flag to use spinner.
 
         True if:
-            - verbose option is set
-            - output ot terminal
+            - verbose option is not set
+            - output to terminal
             - ANYMOTION_USE_SPINNER is true or not set
         """
+        from .utils import get_bool_env
+
         env = get_bool_env("ANYMOTION_USE_SPINNER", True)
         return not self.verbose and is_show() and env
 
