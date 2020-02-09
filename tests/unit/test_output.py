@@ -96,12 +96,16 @@ def test_echo_json(capfd):
         (None, None, "POST http://example.com\n\n"),
     ],
 )
-def test_echo_request(capfd, monkeypatch, headers, json, expected):
+def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
     monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
-    echo_request(
-        "http://example.com", "POST", headers=headers, json=json,
-    )
+    request_mock = mocker.MagicMock()
+    request_mock.return_value.url = "http://example.com"
+    request_mock.return_value.method = "POST"
+    request_mock.return_value.headers = headers
+    request_mock.return_value.json = json
+
+    echo_request(request_mock())
 
     out, err = capfd.readouterr()
     assert out == expected
@@ -164,11 +168,18 @@ def test_echo_request(capfd, monkeypatch, headers, json, expected):
     ],
 )
 def test_echo_response(
-    capfd, monkeypatch, status_code, reason, version, headers, json, expected
+    mocker, capfd, monkeypatch, status_code, reason, version, headers, json, expected
 ):
     monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
-    echo_response(status_code, reason, version, headers, json)
+    response_mock = mocker.MagicMock()
+    response_mock.return_value.status_code = status_code
+    response_mock.return_value.reason = reason
+    response_mock.return_value.raw.version = version
+    response_mock.return_value.headers = headers
+    response_mock.return_value.json.return_value = json
+
+    echo_response(response_mock())
 
     out, err = capfd.readouterr()
     assert out == expected
