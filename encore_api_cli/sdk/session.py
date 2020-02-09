@@ -11,7 +11,6 @@ class HttpSession(object):
 
     def __init__(self):
         self.session = requests.Session()
-
         self.request_callbacks: List[Callable] = []
         self.response_callbacks: List[Callable] = []
 
@@ -29,6 +28,9 @@ class HttpSession(object):
         Raises:
             RequestsError
         """
+        if method not in ["GET", "POST", "PUT", "DELETE"]:
+            raise Exception("method is invalid")
+
         request = requests.Request(
             method, url, params=params, data=data, json=json, headers=headers,
         )

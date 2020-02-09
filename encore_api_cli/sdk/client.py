@@ -1,10 +1,12 @@
 import base64
 import hashlib
+import os
 import time
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
+from .auth import get_token
 from .exceptions import ClientValueError, FileTypeError
 from .response import Response
 from .session import HttpSession
@@ -22,12 +24,17 @@ class Client(object):
 
     Attributes:
         token (str): access token for authentication.
+
+    Examples:
+        >>> client = Client()
+        >>> client.get_one_data("images", 1)
+        {'id': 1, 'name': None, 'contentMd5': '/vtZRXU8pPhu/8qJaV+Ahw=='}
     """
 
     def __init__(
         self,
-        client_id: str,
-        client_secret: str,
+        client_id: str = os.getenv("ANYMOTION_CLIENT_ID", ""),
+        client_secret: str = os.getenv("ANYMOTION_CLIENT_SECRET", ""),
         api_url: str = "https://api.customer.jp/anymotion/v1/",
         interval: int = 5,
         timeout: int = 600,
@@ -42,7 +49,7 @@ class Client(object):
         """
         self._set_credentials(client_id, client_secret)
         self._set_url(api_url)
-        self._token = None
+        self._token: Optional[str] = None
 
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
@@ -63,7 +70,14 @@ class Client(object):
     @property
     def token(self) -> str:
         """Return access token."""
-        return self._token or self._get_token()
+        if self._token is None:
+            self._token = get_token(
+                self._client_id,
+                self._client_secret,
+                base_url=self._base_url,
+                session=self._session,
+            )
+        return self._token
 
     def get_one_data(self, endpoint: str, endpoint_id: int) -> dict:
         """Get one piece of data from AnyMotion API.
@@ -265,24 +279,6 @@ class Client(object):
 
         return Response(response)
 
-    def _get_token(self) -> str:
-        """Get a token using client ID and secret."""
-        data = {
-            "grantType": "client_credentials",
-            "clientId": self._client_id,
-            "clientSecret": self._client_secret,
-        }
-        response = self._request(
-            self._oauth_url,
-            method="POST",
-            json=data,
-            headers={"Content-Type": "application/json"},
-        )
-        (token,) = response.get("accessToken")
-
-        self._token = token
-        return token
-
     def _get_media_type(self, path: Path) -> str:
         if path.suffix.lower() in MOVIE_SUFFIXES:
             return "movie"
@@ -317,6 +313,7 @@ class Client(object):
 
     def _set_url(self, api_url: str) -> None:
         parts = urlparse(api_url)
+        self._base_url = str(urlunparse((parts.scheme, parts.netloc, "", "", "", "")))
 
         api_path = parts.path
         if "anymotion" not in api_path:
@@ -324,7 +321,4 @@ class Client(object):
         if api_path[-1] != "/":
             api_path += "/"
 
-        self._api_url = urlunparse((parts.scheme, parts.netloc, api_path, "", "", ""))
-        self._oauth_url = urlunparse(
-            (parts.scheme, parts.netloc, "v1/oauth/accesstokens", "", "", "")
-        )
+        self._api_url = urljoin(self._base_url, api_path)

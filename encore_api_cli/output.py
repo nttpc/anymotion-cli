@@ -3,6 +3,7 @@ import sys
 from typing import Optional
 
 import click
+import requests
 from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import JsonLexer
@@ -44,9 +45,7 @@ def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> Non
         click.echo(body)
 
 
-def echo_request(
-    url: str, method: str, headers: Optional[dict] = None, json: Optional[object] = None
-) -> None:
+def echo_request(request: requests.Request) -> None:
     """Output http request.
 
     Examples:
@@ -57,28 +56,22 @@ def echo_request(
             "key": "value"
         }
     """
-    url = click.style(url, fg="cyan")
-    method = click.style(method, fg="green")
+    url = click.style(request.url, fg="cyan")
+    method = click.style(request.method, fg="green")
     click.echo(f"{method} {url}")
 
-    if headers is not None:
-        for key, value in headers.items():
+    if request.headers is not None:
+        for key, value in request.headers.items():
             key = click.style(key, fg="cyan")
             click.echo(f"{key}: {value}")
 
-    if json is not None:
-        echo_json(json)
+    if request.json is not None:
+        echo_json(request.json)
 
     click.echo()
 
 
-def echo_response(
-    status_code: int,
-    reason: str,
-    version: int,
-    headers: Optional[dict],
-    json: Optional[object],
-) -> None:
+def echo_response(response: requests.Response) -> None:
     """Output http response.
 
     Examples:
@@ -89,21 +82,22 @@ def echo_response(
             "id": 1
         }
     """
-    status = click.style(str(status_code), fg="blue")
-    reason = click.style(reason, fg="cyan")
+    status = click.style(str(response.status_code), fg="blue")
+    reason = click.style(response.reason, fg="cyan")
     http_version = "HTTP"
-    if version == 10:
+    if response.raw.version == 10:
         http_version = "HTTP/1.0"
-    elif version == 11:
+    elif response.raw.version == 11:
         http_version = "HTTP/1.1"
     http_version = click.style(http_version, fg="blue")
     click.echo(f"{http_version} {status} {reason}")
 
-    if headers is not None:
-        for key, value in headers.items():
+    if response.headers is not None:
+        for key, value in response.headers.items():
             key = click.style(key, fg="cyan")
             click.echo(f"{key}: {value}")
 
+    json = response.json()
     if json is not None:
         echo_json(json)
 
