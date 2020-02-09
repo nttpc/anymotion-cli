@@ -96,7 +96,7 @@ jobs:
           name: Check security with bandit
           command: poetry run bandit -r encore_api_cli -s B303
 
-  build-and-upload:
+  release:
     executor:
       name: python
     steps:
@@ -161,7 +161,8 @@ workflows:
               only: /^\d.*/
           requires:
             - setup-py38
-      - build-and-upload:
+      - approval-release:
+          type: approval
           filters:
             tags:
               only: /^\d.*/
@@ -173,3 +174,11 @@ workflows:
             - measure-coverage
             - check-syntax
             - check-security
+      - release:
+          filters:
+            tags:
+              only: /^\d.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - approval-release
