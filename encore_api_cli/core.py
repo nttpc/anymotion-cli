@@ -17,6 +17,8 @@ from .state import State, pass_state
 
 
 class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
+    """A class that mixes HelpColorsMixin and CommandCollection."""
+
     def __init__(self, *args, **kwargs):
         super(ColorsCommandCollection, self).__init__(*args, **kwargs)
 
