@@ -6,6 +6,7 @@ import requests
 from .exceptions import ResponseError
 
 
+# TODO: refactor
 class Response(object):
     """AnyMotion API Response."""
 

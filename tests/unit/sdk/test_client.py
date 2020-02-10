@@ -11,7 +11,8 @@ from encore_api_cli.sdk.exceptions import FileTypeError
 def client(requests_mock):
     api_url = "http://api.example.com/anymotion/v1/"
     client = Client("client_id", "client_secret", api_url, 5, 600)
-    requests_mock.post(client._oauth_url, json={"accessToken": "token"})
+    oauth_url = urljoin(client._base_url, "v1/oauth/accesstokens")
+    requests_mock.post(oauth_url, json={"accessToken": "token"})
     yield client
 
 

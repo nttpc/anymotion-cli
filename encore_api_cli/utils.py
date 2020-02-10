@@ -18,7 +18,7 @@ from .settings import Settings
 def get_client(state: Any) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
-    if settings.is_ok is False:
+    if not settings.is_ok:
         command = click.style(f"{state.cli_name} configure", fg="cyan")
         message = (
             "The credentials is invalid or not set. "
@@ -28,17 +28,18 @@ def get_client(state: Any) -> Client:
 
     try:
         client = Client(
-            str(settings.client_id),
-            str(settings.client_secret),
+            client_id=str(settings.client_id),
+            client_secret=str(settings.client_secret),
             api_url=settings.api_url,
             interval=settings.interval,
             timeout=settings.timeout,
-            verbose=state.verbose,
-            echo_request=echo_request,
-            echo_response=echo_response,
         )
     except ClientValueError as e:
         raise ClickException(str(e))
+
+    if state.verbose:
+        client.session.add_request_callback(echo_request)
+        client.session.add_response_callback(echo_response)
 
     return client
 
