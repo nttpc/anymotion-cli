@@ -2,7 +2,7 @@ import json
 import os
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 import click
 
@@ -10,12 +10,10 @@ from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response
 from .sdk import Client, ClientValueError
 from .settings import Settings
+from .state import State
 
-# from encore_api_cli.state import State
 
-
-# TODO: use profile, verbose, cli_name instead of state
-def get_client(state: Any) -> Client:
+def get_client(state: State) -> Client:
     """Get client from state."""
     settings = get_settings(state.profile)
     if not settings.is_ok:
