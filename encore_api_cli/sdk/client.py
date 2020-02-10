@@ -132,7 +132,11 @@ class Client(object):
         response = self.session.request(
             urljoin(self._api_url, f"{media_type}s/"),
             method="POST",
-            json={"origin_key": path.name, "content_md5": content_md5},
+            json={
+                "origin_key": path.name,
+                "content_md5": content_md5,
+                "name": path.stem,
+            },
             token=self.token,
         )
         media_id, upload_url = Response(response).get(("id", "uploadUrl"))
@@ -226,6 +230,7 @@ class Client(object):
         drawing_url = None
         if response.status == "SUCCESS":
             (drawing_url,) = response.get("drawingUrl")
+        # TODO: return response only
         return response.status, drawing_url
 
     def wait_for_analysis(self, analysis_id: int) -> Response:
@@ -247,6 +252,31 @@ class Client(object):
         response = self.session.request(url)
         with path.open("wb") as f:
             f.write(response.content)
+
+    def get_name_from_drawing_id(self, drawing_id: int) -> str:
+        """Get image or movie name from drawing_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
+        url = urljoin(self._api_url, f"drawings/{drawing_id}/")
+        response = self.session.request(url, token=self.token)
+        (keypoint_id,) = Response(response).get("keypoint")
+
+        url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
+        response = self.session.request(url, token=self.token)
+        (image_id, movie_id) = Response(response).get(("image", "movie"))
+
+        if image_id:
+            url = urljoin(self._api_url, f"images/{image_id}/")
+        elif movie_id:
+            url = urljoin(self._api_url, f"movies/{movie_id}/")
+        else:
+            raise
+        response = self.session.request(url, token=self.token)
+        (name,) = Response(response).get("name")
+
+        return name
 
     def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:

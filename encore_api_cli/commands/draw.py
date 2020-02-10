@@ -73,6 +73,7 @@ def draw(
                 status, url = client.wait_for_drawing(drawing_id)
         else:
             status, url = client.wait_for_drawing(drawing_id)
+        name = client.get_name_from_drawing_id(drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
@@ -81,7 +82,7 @@ def draw(
         if no_download:
             return
 
-        is_ok, message, path = check_download(out_dir, url)
+        is_ok, message, path = check_download(out_dir, url, name)
         if is_ok:
             try:
                 client.download(url, path)

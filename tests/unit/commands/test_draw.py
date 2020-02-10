@@ -15,6 +15,7 @@ class TestDraw(object):
             "http://example.com/image.jpg",
         )
         client_mock.return_value.download.return_value = None
+        client_mock.return_value.get_name_from_drawing_id.return_value = "image"
         mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
         yield client_mock
 

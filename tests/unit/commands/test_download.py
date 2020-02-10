@@ -35,6 +35,7 @@ class TestDownload(object):
         client_mock = mocker.MagicMock()
         client_mock.return_value.wait_for_drawing.return_value = wait_for_drawing_return
         client_mock.return_value.download.return_value = None
+        client_mock.return_value.get_name_from_drawing_id.return_value = "image"
         mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
 
         runner = CliRunner()

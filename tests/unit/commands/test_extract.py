@@ -113,6 +113,7 @@ def test_keypoint_extract_with_drawing(mocker):
     extract_keypoint_mock.return_value = keypoint_id
     client_mock.return_value.draw_keypoint.return_value = 333
     client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
+    client_mock.return_value.get_name_from_drawing_id.return_value = "image"
     client_mock.return_value.download.return_value = None
     mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
@@ -128,6 +129,7 @@ def test_keypoint_extract_with_drawing(mocker):
         (keypoint_id,),
         {"rule": None},
     )
+    assert client_mock.return_value.get_name_from_drawing_id.call_count == 1
     assert client_mock.return_value.download.call_count == 1
 
     assert result.exit_code == 0
