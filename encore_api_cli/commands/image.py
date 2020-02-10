@@ -1,4 +1,5 @@
 import click
+from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
 from ..exceptions import ClickException
@@ -9,7 +10,7 @@ from ..state import State, pass_state
 from ..utils import get_client
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 

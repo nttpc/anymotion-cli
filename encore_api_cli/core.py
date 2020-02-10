@@ -1,4 +1,5 @@
 import click
+from click_help_colors import HelpColorsMixin
 
 from . import __version__
 from .commands.analysis import cli as analysis
@@ -15,8 +16,15 @@ from .commands.upload import cli as upload
 from .state import State, pass_state
 
 
+class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
+    """A class that mixes HelpColorsMixin and CommandCollection."""
+
+    def __init__(self, *args, **kwargs):
+        super(ColorsCommandCollection, self).__init__(*args, **kwargs)
+
+
 @click.command(
-    cls=click.CommandCollection,
+    cls=ColorsCommandCollection,
     sources=[
         analysis,
         analyze,
@@ -30,6 +38,7 @@ from .state import State, pass_state
         movie,
         upload,
     ],  # type: ignore
+    help_options_color="cyan",
 )
 @click.version_option(
     version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
