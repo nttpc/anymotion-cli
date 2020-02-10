@@ -10,12 +10,10 @@ from encore_api_cli.commands.configure import cli
 def test_configure(mocker, tmpdir):
     default_url = "https://api.customer.jp/anymotion/v1/"
     api_url = "http://api.example.com/anymotion/v1/"
-    expected = dedent(
-        f"""\
-        AnyMotion API URL [{default_url}]: {api_url}
-        AnyMotion Client ID: client id
-        AnyMotion Client Secret: client secret
-    """
+    expected = (
+        f"AnyMotion API URL [{default_url}]: {api_url}\n"
+        "AnyMotion Client ID: \n"
+        "AnyMotion Client Secret: \n"
     )
 
     tmpdir = Path(tmpdir)
