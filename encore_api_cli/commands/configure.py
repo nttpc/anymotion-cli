@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 import click
 from tabulate import tabulate
@@ -22,11 +22,24 @@ def configure(ctx: click.Context, state: State) -> None:
     """Configure your AnyMotion Credentials."""
     if ctx.invoked_subcommand is None:
         settings = get_settings(state.profile, use_env=False)
+
         api_url = click.prompt("AnyMotion API URL", default=settings.api_url)
-        client_id = click.prompt("AnyMotion Client ID", default=settings.client_id)
-        client_secret = click.prompt(
-            "AnyMotion Client Secret", default=settings.client_secret
+        client_id = click.prompt(
+            "AnyMotion Client ID",
+            default=make_hidden(settings.client_id),
+            hide_input=True,
         )
+        client_secret = click.prompt(
+            "AnyMotion Client Secret",
+            default=make_hidden(settings.client_secret),
+            hide_input=True,
+        )
+
+        if isinstance(client_id, HiddenCredential):
+            client_id = client_id.value
+        if isinstance(client_secret, HiddenCredential):
+            client_secret = client_secret.value
+
         settings.write_config(api_url)
         settings.write_credentials(client_id, client_secret)
 
@@ -37,16 +50,11 @@ def configure(ctx: click.Context, state: State) -> None:
 def list(state: State) -> None:
     """Show the configuration you use."""
     settings = get_settings(state.profile)
+
     none = click.style("None", fg="yellow")
+    client_id = make_hidden(settings.client_id, none)
+    client_secret = make_hidden(settings.client_secret, none)
 
-    def hidden_credentials(string: Optional[str]) -> str:
-        if string is None or len(string) == 0:
-            return none
-        else:
-            return string[-4:].rjust(20, "*")
-
-    client_id = hidden_credentials(settings.client_id)
-    client_secret = hidden_credentials(settings.client_secret)
     table = tabulate(
         [
             ["profile", state.profile],
@@ -74,3 +82,31 @@ def clear(state: State) -> None:
     settings = get_settings(state.profile)
     settings.write_config(API_URL)
     settings.write_credentials("", "")
+
+
+class HiddenCredential(str):
+    """Make hidden the credentials value.
+
+    Examples:
+        >>> x = HiddenCredential("abcdefghij")
+        >>> str(x)
+        ****************ghij
+        >>> x.value
+        abcdefghij
+    """
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def __str__(self):
+        return self.value[-4:].rjust(20, "*")
+
+
+def make_hidden(
+    value: Optional[str], default: Optional[str] = None
+) -> Optional[Union[str, HiddenCredential]]:
+    """Get hidden value."""
+    if value:
+        return HiddenCredential(value)
+    else:
+        return default

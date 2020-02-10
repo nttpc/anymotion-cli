@@ -6,6 +6,7 @@ Unreleased
 
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure clear` command.
+- Make hidden the credentials value at `configure` command.
 
 ## 0.7.1
 
