@@ -3,8 +3,10 @@ from typing import Optional
 import click
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_json
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -27,7 +29,13 @@ def drawing() -> None:
 def show(state: State, drawing_id: int) -> None:
     """Show drawn files information."""
     client = get_client(state)
-    echo_json(client.get_one_data("drawings", drawing_id))
+
+    try:
+        data = client.get_one_data("drawings", drawing_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
+
+    echo_json(data)
 
 
 @drawing.command()
@@ -48,12 +56,14 @@ def list(state: State, status: Optional[str]) -> None:
     if status:
         params = {"execStatus": status.upper()}
 
-    # TODO: catch error in get_list_data
-    if state.use_spinner:
-        with yaspin(text="Retrieving..."):
+    try:
+        if state.use_spinner:
+            with yaspin(text="Retrieving..."):
+                data = client.get_list_data("drawings", params=params)
+        else:
             data = client.get_list_data("drawings", params=params)
-    else:
-        data = client.get_list_data("drawings", params=params)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if len(data) < state.pager_length:
         echo_json(data)

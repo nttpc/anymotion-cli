@@ -78,7 +78,10 @@ class TestDraw(object):
 
     @pytest.mark.parametrize(
         "status, message",
-        [("TIMEOUT", "Drawing is timed out."), ("FAILURE", "Drawing failed.")],
+        [
+            ("TIMEOUT", "Error: Drawing is timed out."),
+            ("FAILURE", "Error: Drawing failed."),
+        ],
     )
     def test_valid_not_success(self, mocker, status, message):
         client_mock = mocker.MagicMock()

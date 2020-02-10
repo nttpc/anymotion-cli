@@ -4,14 +4,15 @@ from urllib.parse import urljoin
 import pytest
 
 from encore_api_cli.sdk.client import Client
-from encore_api_cli.sdk.exceptions import InvalidFileType
+from encore_api_cli.sdk.exceptions import FileTypeError
 
 
 @pytest.fixture
 def client(requests_mock):
     api_url = "http://api.example.com/anymotion/v1/"
     client = Client("client_id", "client_secret", api_url, 5, 600)
-    requests_mock.post(client._oauth_url, json={"accessToken": "token"})
+    oauth_url = urljoin(client._base_url, "v1/oauth/accesstokens")
+    requests_mock.post(oauth_url, json={"accessToken": "token"})
     yield client
 
 
@@ -71,7 +72,7 @@ class TestUpload(object):
     def test_正しい拡張子でない場合アップロードできないこと(self, client):
         path = "test.text"
 
-        with pytest.raises(InvalidFileType):
+        with pytest.raises(FileTypeError):
             client.upload_to_s3(path)
 
 

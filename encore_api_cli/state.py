@@ -5,6 +5,8 @@ from .utils import get_bool_env
 
 
 class State(object):
+    """Manage state."""
+
     def __init__(self) -> None:
         self.verbose = False
         self.profile = "default"

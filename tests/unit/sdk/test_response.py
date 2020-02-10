@@ -1,6 +1,6 @@
 import pytest
 
-from encore_api_cli.sdk import InvalidResponse
+from encore_api_cli.sdk import ResponseError
 from encore_api_cli.sdk.response import Response
 
 
@@ -42,7 +42,7 @@ class TestResponse(object):
 
     def test_error_occurs_when_trying_to_get(self, mocker):
         response = Response(self._response_mock(mocker, {"value": 1}))
-        with pytest.raises(InvalidResponse):
+        with pytest.raises(ResponseError):
             response.get("non-existent")
 
     def _response_mock(self, mocker, return_value):

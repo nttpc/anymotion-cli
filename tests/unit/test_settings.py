@@ -61,7 +61,7 @@ class Test_設定ファイルが存在しない場合(object):
         assert not config_file_path.exists()
 
         settings = Settings("default")
-        with pytest.raises(ValueError):
+        with pytest.raises(SettingsValueError):
             settings.write_config(None)
 
         assert not config_file_path.exists()
@@ -105,7 +105,7 @@ class Test_設定ファイルが存在しない場合(object):
 
     def test_正しい値出ない場合credentialsファイルを更新できないこと(self, mocker_home):
         settings = Settings("default")
-        with pytest.raises(ValueError):
+        with pytest.raises(SettingsValueError):
             settings.write_credentials(None, None)
 
 
@@ -194,4 +194,4 @@ def test_is_ok(monkeypatch, mocker_home, client_id, client_secret, expected):
     monkeypatch.setattr(Settings, "client_secret", client_secret)
     settings = Settings("default")
 
-    assert settings.is_ok() is expected
+    assert settings.is_ok is expected
