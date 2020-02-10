@@ -28,6 +28,7 @@ def keypoint() -> None:
 @pass_state
 def show(state: State, keypoint_id: int) -> None:
     """Show extracted keypoint data."""
+    # TODO: add full option or another command
     client = get_client(state)
 
     try:

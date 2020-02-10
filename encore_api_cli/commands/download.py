@@ -1,6 +1,6 @@
 from pathlib import Path
 from textwrap import dedent
-from typing import Tuple
+from typing import Optional, Tuple
 from urllib.parse import urlparse
 
 import click
@@ -36,11 +36,12 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
 
     try:
         status, url = client.wait_for_drawing(drawing_id)
+        name = client.get_name_from_drawing_id(drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
     if status == "SUCCESS" and url is not None:
-        is_ok, message, path = check_download(out_dir, url)
+        is_ok, message, path = check_download(out_dir, url, name)
         if is_ok:
             try:
                 client.download(url, path)
@@ -53,14 +54,22 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
         echo_error("Unable to download because drawing failed.")
 
 
-def check_download(out_dir: str, url: str) -> Tuple[bool, str, Path]:
+def check_download(
+    out_dir: str, url: str, name: Optional[str] = None
+) -> Tuple[bool, str, Path]:
     """Check if you want to overwrite before downloading.
 
     Returns:
         A tuple of is_ok, message, path.
     """
     Path(out_dir).mkdir(parents=True, exist_ok=True)
-    path = Path(out_dir) / Path(str(urlparse(url).path)).name
+
+    if name:
+        file_name = name + Path(str(urlparse(url).path)).suffix
+    else:
+        file_name = Path(str(urlparse(url).path)).name
+    path = Path(out_dir) / file_name
+
     if path.exists():
         echo(f"File already exists: {color_path(path)}")
         if not click.confirm("Do you want to overwrite?"):

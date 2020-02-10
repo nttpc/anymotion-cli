@@ -7,6 +7,7 @@ Unreleased
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure clear` command.
 - Moved request method on `encore_api_cli.sdk.client` to `encore_api_cli.sdk.session`.
+- Improved the name of the file to be downloaded.
 - Improved error message by catching exceptions.
 
 ## 0.7.1
