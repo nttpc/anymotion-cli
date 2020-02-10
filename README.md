@@ -49,7 +49,7 @@ The quickest way to get started is to run the `amcli configure` command:
 
 ```sh
 $ amcli configure
-AnyMotion API URL [https://api.customer.jp/]:
+AnyMotion API URL [https://api.customer.jp/anymotion/v1/]:
 AnyMotion Client ID: your_client_id
 AnyMotion Client Secret: your_client_secret
 ```

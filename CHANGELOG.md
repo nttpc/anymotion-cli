@@ -6,6 +6,8 @@ Unreleased
 
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure clear` command.
+- Added color to help display.
+- Made hidden the credentials value at `configure` command.
 - Moved request method on `encore_api_cli.sdk.client` to `encore_api_cli.sdk.session`.
 - Improved the name of the file to be downloaded.
 - Improved error message by catching exceptions.
