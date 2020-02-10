@@ -33,16 +33,33 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis id: 111)
-                Success: Analysis is complete.
+            Analysis started. (analysis id: 111)
+            Success: Analysis is complete.
             """
         )
 
     @pytest.mark.parametrize(
         "status, message",
         [
-            ("TIMEOUT", "Analysis is timed out."),
-            ("FAILURE", "Analysis failed: message"),
+            (
+                "TIMEOUT",
+                dedent(
+                    """\
+                    Analysis started. (analysis id: 111)
+                    Error: Analysis is timed out.
+                    """
+                ),
+            ),
+            (
+                "FAILURE",
+                dedent(
+                    """\
+                    Analysis started. (analysis id: 111)
+                    Error: Analysis failed.
+                    message
+                    """
+                ),
+            ),
         ],
     )
     def test_valid_not_success(self, mocker, status, message):
@@ -53,12 +70,7 @@ class TestAnalyze(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == dedent(
-            f"""\
-                Analysis started. (analysis id: 111)
-                {message}
-            """
-        )
+        assert result.output == message
 
     def test_valid_rule_file(self, mocker, tmp_path):
         client_mock = self._client_mock(mocker)
@@ -72,8 +84,8 @@ class TestAnalyze(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             """\
-                Analysis started. (analysis id: 111)
-                Success: Analysis is complete.
+            Analysis started. (analysis id: 111)
+            Success: Analysis is complete.
             """
         )
 

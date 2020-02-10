@@ -1,15 +1,15 @@
 import base64
 import hashlib
+import os
 import time
 from pathlib import Path
-from textwrap import dedent
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
-import requests
-
-from . import InvalidFileType, RequestsError
+from .auth import get_token
+from .exceptions import ClientValueError, FileTypeError
 from .response import Response
+from .session import HttpSession
 
 MOVIE_SUFFIXES = [".mp4", ".mov"]
 IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png"]
@@ -24,53 +24,87 @@ class Client(object):
 
     Attributes:
         token (str): access token for authentication.
+        session (HttpSession)
+
+    Examples:
+        >>> client = Client()
+        >>> client.get_one_data("images", 1)
+        {'id': 1, 'name': None, 'contentMd5': '/vtARXU7pPhu/8qJaV+Ahw=='}
     """
 
     def __init__(
         self,
-        client_id: str,
-        client_secret: str,
+        client_id: str = os.getenv("ANYMOTION_CLIENT_ID", ""),
+        client_secret: str = os.getenv("ANYMOTION_CLIENT_SECRET", ""),
         api_url: str = "https://api.customer.jp/anymotion/v1/",
         interval: int = 5,
         timeout: int = 600,
-        verbose: bool = False,
-        echo_request: Optional[Callable] = None,
-        echo_response: Optional[Callable] = None,
     ):
-        self._client_id = client_id
-        self._client_secret = client_secret
-        self._token = None
+        """Initialize the client.
 
-        self._set_url(api_url)
+        Raises
+            ClientValueError: Invalid argument value.
+        """
+        self.session = HttpSession()
+
+        if client_id is None or client_id == "":
+            raise ClientValueError(f"Invalid Client ID: {client_id}")
+        self.client_id = client_id
+
+        if client_secret is None or client_secret == "":
+            raise ClientValueError(f"Invalid Client Secret: {client_secret}")
+        self.client_secret = client_secret
+
+        parts = urlparse(api_url)
+        api_path = parts.path
+        if "anymotion" not in api_path:
+            raise ClientValueError(f"Invalid API URL: {api_url}")
+        if api_path[-1] != "/":
+            api_path += "/"
+
+        self._base_url = str(urlunparse((parts.scheme, parts.netloc, "", "", "", "")))
+        self._api_url = urljoin(self._base_url, api_path)
+        self._token: Optional[str] = None
 
         self._interval = max(1, interval)
         self._max_steps = max(1, timeout // self._interval)
-
-        self._verbose = verbose
-        self._echo_request = echo_request
-        self._echo_response = echo_response
 
         self._page_size = 1000
 
     @property
     def token(self) -> str:
         """Return access token."""
-        return self._token or self._get_token()
+        if self._token is None:
+            self._token = get_token(
+                self.client_id,
+                self.client_secret,
+                base_url=self._base_url,
+                session=self.session,
+            )
+        return self._token
 
     def get_one_data(self, endpoint: str, endpoint_id: int) -> dict:
-        """Get one piece of data from AnyMotion API."""
+        """Get one piece of data from AnyMotion API.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"{endpoint}/{endpoint_id}/")
-        response = self._requests(requests.get, url)
-        return response.json
+        response = self.session.request(url, token=self.token)
+        return response.json()
 
     def get_list_data(self, endpoint: str, params: dict = {}) -> List[dict]:
-        """Get list data from AnyMotion API."""
+        """Get list data from AnyMotion API.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"{endpoint}/")
         params["size"] = self._page_size
         data: List[dict] = []
         while url:
-            response = self._requests(requests.get, url, params=params)
-            sub_data, url = response.get(("data", "next"))
+            response = self.session.request(url, params=params, token=self.token)
+            sub_data, url = Response(response).get(("data", "next"))
             data += sub_data
         return data
 
@@ -85,8 +119,8 @@ class Client(object):
             movie_id. media_type is the string of "image" or "movie".
 
         Raises:
-            InvalidFileType: Exception raised in _get_media_type function.
-            RequestsError: Exception raised in _requests function.
+            FileTypeError: Invalid file types.
+            RequestsError: HTTP request fails.
         """
         if isinstance(path, str):
             path = Path(path)
@@ -95,17 +129,18 @@ class Client(object):
         content_md5 = self._create_md5(path)
 
         # Register movie or image
-        response = self._requests(
-            requests.post,
+        response = self.session.request(
             urljoin(self._api_url, f"{media_type}s/"),
+            method="POST",
             json={"origin_key": path.name, "content_md5": content_md5},
+            token=self.token,
         )
-        media_id, upload_url = response.get(("id", "uploadUrl"))
+        media_id, upload_url = Response(response).get(("id", "uploadUrl"))
 
         # Upload to S3
-        self._requests(
-            requests.put,
+        self.session.request(
             upload_url,
+            method="PUT",
             data=path.open("rb"),
             headers={"Content-MD5": content_md5},
         )
@@ -117,6 +152,9 @@ class Client(object):
 
         Returns:
             keypoint_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
         """
         return self._extract_keypoint({"image_id": image_id})
 
@@ -125,39 +163,64 @@ class Client(object):
 
         Returns:
             keypoint_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
         """
         return self._extract_keypoint({"movie_id": movie_id})
 
     def draw_keypoint(
         self, keypoint_id: int, rule: Optional[Union[list, dict]] = None
     ) -> int:
-        """Start drawing for keypoint_id."""
+        """Start drawing for keypoint_id.
+
+        Returns:
+            drawing_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"drawings/")
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._requests(requests.post, url, json=json)
-        (drawing_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=json, token=self.token)
+        (drawing_id,) = Response(response).get("id")
         return drawing_id
 
     def analyze_keypoint(self, keypoint_id: int, rule: Union[list, dict]) -> int:
-        """Start analyze for keypoint_id."""
+        """Start analyze for keypoint_id.
+
+        Returns:
+            drawing_id.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"analyses/")
         json: Dict[str, Union[int, list, dict]] = {"keypoint_id": keypoint_id}
         if rule is not None:
             json["rule"] = rule
-        response = self._requests(requests.post, url, json=json)
-        (analysis_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=json, token=self.token)
+        (analysis_id,) = Response(response).get("id")
         return analysis_id
 
     def wait_for_extraction(self, keypoint_id: int) -> Response:
-        """Wait for extraction."""
+        """Wait for extraction.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"keypoints/{keypoint_id}/")
         response = self._wait_for_done(url)
         return response
 
     def wait_for_drawing(self, drawing_id: int) -> Tuple[str, Optional[str]]:
-        """Wait for drawing."""
+        """Wait for drawing.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"drawings/{drawing_id}/")
         response = self._wait_for_done(url)
         drawing_url = None
@@ -166,16 +229,24 @@ class Client(object):
         return response.status, drawing_url
 
     def wait_for_analysis(self, analysis_id: int) -> Response:
-        """Wait for analysis."""
+        """Wait for analysis.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
         url = urljoin(self._api_url, f"analyses/{analysis_id}/")
         response = self._wait_for_done(url)
         return response
 
     def download(self, url: str, path: Path) -> None:
-        """Download file from url."""
-        response = self._requests(requests.get, url, headers={})
+        """Download file from url.
+
+        Raises:
+            RequestsError: HTTP request fails.
+        """
+        response = self.session.request(url)
         with path.open("wb") as f:
-            f.write(response.raw.content)
+            f.write(response.content)
 
     def _create_md5(self, path: Path) -> str:
         with path.open("rb") as f:
@@ -185,94 +256,11 @@ class Client(object):
         return content_md5
 
     def _extract_keypoint(self, data: dict) -> int:
-        """Start keypoint extraction.
-
-        Raises:
-            RequestsError: Exception raised in _requests function.
-        """
+        """Start keypoint extraction."""
         url = urljoin(self._api_url, "keypoints/")
-        response = self._requests(requests.post, url, json=data)
-        (keypoint_id,) = response.get("id")
+        response = self.session.request(url, method="POST", json=data, token=self.token)
+        (keypoint_id,) = Response(response).get("id")
         return keypoint_id
-
-    def _requests(
-        self,
-        requests_func: Callable,
-        url: str,
-        params: Optional[dict] = None,
-        json: Optional[dict] = None,
-        data: Optional[object] = None,
-        headers: Optional[dict] = None,
-    ) -> Response:
-        """Send an HTTP requests to the AnyMotion API or Amazon S3 and receive a response.
-
-        Raises:
-            RequestsError
-        """
-        method = requests_func.__name__.upper()
-        is_json = json is not None
-
-        if headers is None:
-            headers = self._get_headers(with_content_type=is_json)
-
-        if self._verbose and self._echo_request:
-            # TODO: add params
-            self._echo_request(url, method, headers, json)
-
-        try:
-            if is_json:
-                response = requests_func(url, params=params, json=json, headers=headers)
-            else:
-                response = requests_func(url, params=params, data=data, headers=headers)
-        except requests.exceptions.ConnectionError:
-            message = f"{method} {url} is failed."
-            raise RequestsError(message)
-
-        if self._verbose and self._echo_response:
-            self._echo_response(
-                response.status_code,
-                response.reason,
-                response.raw.version,
-                response.headers,
-                response.json(),
-            )
-
-        if response.status_code not in [200, 201]:
-            message = dedent(
-                f"""\
-                    {method} {url} is failed.
-                    status code: {response.status_code}
-                    content: {response.content.decode()}
-                """
-            )
-            raise RequestsError(message)
-
-        return Response(response)
-
-    def _get_headers(self, with_content_type: bool = True) -> dict:
-        """Generate Authorization and Content-Type headers."""
-        headers = {"Authorization": f"Bearer {self.token}"}
-        if with_content_type:
-            headers["Content-Type"] = "application/json"
-        return headers
-
-    def _get_token(self) -> str:
-        """Get a token using client ID and secret."""
-        data = {
-            "grantType": "client_credentials",
-            "clientId": self._client_id,
-            "clientSecret": self._client_secret,
-        }
-        response = self._requests(
-            requests.post,
-            self._oauth_url,
-            json=data,
-            headers={"Content-Type": "application/json"},
-        )
-        (token,) = response.get("accessToken")
-
-        self._token = token
-        return token
 
     def _get_media_type(self, path: Path) -> str:
         if path.suffix.lower() in MOVIE_SUFFIXES:
@@ -285,29 +273,14 @@ class Client(object):
                 f"The extension of the file {path} must be"
                 f"{', '.join(suffix[:-1])} or {suffix[-1]}."
             )
-            raise InvalidFileType(message)
+            raise FileTypeError(message)
 
     def _wait_for_done(self, url: str) -> Response:
         for _ in range(self._max_steps):
-            response = self._requests(requests.get, url)
+            response = Response(self.session.request(url, token=self.token))
             if response.status in ["SUCCESS", "FAILURE"]:
                 break
             time.sleep(self._interval)
         else:
             response.status = "TIMEOUT"
         return response
-
-    def _set_url(self, api_url: str) -> None:
-        parts = urlparse(api_url)
-
-        api_path = parts.path
-        if "anymotion" not in api_path:
-            # TODO: use custom exception
-            raise Exception("Invalid API URL")
-        if api_path[-1] != "/":
-            api_path += "/"
-
-        self._api_url = urlunparse((parts.scheme, parts.netloc, api_path, "", "", ""))
-        self._oauth_url = urlunparse(
-            (parts.scheme, parts.netloc, "v1/oauth/accesstokens", "", "", "")
-        )

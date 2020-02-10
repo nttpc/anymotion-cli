@@ -5,9 +5,10 @@ import click
 from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_success
-from ..sdk.exceptions import RequestsError
+from ..output import echo, echo_error, echo_success
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client
 from .draw import draw, draw_options
@@ -60,22 +61,22 @@ def extract(
             keypoint_id = client.extract_keypoint_from_movie(movie_id)
         elif image_id is not None:
             keypoint_id = client.extract_keypoint_from_image(image_id)
-
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
+
         if state.use_spinner:
             with yaspin(text="Processing..."):
                 response = client.wait_for_extraction(keypoint_id)
         else:
             response = client.wait_for_extraction(keypoint_id)
     except RequestsError as e:
-        raise click.ClickException(str(e))
+        raise ClickException(str(e))
 
     if response.status == "SUCCESS":
         echo_success("Keypoint extraction is complete.")
     elif response.status == "TIMEOUT":
-        echo("Keypoint extraction is timed out.")
+        echo_error("Keypoint extraction is timed out.")
     else:
-        echo(f"Keypoint extraction failed: {response.failure_detail}")
+        echo_error(f"Keypoint extraction failed.\n{response.failure_detail}")
 
     if with_drawing:
         echo()

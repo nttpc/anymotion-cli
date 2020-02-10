@@ -25,7 +25,7 @@ class TestGetClient(object):
 
     def test_is_okがFalseの場合エラーが発生すること(self, mocker):
         settings_mock = mocker.MagicMock()
-        settings_mock.return_value.is_ok.return_value = False
+        settings_mock.return_value.is_ok = False
         mocker.patch("encore_api_cli.utils.Settings", settings_mock)
 
         state = State()

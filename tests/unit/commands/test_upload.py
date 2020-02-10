@@ -1,7 +1,7 @@
 from click.testing import CliRunner
 
 from encore_api_cli.commands.upload import cli
-from encore_api_cli.sdk.exceptions import InvalidFileType, RequestsError
+from encore_api_cli.sdk.exceptions import FileTypeError, RequestsError
 
 
 def test_upload(mocker, tmp_path):
@@ -16,12 +16,12 @@ def test_upload(mocker, tmp_path):
     assert result.exit_code == 0
 
 
-def test_upload_with_InvalidFileType(mocker, tmp_path):
+def test_upload_with_FileTypeError(mocker, tmp_path):
     message = (
         f"The extension of the file {tmp_path} must be .mp4, .mov, .jpg, .jpeg or .png."
     )
     client_mock = mocker.MagicMock()
-    client_mock.return_value.upload_to_s3.side_effect = InvalidFileType(message)
+    client_mock.return_value.upload_to_s3.side_effect = FileTypeError(message)
     mocker.patch("encore_api_cli.commands.upload.get_client", client_mock)
 
     runner = CliRunner()

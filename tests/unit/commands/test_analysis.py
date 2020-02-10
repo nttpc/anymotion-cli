@@ -18,7 +18,7 @@ class TestAnalysisShow(object):
         "response, expected",
         [
             ({"result": [], "execStatus": "SUCCESS"}, "\n[]\n\n"),
-            ({"execStatus": "FAILURE"}, "Status is not SUCCESS.\n"),
+            ({"execStatus": "FAILURE"}, "Error: Status is not SUCCESS.\n"),
         ],
     )
     def test_valid(self, mocker, response, expected):

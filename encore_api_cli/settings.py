@@ -15,6 +15,7 @@ class Settings(object):
     """Read and write settings.
 
     Attributes:
+        is_ok (bool): Whether credentials are valid value.
         client_id (Optional[str]): The value used for authentication.
         client_secret (Optional[str]): The value used for authentication.
         api_url (str): The AnyMotion API URL to request.
@@ -32,36 +33,15 @@ class Settings(object):
         config_file = settings_dir / "config"
         credentials_file = settings_dir / "credentials"
 
-        self._config = Profile(config_file, profile_name)
-        self._credentials = Profile(credentials_file, profile_name)
+        self._config = _Profile(config_file, profile_name)
+        self._credentials = _Profile(credentials_file, profile_name)
 
-        self._env = Environment(use_env)
+        self._env = _Environment(use_env)
 
+    @property
     def is_ok(self) -> bool:
         """Whether credentials are valid value."""
         return self.client_id is not None and self.client_secret is not None
-
-    def write_config(self, api_url: str) -> None:
-        """Update config file.
-
-        Update only when different from current value.
-        """
-        if api_url == self.api_url:
-            return
-        if api_url is None or "anymotion" not in api_url:
-            raise ValueError("api_url is invald.")
-
-        self._config.anymotion_api_url = api_url
-        self._config.save()
-
-    def write_credentials(self, client_id: str, client_secret: str) -> None:
-        """Update credentials file."""
-        if client_id is None or client_secret is None:
-            raise ValueError("client_id or client_secret is invald.")
-
-        self._credentials.anymotion_client_id = client_id
-        self._credentials.anymotion_client_secret = client_secret
-        self._credentials.save()
 
     @property
     def client_id(self) -> Optional[str]:
@@ -90,6 +70,9 @@ class Settings(object):
         """Return the interval time(sec).
 
         If not in config file, return the default value.
+
+        Raises:
+            SettingsValueError
         """
         interval = self._config.polling_interval or POLLING_INTERVAL
         interval = self._to_int_with_check(interval, "polling_interval", 1)
@@ -100,10 +83,42 @@ class Settings(object):
         """Return the timeout period(sec).
 
         If not in config file, return the default value.
+
+        Raises:
+            SettingsValueError
         """
         timeout = self._config.timeout or TIMEOUT
         timeout = self._to_int_with_check(timeout, "timeout", 1)
         return timeout
+
+    def write_config(self, api_url: str) -> None:
+        """Update config file.
+
+        Update only when different from current value.
+
+        Raises:
+            SettingsValueError
+        """
+        if api_url == self.api_url:
+            return
+        if api_url is None or "anymotion" not in api_url:
+            raise SettingsValueError("api_url is invald.")
+
+        self._config.anymotion_api_url = api_url
+        self._config.save()
+
+    def write_credentials(self, client_id: str, client_secret: str) -> None:
+        """Update credentials file.
+
+        Raises:
+            SettingsValueError
+        """
+        if client_id is None or client_secret is None:
+            raise SettingsValueError("client_id or client_secret is invald.")
+
+        self._credentials.anymotion_client_id = client_id
+        self._credentials.anymotion_client_secret = client_secret
+        self._credentials.save()
 
     def _to_int_with_check(
         self, value: Union[str, int], name: str, min_value: int
@@ -129,7 +144,7 @@ class Settings(object):
         return x
 
 
-class Profile(object):
+class _Profile(object):
     def __init__(self, file: Path, profile_name: str):
         self._file = file
         self._parser, self._section = self._read(file, profile_name)
@@ -162,7 +177,7 @@ class Profile(object):
         return parser, section
 
 
-class Environment(object):
+class _Environment(object):
     def __init__(self, use_env: bool):
         self._use_env = use_env
 

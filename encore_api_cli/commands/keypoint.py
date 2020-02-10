@@ -4,8 +4,10 @@ import click
 from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_json
+from ..output import echo_error, echo_json
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -28,10 +30,13 @@ def keypoint() -> None:
 def show(state: State, keypoint_id: int) -> None:
     """Show extracted keypoint data."""
     client = get_client(state)
-    response = client.get_one_data("keypoints", keypoint_id)
+
+    try:
+        response = client.get_one_data("keypoints", keypoint_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
     if not isinstance(response, dict):
-        # TODO: catch error
-        raise
+        raise Exception("response is invalid.")
 
     status = response.get("execStatus", "FAILURE")
     if status == "SUCCESS":
@@ -42,7 +47,7 @@ def show(state: State, keypoint_id: int) -> None:
         else:
             echo_json(data, pager=True)
     else:
-        echo("Status is not SUCCESS.")
+        echo_error("Status is not SUCCESS.")
 
 
 @keypoint.command()
@@ -63,12 +68,14 @@ def list(state: State, status: Optional[str]) -> None:
     if status:
         params = {"execStatus": status.upper()}
 
-    # TODO: catch error in get_list_data
-    if state.use_spinner:
-        with yaspin(text="Retrieving..."):
+    try:
+        if state.use_spinner:
+            with yaspin(text="Retrieving..."):
+                data = client.get_list_data("keypoints", params=params)
+        else:
             data = client.get_list_data("keypoints", params=params)
-    else:
-        data = client.get_list_data("keypoints", params=params)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if len(data) < state.pager_length:
         echo_json(data)
