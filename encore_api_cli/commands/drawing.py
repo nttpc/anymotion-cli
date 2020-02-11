@@ -17,13 +17,12 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group()
+@cli.group(short_help="Show the information of the drawn images or movies.")
 def drawing() -> None:
     """Show the information of the drawn images or movies."""
-    pass
 
 
-@drawing.command()
+@drawing.command(short_help="Show drawn files information.")
 @click.argument("drawing_id", type=int)
 @common_options
 @pass_state
@@ -39,7 +38,7 @@ def show(state: State, drawing_id: int) -> None:
     echo_json(data)
 
 
-@drawing.command()
+@drawing.command(short_help="Show a list of information for all drawn files.")
 @click.option(
     "--status",
     type=click.Choice(

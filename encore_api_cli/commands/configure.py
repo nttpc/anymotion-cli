@@ -17,7 +17,9 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group(invoke_without_command=True)
+@cli.group(
+    invoke_without_command=True, short_help="Configure your AnyMotion Credentials."
+)
 @common_options
 @pass_state
 @click.pass_context
@@ -50,7 +52,7 @@ def configure(ctx: click.Context, state: State) -> None:
             raise ClickException(str(e))
 
 
-@configure.command()
+@configure.command(short_help="Show the configuration you use.")
 @common_options
 @pass_state
 def list(state: State) -> None:
@@ -79,7 +81,7 @@ def list(state: State) -> None:
         echo_warning("client_id and/or client_secret not set.")
 
 
-@configure.command()
+@configure.command(short_help="Clear the configuration.")
 @common_options
 @pass_state
 def clear(state: State) -> None:

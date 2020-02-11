@@ -19,7 +19,7 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Analyze the extracted keypoint data.")
 @click.argument("keypoint_id", type=int)
 @click.option("--rule", "rule_str", help="Analysis rules in JSON format.")
 @click.option(

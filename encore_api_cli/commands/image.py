@@ -15,13 +15,12 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group()
+@cli.group(short_help="Show the information of the uploaded images.")
 def image() -> None:
     """Show the information of the uploaded images."""
-    pass
 
 
-@image.command()
+@image.command(short_help="Show image information.")
 @click.argument("image_id", type=int)
 @common_options
 @pass_state
@@ -37,7 +36,7 @@ def show(state: State, image_id: int) -> None:
     echo_json(data)
 
 
-@image.command()
+@image.command(short_help="Show a list of information for all images.")
 @common_options
 @pass_state
 def list(state: State) -> None:
