@@ -42,6 +42,7 @@ def get_client(state: State) -> Client:
     return client
 
 
+# TODO: remove?
 def get_settings(profile: str, use_env: bool = True) -> Settings:
     """Get settings from profile."""
     try:

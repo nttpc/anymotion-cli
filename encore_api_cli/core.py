@@ -1,6 +1,10 @@
+import os
+from pathlib import Path
+
 import click
 from click_help_colors import HelpColorsMixin
 from click_repl import repl
+from prompt_toolkit.history import FileHistory
 
 from . import __version__
 from .commands.analysis import cli as analysis
@@ -57,18 +61,7 @@ def cli(ctx: click.Context, state: State, interactive: bool) -> None:
 
     if ctx.invoked_subcommand is None:
         if interactive:
-            click.echo(f"Start interactive mode.")
-            click.echo(
-                "You can use the internal {help} command to explain usage.".format(
-                    help=click.style(":help", fg="cyan")
-                )
-            )
-            click.echo()
-            repl(
-                click.get_current_context(),
-                prompt_kwargs={"message": f"{state.cli_name}> "},
-                # prompt_kwargs={"message": f"{state.cli_name}:{state.profile}> "},
-            )
+            _run_interactive_mode(state)
         else:
             click.echo(cli.get_help(ctx))
 
@@ -82,3 +75,38 @@ def cli(ctx: click.Context, state: State, interactive: bool) -> None:
     #         err=True,
     #     )
     #     click.echo()
+
+
+def _run_interactive_mode(state):
+    click.echo(f"Start interactive mode.")
+    click.echo(
+        "You can use the internal {help} command to explain usage.".format(
+            help=click.style(":help", fg="cyan")
+        )
+    )
+    click.echo()
+
+    # TODO: move utils.py
+    app_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
+    app_dir.mkdir(exist_ok=True)
+
+    message = f"{state.cli_name}> "
+
+    # from prompt_toolkit.styles import Style
+
+    # style = Style.from_dict({"profile": "gray"})
+    # message = [
+    #     ("class:cli_name", state.cli_name),
+    #     ("class:separator", " "),
+    #     ("class:profile", state.profile),
+    #     ("class:pound", "> "),
+    # ]
+
+    repl(
+        click.get_current_context(),
+        prompt_kwargs={
+            "message": message,
+            # "style": style,
+            "history": FileHistory(app_dir / ".repl-history"),
+        },
+    )

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.9.0
+
+Unreleased
+
+- Added `--interactive` option (You can use interactive mode).
+
 ## 0.8.0
 
 Unreleased
