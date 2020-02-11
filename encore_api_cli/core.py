@@ -5,6 +5,7 @@ import click
 from click_help_colors import HelpColorsMixin
 from click_repl import repl
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.styles import Style
 
 from . import __version__
 from .commands.analysis import cli as analysis
@@ -18,8 +19,7 @@ from .commands.image import cli as image
 from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
-
-# from .options import profile_option
+from .options import profile_option
 from .state import State, pass_state
 
 
@@ -47,9 +47,10 @@ class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
     ],  # type: ignore
     help_options_color="cyan",
     invoke_without_command=True,
+    short_help="Command Line Interface for AnyMotion API.",
 )
 @click.option("--interactive", is_flag=True, help="Start interactive mode.")
-# @profile_option
+@profile_option
 @click.version_option(
     version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
 )
@@ -86,27 +87,23 @@ def _run_interactive_mode(state):
     )
     click.echo()
 
+    style = Style.from_dict({"profile": "gray"})
+    message = [
+        ("class:cli_name", state.cli_name),
+        ("class:separator", " "),
+        ("class:profile", state.profile),
+        ("class:pound", "> "),
+    ]
+
     # TODO: move utils.py
     app_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
     app_dir.mkdir(exist_ok=True)
-
-    message = f"{state.cli_name}> "
-
-    # from prompt_toolkit.styles import Style
-
-    # style = Style.from_dict({"profile": "gray"})
-    # message = [
-    #     ("class:cli_name", state.cli_name),
-    #     ("class:separator", " "),
-    #     ("class:profile", state.profile),
-    #     ("class:pound", "> "),
-    # ]
 
     repl(
         click.get_current_context(),
         prompt_kwargs={
             "message": message,
-            # "style": style,
+            "style": style,
             "history": FileHistory(app_dir / ".repl-history"),
         },
     )
