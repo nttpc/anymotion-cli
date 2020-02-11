@@ -1,5 +1,6 @@
 import click
 from click_help_colors import HelpColorsMixin
+from click_repl import repl
 
 from . import __version__
 from .commands.analysis import cli as analysis
@@ -13,6 +14,8 @@ from .commands.image import cli as image
 from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
+
+# from .options import profile_option
 from .state import State, pass_state
 
 
@@ -23,7 +26,7 @@ class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
         super(ColorsCommandCollection, self).__init__(*args, **kwargs)
 
 
-@click.command(
+@click.group(
     cls=ColorsCommandCollection,
     sources=[
         analysis,
@@ -39,15 +42,35 @@ class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
         upload,
     ],  # type: ignore
     help_options_color="cyan",
+    invoke_without_command=True,
 )
+@click.option("--interactive", is_flag=True, help="Start interactive mode.")
+# @profile_option
 @click.version_option(
     version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
 )
 @pass_state
 @click.pass_context
-def cli(ctx: click.Context, state: State) -> None:
+def cli(ctx: click.Context, state: State, interactive: bool) -> None:
     """Command Line Interface for AnyMotion API."""
     state.cli_name = str(ctx.find_root().info_name)
+
+    if ctx.invoked_subcommand is None:
+        if interactive:
+            click.echo(f"Start interactive mode.")
+            click.echo(
+                "You can use the internal {help} command to explain usage.".format(
+                    help=click.style(":help", fg="cyan")
+                )
+            )
+            click.echo()
+            repl(
+                click.get_current_context(),
+                prompt_kwargs={"message": f"{state.cli_name}> "},
+                # prompt_kwargs={"message": f"{state.cli_name}:{state.profile}> "},
+            )
+        else:
+            click.echo(cli.get_help(ctx))
 
     # TODO: future warning
     # if state.cli_name != "amcli":

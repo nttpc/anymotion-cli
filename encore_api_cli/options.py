@@ -8,7 +8,7 @@ from .state import State
 def verbose_option(f: Callable) -> Callable:
     """Set verbose option."""
 
-    def callback(ctx: click.core.Context, param: Any, value: bool) -> bool:
+    def callback(ctx: click.Context, param: Any, value: bool) -> bool:
         state = ctx.ensure_object(State)
         state.verbose = value
         return value
@@ -26,7 +26,7 @@ def verbose_option(f: Callable) -> Callable:
 def profile_option(f: Callable) -> Callable:
     """Set profile option."""
 
-    def callback(ctx: click.core.Context, param: Any, value: str) -> str:
+    def callback(ctx: click.Context, param: Any, value: str) -> str:
         state = ctx.ensure_object(State)
         state.profile = value
         return value
@@ -35,7 +35,7 @@ def profile_option(f: Callable) -> Callable:
         "--profile",
         default="default",
         expose_value=False,
-        help="Use a specific profile from your credential file.",
+        help="Use a specific profile from your config file.",
         callback=callback,
     )(f)
 

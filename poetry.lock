@@ -100,6 +100,19 @@ version = "0.6"
 click = ">=7.0"
 
 [[package]]
+category = "main"
+description = "REPL plugin for Click"
+name = "click-repl"
+optional = false
+python-versions = "*"
+version = "0.1.6"
+
+[package.dependencies]
+click = "*"
+prompt-toolkit = "*"
+six = "*"
+
+[[package]]
 category = "dev"
 description = "Cross-platform colored terminal text."
 marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
@@ -311,6 +324,17 @@ version = ">=0.12"
 dev = ["pre-commit", "tox"]
 
 [[package]]
+category = "main"
+description = "Library for building powerful interactive command lines in Python"
+name = "prompt-toolkit"
+optional = false
+python-versions = ">=3.6"
+version = "3.0.3"
+
+[package.dependencies]
+wcwidth = "*"
+
+[[package]]
 category = "dev"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
@@ -467,7 +491,7 @@ fixture = ["fixtures"]
 test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.18)", "testtools"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -589,7 +613,7 @@ docs = ["sphinx (>=1.8.0,<2)", "towncrier (>=18.5.0)", "sphinx-rtd-theme (>=0.4.
 testing = ["pytest (>=4.0.0,<5)", "coverage (>=4.5.0,<5)", "pytest-timeout (>=1.3.0,<2)", "six (>=1.10.0,<2)", "pytest-xdist", "pytest-localserver", "pypiserver", "mock", "xonsh"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Measures number of Terminal column cells of wide-character codes"
 name = "wcwidth"
 optional = false
@@ -618,7 +642,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools"]
 
 [metadata]
-content-hash = "6acb56e788bc2c757c334d7ccf95f0ed3795f4a53c5ef4ec8f2d2860f8704248"
+content-hash = "44965e1557202a95b8551f1b87d2347c80c69823696454bafd07d10bcd10733c"
 python-versions = "^3.6 || ^3.7 || ^3.8"
 
 [metadata.files]
@@ -657,6 +681,10 @@ click = [
 click-help-colors = [
     {file = "click-help-colors-0.6.tar.gz", hash = "sha256:258d5f4d79e54af8d017c07313456db22e636c964dd0808a2fb0aefc654ee30c"},
     {file = "click_help_colors-0.6-py3-none-any.whl", hash = "sha256:979b3837da6c6cfccd59f4f20e28ff06c6fc4c240c7d2660b3a2c2b337ae5dcb"},
+]
+click-repl = [
+    {file = "click-repl-0.1.6.tar.gz", hash = "sha256:b9f29d52abc4d6059f8e276132a111ab8d94980afe6a5432b9d996544afa95d5"},
+    {file = "click_repl-0.1.6-py3-none-any.whl", hash = "sha256:9c4c3d022789cae912aad8a3f5e1d7c2cdd016ee1225b5212ad3e8691563cda5"},
 ]
 colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
@@ -774,6 +802,10 @@ pbr = [
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
+]
+prompt-toolkit = [
+    {file = "prompt_toolkit-3.0.3-py3-none-any.whl", hash = "sha256:c93e53af97f630f12f5f62a3274e79527936ed466f038953dfa379d4941f651a"},
+    {file = "prompt_toolkit-3.0.3.tar.gz", hash = "sha256:a402e9bf468b63314e37460b68ba68243d55b2f8c4d0192f85a019af3945050e"},
 ]
 py = [
     {file = "py-1.8.1-py2.py3-none-any.whl", hash = "sha256:c20fdd83a5dbc0af9efd622bee9a5564e278f6380fffcacc43ba6f43db2813b0"},
