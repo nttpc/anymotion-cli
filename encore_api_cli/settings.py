@@ -63,6 +63,10 @@ class Settings(object):
 
         If not in config file, return the default value.
         """
+        # TODO: use env
+        # value_from_env = self._env.anymotion_api_url
+        # value_from_file = self._config.anymotion_api_url
+        # return value_from_env or value_from_file or API_URL
         return self._config.anymotion_api_url or API_URL
 
     @property
