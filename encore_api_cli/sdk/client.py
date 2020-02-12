@@ -37,8 +37,8 @@ class Client(object):
         client_id: str = os.getenv("ANYMOTION_CLIENT_ID", ""),
         client_secret: str = os.getenv("ANYMOTION_CLIENT_SECRET", ""),
         api_url: str = "https://api.customer.jp/anymotion/v1/",
-        interval: int = 5,
-        timeout: int = 600,
+        interval: float = 5.0,
+        timeout: float = 600.0,
     ):
         """Initialize the client.
 
@@ -66,8 +66,8 @@ class Client(object):
         self._api_url = urljoin(self._base_url, api_path)
         self._token: Optional[str] = None
 
-        self._interval = max(1, interval)
-        self._max_steps = max(1, timeout // self._interval)
+        self._interval = max(0.1, interval)
+        self._max_steps = int(max(1, timeout / self._interval))
 
         self._page_size = 1000
 

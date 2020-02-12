@@ -43,6 +43,10 @@ jobs:
       version:
         type: string
         default: "3.8"
+      test-type:
+        type: enum
+        enum: ["unit", "integration"]
+        default: unit
     executor:
       name: python
       version: << parameters.version >>
@@ -51,10 +55,11 @@ jobs:
       - setup_python:
           version: << parameters.version >>
       - run:
-          name: Run unit test with pytest
+          name: Run << parameters.test-type >> test with pytest
           command: |
             mkdir test-reports
-            poetry run pytest -v --junitxml=test-reports/junit.xml
+            poetry run pytest tests/<< parameters.test-type >> \
+              -v --junitxml=test-reports/junit.xml
       - store_test_results:
           path: test-reports
 
@@ -66,7 +71,7 @@ jobs:
       - setup_python
       - run:
           name: Run unit test with pytest
-          command: poetry run pytest --cov --cov-report=xml
+          command: poetry run pytest tests/unit --cov --cov-report=xml
       - codecov/upload:
           flags: unittest
 
@@ -123,42 +128,50 @@ workflows:
       - setup-py38:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
       - test:
           name: test-py36
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           version: "3.6"
       - test:
           name: test-py37
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           version: "3.7"
       - test:
-          name: test-py38
+          name: py38-unit-test
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
+      - test:
+          name: py38-integration-test
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - setup-py38
+          test-type: integration
       - measure-coverage:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
-            - test-py38
+            - py38-unit-test
       - check-syntax:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
       - check-security:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
       - approval-release:
@@ -171,6 +184,7 @@ workflows:
           requires:
             - test-py36
             - test-py37
+            - py38-integration-test
             - measure-coverage
             - check-syntax
             - check-security

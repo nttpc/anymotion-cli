@@ -1,0 +1,517 @@
+# Orb 'codecov/codecov@1.0.5' resolved to 'codecov/codecov@1.0.5'
+# Orb 'circleci/aws-cli@0.1.19' resolved to 'circleci/aws-cli@0.1.19'
+version: 2
+jobs:
+  release:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - run:
+        name: Install AWS CLI
+        command: |
+          if which aws > /dev/null; then
+            echo "The AWS CLI is already installed. Skipping."
+            exit 0
+          fi
+
+          export PIP=$(which pip pip3 | head -1)
+          if [[ -n $PIP ]]; then
+            if which sudo > /dev/null; then
+              sudo $PIP install awscli --upgrade
+            else
+              # This installs the AWS CLI to ~/.local/bin. Make sure that ~/.local/bin is in your $PATH.
+              $PIP install awscli --upgrade --user
+            fi
+          elif [[ $(which unzip curl | wc -l) -eq 2 ]]; then
+            cd
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            if which sudo > /dev/null; then
+              sudo ~/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+            else
+              # This installs the AWS CLI to the default location (~/.local/lib/aws) and create a symbolic link (symlink) at ~/bin/aws. Make sure that ~/bin is in your $PATH.
+              awscli-bundle/install -b ~/bin/aws
+            fi
+            rm -rf awscli-bundle*
+            cd -
+          else
+            echo "Unable to install AWS CLI. Please install pip."
+            exit 1
+          fi
+    - run:
+        name: Configure AWS Access Key ID
+        command: |
+          aws configure set aws_access_key_id \
+          $AWS_ACCESS_KEY_ID \
+          --profile default
+    - run:
+        name: Configure AWS Secret Access Key
+        command: |
+          aws configure set aws_secret_access_key \
+          $AWS_SECRET_ACCESS_KEY \
+          --profile default
+    - run:
+        name: Configure AWS default region
+        command: |
+          aws configure set region $AWS_DEFAULT_REGION \
+          --profile default
+    - run:
+        name: Build
+        command: poetry build
+    - run:
+        name: Upload build file to S3
+        command: |
+          aws s3 sync dist s3://encore-api-cli
+          aws s3 cp README.md s3://encore-api-cli
+          aws s3 cp CHANGELOG.md s3://encore-api-cli
+    - run:
+        name: Notify slack
+        command: |
+          sed -e "s/<version>/${CIRCLE_TAG}/" .circleci/slack-message.json > message.json
+          curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
+  setup-py38:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+  test-py37:
+    docker:
+    - image: circleci/python:3.7
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.7-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.7-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Run unit test with pytest
+        command: |
+          mkdir test-reports
+          poetry run pytest tests/unit\
+            -v --junitxml=test-reports/junit.xml
+    - store_test_results:
+        path: test-reports
+  py38-integration-test:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Run integration test with pytest
+        command: |
+          mkdir test-reports
+          poetry run pytest tests/integration\
+            -v --junitxml=test-reports/junit.xml
+    - store_test_results:
+        path: test-reports
+  py38-unit-test:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Run unit test with pytest
+        command: |
+          mkdir test-reports
+          poetry run pytest tests/unit\
+            -v --junitxml=test-reports/junit.xml
+    - store_test_results:
+        path: test-reports
+  test-py36:
+    docker:
+    - image: circleci/python:3.6
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.6-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.6-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Run unit test with pytest
+        command: |
+          mkdir test-reports
+          poetry run pytest tests/unit\
+            -v --junitxml=test-reports/junit.xml
+    - store_test_results:
+        path: test-reports
+  check-syntax:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Lint with flake8
+        command: poetry run flake8
+    - run:
+        name: Lint with black
+        command: poetry run black . --check
+    - run:
+        name: Lint with mypy
+        command: poetry run mypy
+  measure-coverage:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Run test with pytest
+        command: poetry run pytest tests/unit --cov --cov-report=xml
+    - run:
+        name: Upload Coverage Results
+        command: |
+          curl -s https://codecov.io/bash | bash -s -- \
+            -t "${CODECOV_TOKEN}" \
+            -n "${CIRCLE_BUILD_NUM}" \
+            -y ".codecov.yml" \
+            -F "unittest" \
+            -Z || echo 'Codecov upload failed'
+        when: always
+  check-security:
+    docker:
+    - image: circleci/python:3.8
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - deps-3.8-{{ checksum "poetry.lock" }}
+    - run:
+        name: Install python packages
+        command: poetry install
+    - save_cache:
+        key: deps-3.8-{{ checksum "poetry.lock" }}
+        paths:
+        - /home/circleci/.cache/pypoetry/virtualenvs
+    - run:
+        name: Check security with bandit
+        command: poetry run bandit -r encore_api_cli -s B303
+workflows:
+  workflow:
+    jobs:
+    - setup-py38:
+        filters:
+          tags:
+            only: /.*/
+    - test-py36:
+        filters:
+          tags:
+            only: /.*/
+    - test-py37:
+        filters:
+          tags:
+            only: /.*/
+    - py38-unit-test:
+        filters:
+          tags:
+            only: /.*/
+        requires:
+        - setup-py38
+    - py38-integration-test:
+        filters:
+          tags:
+            only: /.*/
+        requires:
+        - setup-py38
+    - measure-coverage:
+        filters:
+          tags:
+            only: /.*/
+        requires:
+        - py38-unit-test
+    - check-syntax:
+        filters:
+          tags:
+            only: /.*/
+        requires:
+        - setup-py38
+    - check-security:
+        filters:
+          tags:
+            only: /.*/
+        requires:
+        - setup-py38
+    - approval-release:
+        filters:
+          tags:
+            only: /^\d.*/
+          branches:
+            ignore: /.*/
+        type: approval
+        requires:
+        - test-py36
+        - test-py37
+        - py38-integration-test
+        - measure-coverage
+        - check-syntax
+        - check-security
+    - release:
+        filters:
+          tags:
+            only: /^\d.*/
+          branches:
+            ignore: /.*/
+        requires:
+        - approval-release
+  version: 2
+
+# Original config.yml file:
+# version: 2.1
+# orbs:
+#   codecov: codecov/codecov@1.0.5
+#   aws-cli: circleci/aws-cli@0.1.19
+# 
+# executors:
+#   python:
+#     parameters:
+#       version:
+#         type: string
+#         default: \"3.8\"
+#     docker:
+#       - image: circleci/python:<< parameters.version >>
+# 
+# commands:
+#   setup_python:
+#     parameters:
+#       version:
+#         type: string
+#         default: \"3.8\"
+#     steps:
+#       - restore_cache:
+#           keys:
+#             - deps-<< parameters.version >>-{{ checksum \"poetry.lock\" }}
+#       - run:
+#           name: Install python packages
+#           command: poetry install
+#       - save_cache:
+#           key: deps-<< parameters.version >>-{{ checksum \"poetry.lock\" }}
+#           paths:
+#             - /home/circleci/.cache/pypoetry/virtualenvs
+# 
+# jobs:
+#   setup-py38:
+#     executor:
+#       name: python
+#     steps:
+#       - checkout
+#       - setup_python
+# 
+#   test:
+#     parameters:
+#       version:
+#         type: string
+#         default: \"3.8\"
+#       test-type:
+#         type: enum
+#         enum: [\"unit\", \"integration\"]
+#         default: unit
+#     executor:
+#       name: python
+#       version: << parameters.version >>
+#     steps:
+#       - checkout
+#       - setup_python:
+#           version: << parameters.version >>
+#       - run:
+#           name: Run << parameters.test-type >> test with pytest
+#           command: |
+#             mkdir test-reports
+#             poetry run pytest tests/<< parameters.test-type >>\\
+#               -v --junitxml=test-reports/junit.xml
+#       - store_test_results:
+#           path: test-reports
+# 
+#   measure-coverage:
+#     executor:
+#       name: python
+#     steps:
+#       - checkout
+#       - setup_python
+#       - run:
+#           name: Run test with pytest
+#           command: poetry run pytest tests/unit --cov --cov-report=xml
+#       - codecov/upload:
+#           flags: unittest
+# 
+#   check-syntax:
+#     executor:
+#       name: python
+#     steps:
+#       - checkout
+#       - setup_python
+#       - run:
+#           name: Lint with flake8
+#           command: poetry run flake8
+#       - run:
+#           name: Lint with black
+#           command: poetry run black . --check
+#       - run:
+#           name: Lint with mypy
+#           command: poetry run mypy
+# 
+#   check-security:
+#     executor:
+#       name: python
+#     steps:
+#       - checkout
+#       - setup_python
+#       - run:
+#           name: Check security with bandit
+#           command: poetry run bandit -r encore_api_cli -s B303
+# 
+#   release:
+#     executor:
+#       name: python
+#     steps:
+#       - checkout
+#       - aws-cli/setup
+#       - run:
+#           name: Build
+#           command: poetry build
+#       - run:
+#           name: Upload build file to S3
+#           command: |
+#             aws s3 sync dist s3://encore-api-cli
+#             aws s3 cp README.md s3://encore-api-cli
+#             aws s3 cp CHANGELOG.md s3://encore-api-cli
+#       - run:
+#           name: Notify slack
+#           command: |
+#             sed -e \"s/<version>/${CIRCLE_TAG}/\" .circleci/slack-message.json > message.json
+#             curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
+# 
+# workflows:
+#   workflow:
+#     jobs:
+#       - setup-py38:
+#           filters:
+#             tags:
+#               only: /.*/
+#       - test:
+#           name: test-py36
+#           filters:
+#             tags:
+#               only: /.*/
+#           version: \"3.6\"
+#       - test:
+#           name: test-py37
+#           filters:
+#             tags:
+#               only: /.*/
+#           version: \"3.7\"
+#       - test:
+#           name: py38-unit-test
+#           filters:
+#             tags:
+#               only: /.*/
+#           requires:
+#             - setup-py38
+#       - test:
+#           name: py38-integration-test
+#           filters:
+#             tags:
+#               only: /.*/
+#           requires:
+#             - setup-py38
+#           test-type: integration
+#       - measure-coverage:
+#           filters:
+#             tags:
+#               only: /.*/
+#           requires:
+#             - py38-unit-test
+#       - check-syntax:
+#           filters:
+#             tags:
+#               only: /.*/
+#           requires:
+#             - setup-py38
+#       - check-security:
+#           filters:
+#             tags:
+#               only: /.*/
+#           requires:
+#             - setup-py38
+#       - approval-release:
+#           type: approval
+#           filters:
+#             tags:
+#               only: /^\\d.*/
+#             branches:
+#               ignore: /.*/
+#           requires:
+#             - test-py36
+#             - test-py37
+#             - py38-integration-test
+#             - measure-coverage
+#             - check-syntax
+#             - check-security
+#       - release:
+#           filters:
+#             tags:
+#               only: /^\\d.*/
+#             branches:
+#               ignore: /.*/
+#           requires:
+#             - approval-release
