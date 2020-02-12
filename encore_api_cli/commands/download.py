@@ -25,7 +25,7 @@ def cli() -> None:  # noqa: D103
     "-o",
     "--out-dir",
     default=".",
-    type=click.Path(exists=True),
+    type=click.Path(exists=True, file_okay=False),
     show_default=True,
     help="Path of directory to output drawn file.",
 )
