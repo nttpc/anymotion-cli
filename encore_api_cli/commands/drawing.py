@@ -55,7 +55,7 @@ def list(state: State, status: Optional[str]) -> None:
 
     params = {}
     if status:
-        params = {"execStatus": status.upper()}
+        params = {"execStatus": status}
 
     try:
         if state.use_spinner:

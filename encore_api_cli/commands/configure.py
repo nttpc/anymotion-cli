@@ -80,10 +80,51 @@ def list(state: State) -> None:
 
 
 @configure.command()
+@click.argument(
+    "key", type=click.Choice(["client_id", "client_secret"], case_sensitive=False)
+)
+@common_options
+@pass_state
+def get(state: State, key: str) -> None:
+    """Get a configuration value from the file."""
+    settings = get_settings(state.profile, use_env=False)
+
+    if key == "client_id":
+        echo(settings.client_id)
+    elif key == "client_secret":
+        echo(settings.client_secret)
+
+
+@configure.command()
+@click.argument(
+    "key", type=click.Choice(["client_id", "client_secret"], case_sensitive=False)
+)
+@click.argument("value")
+@common_options
+@pass_state
+def set(state: State, key: str, value: str) -> None:
+    """Set a configuration value in the file."""
+    settings = get_settings(state.profile, use_env=False)
+
+    def to_str(value: Optional[str]) -> str:
+        if value is None:
+            return ""
+        else:
+            return value
+
+    if key == "client_id":
+        client_secret = to_str(settings.client_secret)
+        settings.write_credentials(value, client_secret)
+    elif key == "client_secret":
+        client_id = to_str(settings.client_id)
+        settings.write_credentials(client_id, value)
+
+
+@configure.command()
 @common_options
 @pass_state
 def clear(state: State) -> None:
-    """Clear the configuration."""
+    """Clear a configuration value from the file."""
     settings = get_settings(state.profile)
     settings.write_config(API_URL)
     settings.write_credentials("", "")

@@ -7,6 +7,25 @@ from encore_api_cli.commands.configure import cli
 from encore_api_cli.exceptions import SettingsValueError
 
 
+@pytest.fixture()
+def make_configure_file(mocker, tmp_path):
+    def _make_configure_file(config_content="", credentials_content=""):
+        mocker.patch("pathlib.Path.home", mocker.MagicMock(return_value=tmp_path))
+
+        settings_dir = tmp_path / ".anymotion"
+        settings_dir.mkdir(exist_ok=True)
+
+        config_file = settings_dir / "config"
+        config_file.write_text(config_content)
+
+        credentials_file = settings_dir / "credentials"
+        credentials_file.write_text(credentials_content)
+
+        return config_file, credentials_file
+
+    return _make_configure_file
+
+
 class TestConfigure(object):
     @pytest.mark.parametrize(
         "defaults, inputs, expected",
@@ -135,34 +154,195 @@ def test_configure_list(mocker, runner, client_id, expected_client_id):
     assert expected in result.output
 
 
-def test_configure_clear(mocker, tmpdir, runner):
-    tmpdir = Path(tmpdir)
-    mocker.patch("pathlib.Path.home", mocker.MagicMock(return_value=tmpdir))
+class TestConfigureGet(object):
+    @pytest.mark.parametrize(
+        "args, expected, exists",
+        [
+            (["configure", "get", "client_id"], "client_id\n", True),
+            (["configure", "get", "client_secret"], "client_secret\n", True),
+            (["configure", "get", "CLIENT_ID"], "client_id\n", True),
+            (["configure", "get", "CLIENT_SECRET"], "client_secret\n", True),
+            (["configure", "get", "client_id"], "\n", False),
+            (["configure", "get", "client_secret"], "\n", False),
+        ],
+    )
+    def test_valid(self, runner, make_configure_file, args, expected, exists):
+        if exists:
+            content = dedent(
+                """\
+                [default]
+                anymotion_client_id = client_id
+                anymotion_client_secret = client_secret
+                """
+            )
+        else:
+            content = ""
+        make_configure_file(credentials_content=content)
 
-    settings_dir = tmpdir / ".anymotion"
-    settings_dir.mkdir(exist_ok=True)
+        result = runner.invoke(cli, args)
 
-    config_file = settings_dir / "config"
-    config_file.write_text(
-        dedent(
-            """\
+        assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (
+                ["configure", "get"],
+                (
+                    'Error: Missing argument "[client_id|client_secret]".  '
+                    "Choose from:\n\tclient_id,\n\tclient_secret.\n"
+                ),
+            ),
+            (
+                ["configure", "get", "invalid_value"],
+                (
+                    'Error: Invalid value for "[client_id|client_secret]": '
+                    "invalid choice: invalid_value. "
+                    "(choose from client_id, client_secret)\n"
+                ),
+            ),
+        ],
+    )
+    def test_invalid_params(self, runner, args, expected):
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 2
+        assert result.output.endswith(expected)
+
+
+class TestConfigureSet(object):
+    @pytest.mark.parametrize(
+        "args, expected, content",
+        [
+            (["configure", "set", "client_id", "client_id"], ("client_id", ""), ""),
+            (
+                ["configure", "set", "client_secret", "client_secret"],
+                ("", "client_secret"),
+                "",
+            ),
+            (["configure", "set", "CLIENT_ID", "client_id"], ("client_id", ""), ""),
+            (
+                ["configure", "set", "CLIENT_SECRET", "client_secret"],
+                ("", "client_secret"),
+                "",
+            ),
+            (
+                ["configure", "set", "client_id", "client_id2"],
+                ("client_id2", "client_secret"),
+                dedent(
+                    """\
+                    [default]
+                    anymotion_client_id = client_id
+                    anymotion_client_secret = client_secret
+
+                    """
+                ),
+            ),
+        ],
+    )
+    def test_valid(self, runner, make_configure_file, args, expected, content):
+        _, credentials_file = make_configure_file(credentials_content=content)
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0
+        assert result.output == ""
+        assert credentials_file.read_text() == dedent(
+            f"""\
             [default]
-            anymotion_api_url = https://api.example.jp/anymotion/v1/
+            anymotion_client_id = {expected[0]}
+            anymotion_client_secret = {expected[1]}
 
             """
         )
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (
+                ["configure", "set"],
+                (
+                    'Error: Missing argument "[client_id|client_secret]".  '
+                    "Choose from:\n\tclient_id,\n\tclient_secret.\n"
+                ),
+            ),
+            (
+                ["configure", "set", "invalid_key"],
+                (
+                    'Error: Invalid value for "[client_id|client_secret]": '
+                    "invalid choice: invalid_key. "
+                    "(choose from client_id, client_secret)\n"
+                ),
+            ),
+            (["configure", "set", "client_id"], 'Error: Missing argument "VALUE".\n'),
+            (
+                ["configure", "set", "client_secret"],
+                'Error: Missing argument "VALUE".\n',
+            ),
+        ],
     )
+    def test_invalid_params(self, runner, args, expected):
+        result = runner.invoke(cli, args)
 
-    result = runner.invoke(cli, ["configure", "clear"])
+        assert result.exit_code == 2
+        assert result.output.endswith(expected)
 
-    assert result.exit_code == 0
-    assert result.output == ""
 
-    config = config_file.read_text()
-    assert config == dedent(
-        """\
-        [default]
-        anymotion_api_url = https://api.customer.jp/anymotion/v1/
+class TestConfigureClear(object):
+    @pytest.mark.parametrize(
+        "content",
+        [
+            dedent(
+                """\
+                [default]
+                anymotion_api_url = https://api.example.jp/anymotion/v1/
 
-        """
+                """
+            ),
+        ],
     )
+    def test_clear_config(self, runner, make_configure_file, content):
+        config_file, _ = make_configure_file(config_content=content)
+
+        result = runner.invoke(cli, ["configure", "clear"])
+
+        assert result.exit_code == 0
+        assert result.output == ""
+        assert config_file.read_text() == dedent(
+            """\
+            [default]
+            anymotion_api_url = https://api.customer.jp/anymotion/v1/
+
+            """
+        )
+
+    @pytest.mark.parametrize(
+        "content",
+        [
+            dedent(
+                """\
+                [default]
+                anymotion_client_id = client_id
+                anymotion_client_secret = client_secret
+
+                """
+            ),
+        ],
+    )
+    def test_clear_credentials(self, runner, make_configure_file, content):
+        _, credentials_file = make_configure_file(credentials_content=content)
+
+        result = runner.invoke(cli, ["configure", "clear"])
+
+        assert result.exit_code == 0
+        assert result.output == ""
+        none = ""
+        assert credentials_file.read_text() == dedent(
+            f"""\
+            [default]
+            anymotion_client_id = {none}
+            anymotion_client_secret = {none}
+
+            """
+        )
