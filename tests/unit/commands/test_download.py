@@ -12,21 +12,21 @@ class TestDownload(object):
     @pytest.mark.parametrize(
         "args, status, expected",
         [
-            (["download", "111"], "SUCCESS", "Downloaded the file to image.jpg.\n",),
+            (["download", "111"], "SUCCESS", "Downloaded the file to {path}.\n",),
             (
                 ["download", "111", "-o", "."],
                 "SUCCESS",
-                "Downloaded the file to image.jpg.\n",
+                "Downloaded the file to {path}.\n",
             ),
             (
                 ["download", "111", "--out-dir", "."],
                 "SUCCESS",
-                "Downloaded the file to image.jpg.\n",
+                "Downloaded the file to {path}.\n",
             ),
             (
                 ["download", "-o", ".", "111"],
                 "SUCCESS",
-                "Downloaded the file to image.jpg.\n",
+                "Downloaded the file to {path}.\n",
             ),
             (
                 ["download", "111"],
@@ -41,7 +41,10 @@ class TestDownload(object):
         ],
     )
     def test_valid(self, runner, make_client_mock, args, status, expected):
+        path = (Path(".") / "image.jpg").resolve()
+        expected = expected.format(path=path)
         client_mock = make_client_mock(status)
+
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1

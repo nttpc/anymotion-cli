@@ -1,3 +1,4 @@
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
@@ -12,16 +13,17 @@ class TestDraw(object):
         [["draw", "1"], ["draw", "1", "--rule", "[]"], ["draw", "--rule", "[]", "1"]],
     )
     def test_valid(self, mocker, runner, args):
+        path = (Path(".") / "image.jpg").resolve()
         client_mock = self._get_client_mock(mocker)
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            """\
+            f"""\
                 Drawing started. (drawing id: 111)
                 Success: Drawing is complete.
-                Downloaded the file to image.jpg.
+                Downloaded the file to {path}.
             """
         )
 
@@ -85,6 +87,7 @@ class TestDraw(object):
         )
 
     def test_valid_rule_file(self, mocker, tmp_path, runner):
+        path = (Path(".") / "image.jpg").resolve()
         client_mock = self._get_client_mock(mocker)
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
@@ -94,10 +97,10 @@ class TestDraw(object):
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            """\
+            f"""\
                 Drawing started. (drawing id: 111)
                 Success: Drawing is complete.
-                Downloaded the file to image.jpg.
+                Downloaded the file to {path}.
             """
         )
 
