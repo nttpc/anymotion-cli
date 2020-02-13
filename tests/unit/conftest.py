@@ -44,26 +44,3 @@ def make_path(tmp_path):
         return path
 
     return _make_path
-
-
-# TODO: use make_path
-@pytest.fixture
-def make_dir(tmp_path):
-    def _make_dir(name):
-        (tmp_path / name).mkdir()
-        return tmp_path / name
-
-    return _make_dir
-
-
-# TODO: use make_path
-@pytest.fixture
-def make_file(tmp_path):
-    def _make_file(name, content=None):
-        if content:
-            (tmp_path / name).write_text(content)
-        else:
-            (tmp_path / name).touch()
-        return tmp_path / name
-
-    return _make_file

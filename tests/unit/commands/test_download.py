@@ -117,13 +117,13 @@ class TestDownload(object):
         assert result.exit_code == 2
         assert result.output.endswith(expected)
 
-    def test_invalid_params_with_not_directory(self, runner, make_file):
-        file_path = make_file("file_name")
+    def test_invalid_params_with_not_directory(self, runner, make_path):
+        path = make_path("image.jpg", is_file=True)
         expected = (
             'Error: Invalid value for "-o" / "--out-dir": '
-            f'Directory "{file_path}" is a file.\n'
+            f'Directory "{path}" is a file.\n'
         )
-        result = runner.invoke(cli, ["download", "-o", str(file_path)])
+        result = runner.invoke(cli, ["download", "-o", str(path)])
 
         assert result.exit_code == 2
         assert result.output.endswith(expected)
@@ -159,14 +159,14 @@ class TestDownload(object):
 
 
 class TestCheckDownload(object):
-    def test_not_exists(self, tmp_path):
-        out_dir = str(tmp_path)
+    def test_not_exists(self, make_path):
+        out_dir = make_path("out", is_dir=True)
         url = "https://example.com/image.jpg"
         is_ok, message, path = check_download(out_dir, url)
 
         assert is_ok is True
-        assert message == f"Downloaded the file to \x1b[34m{tmp_path}/image.jpg\x1b[0m."
-        assert path == Path(f"{tmp_path}/image.jpg")
+        assert message == f"Downloaded the file to \x1b[34m{out_dir}/image.jpg\x1b[0m."
+        assert path == Path(f"{out_dir}/image.jpg")
 
     def test_exists_yes(self, monkeypatch, tmp_path):
         monkeypatch.setattr("sys.stdin", io.StringIO("y"))
