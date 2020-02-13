@@ -11,7 +11,7 @@ Unreleased
 Unreleased
 
 - Added pager (if the text to display is long, you can scroll).
-- Added `configure clear` command.
+- Added `configure get`, `configure set`, and `configure clear` commands.
 - Added color to help display.
 - Made hidden the credentials value at `configure` command.
 - Moved request method on `encore_api_cli.sdk.client` to `encore_api_cli.sdk.session`.
@@ -31,7 +31,7 @@ Released 2020-02-06
 - Added `drawing` command.
 - Added alias command `enimo`.
 - Added the display of failure details when processing fails.
-- Added `--status` option to `analysis`, `drawing` and `keypoint` commands.
+- Added `--status` option to `analysis`, `drawing`, and `keypoint` commands.
 - Moved `keypoint extract` subcommand to `extract` command.
 - Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
 - Changed all option names to kebab cases.
