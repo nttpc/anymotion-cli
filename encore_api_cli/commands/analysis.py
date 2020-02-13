@@ -18,6 +18,7 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.group(short_help='Show the analysis results.')
+@common_options
 def analysis() -> None:
     """Show the analysis results."""
 

@@ -18,6 +18,7 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.group(short_help="Show the extracted keypoints.")
+@common_options
 def keypoint() -> None:
     """Show the extracted keypoints."""
 
