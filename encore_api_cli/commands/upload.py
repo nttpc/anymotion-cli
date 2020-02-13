@@ -15,7 +15,7 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.command()
-@click.argument("path", type=click.Path(exists=True))
+@click.argument("path", type=click.Path(exists=True, dir_okay=False))
 @common_options
 @pass_state
 def upload(state: State, path: str) -> None:

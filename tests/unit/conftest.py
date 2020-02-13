@@ -18,6 +18,36 @@ def runner():
 
 
 @pytest.fixture
+def make_path(tmp_path):
+    """Make temporary path.
+
+    Examples:
+        >>> path = make_path("image.jpg", is_file=True)
+        >>> path
+        PosixPath('/tmp/pytest-xxx/test_xxx/image.jpg')
+    """
+
+    def _make_path(name, exists=True, is_file=False, is_dir=False, content=None):
+        if not (is_file ^ is_dir):
+            raise Exception("Either is_file or is_dir must be True.")
+
+        path = tmp_path / name
+
+        if is_file and exists:
+            if content:
+                path.write_text(content)
+            else:
+                path.touch()
+        elif is_dir and exists:
+            path.mkdir()
+
+        return path
+
+    return _make_path
+
+
+# TODO: use make_path
+@pytest.fixture
 def make_dir(tmp_path):
     def _make_dir(name):
         (tmp_path / name).mkdir()
@@ -26,6 +56,7 @@ def make_dir(tmp_path):
     return _make_dir
 
 
+# TODO: use make_path
 @pytest.fixture
 def make_file(tmp_path):
     def _make_file(name, content=None):
