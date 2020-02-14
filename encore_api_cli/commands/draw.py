@@ -25,7 +25,7 @@ def draw_options(f: Callable) -> Callable:
         "-o",
         "--out-dir",
         default=".",
-        type=click.Path(),
+        type=click.Path(exists=True, file_okay=False),
         show_default=True,
         help="Path of directory to output drawn file.",
     )(f)

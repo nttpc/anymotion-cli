@@ -69,7 +69,7 @@ def check_download(
         file_name = name + Path(str(urlparse(url).path)).suffix
     else:
         file_name = Path(str(urlparse(url).path)).name
-    path = Path(out_dir) / file_name
+    path = (Path(out_dir) / file_name).resolve()
 
     if path.exists():
         echo(f"File already exists: {color_path(path)}")
