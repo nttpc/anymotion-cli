@@ -19,7 +19,7 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Extract keypoints from uploaded images or movies.")
 @click.option(
     "--movie-id",
     type=int,

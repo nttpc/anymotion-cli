@@ -37,7 +37,7 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Draw points and/or lines on uploaded movie or image.")
 @click.argument("keypoint_id", type=int)
 @draw_options
 @common_options

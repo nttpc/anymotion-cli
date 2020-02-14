@@ -15,13 +15,13 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group()
+@cli.group(short_help="Show the information of the uploaded movies.")
+@common_options
 def movie() -> None:
     """Show the information of the uploaded movies."""
-    pass
 
 
-@movie.command()
+@movie.command(short_help="Show movie information.")
 @click.argument("movie_id", type=int)
 @common_options
 @pass_state
@@ -37,7 +37,7 @@ def show(state: State, movie_id: int) -> None:
     echo_json(data)
 
 
-@movie.command()
+@movie.command(short_help="Show a list of information for all movies.")
 @common_options
 @pass_state
 def list(state: State) -> None:

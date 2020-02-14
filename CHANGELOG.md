@@ -4,6 +4,7 @@
 
 Unreleased
 
+- Added `--interactive` option (You can use interactive mode).
 - Added pager (if the text to display is long, you can scroll).
 - Added `configure get`, `configure set`, and `configure clear` commands.
 - Added color to help display.
