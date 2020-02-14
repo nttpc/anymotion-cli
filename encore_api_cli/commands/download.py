@@ -19,7 +19,7 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Download the drawn file.")
 @click.argument("drawing_id", type=int)
 @click.option(
     "-o",

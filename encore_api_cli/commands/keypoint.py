@@ -17,13 +17,13 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group()
+@cli.group(short_help="Show the extracted keypoints.")
+@common_options
 def keypoint() -> None:
     """Show the extracted keypoints."""
-    pass
 
 
-@keypoint.command()
+@keypoint.command(short_help="Show extracted keypoint data.")
 @click.argument("keypoint_id", type=int)
 @common_options
 @pass_state
@@ -51,7 +51,7 @@ def show(state: State, keypoint_id: int) -> None:
         echo_error("Status is not SUCCESS.")
 
 
-@keypoint.command()
+@keypoint.command(short_help="Show a list of information for all keypoints.")
 @click.option(
     "--status",
     type=click.Choice(

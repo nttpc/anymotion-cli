@@ -17,12 +17,13 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group()
+@cli.group(short_help="Show the analysis results.")
+@common_options
 def analysis() -> None:
     """Show the analysis results."""
 
 
-@analysis.command()
+@analysis.command(short_help="Show the analysis result.")
 @click.argument("analysis_id", type=int)
 @common_options
 @pass_state
@@ -44,7 +45,7 @@ def show(state: State, analysis_id: int) -> None:
         echo_error("Status is not SUCCESS.")
 
 
-@analysis.command()
+@analysis.command(short_help="Show the analysis list.")
 @click.option(
     "--status",
     type=click.Choice(
