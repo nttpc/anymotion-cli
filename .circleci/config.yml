@@ -106,16 +106,13 @@ jobs:
       name: python
     steps:
       - checkout
-      - aws-cli/setup
+      - setup_python
       - run:
           name: Build
           command: poetry build
       - run:
-          name: Upload build file to S3
-          command: |
-            aws s3 sync dist s3://encore-api-cli
-            aws s3 cp README.md s3://encore-api-cli
-            aws s3 cp CHANGELOG.md s3://encore-api-cli
+          name: Distributing packages
+          command: s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
       - run:
           name: Notify slack
           command: |
