@@ -9,7 +9,7 @@
       "fields": [
         {
           "title": "encore-api-cli <version> is released",
-          "value": "How to install:\n```pip install -U encore-api-cli --extra-index-url https://pypi.anymotion.jp```"
+          "value": "README is <https://pypi.anymotion.jp/encore-api-cli/README.html|here>.\nRelease note is <https://pypi.anymotion.jp/encore-api-cli/CHANGELOG.html|here>.\nHow to install:\n```pip install -U encore-api-cli --extra-index-url https://pypi.anymotion.jp```"
         }
       ],
       "footer": "<https://bitbucket.org/nttpc-datascience/encore-api-cli|encore-api-cli>"

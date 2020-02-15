@@ -20,7 +20,7 @@ $ pip install -U encore-api-cli --extra-index-url https://pypi.anymotion.jp
 
 Alternatively, you can configure the index URL in `~/.pip/pip.conf`:
 
-```sh
+```text
 [global]
 extra-index-url = https://pypi.anymotion.jp
 ```
