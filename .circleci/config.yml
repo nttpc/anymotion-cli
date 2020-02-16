@@ -106,20 +106,34 @@ jobs:
       name: python
     steps:
       - checkout
-      - aws-cli/setup
+      - setup_python
       - run:
           name: Build
           command: poetry build
       - run:
-          name: Upload build file to S3
+          name: Distributing packages
+          command: s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
+      - aws-cli/setup
+      - run:
+          name: Install pandoc
           command: |
-            aws s3 sync dist s3://encore-api-cli
-            aws s3 cp README.md s3://encore-api-cli
-            aws s3 cp CHANGELOG.md s3://encore-api-cli
+            apt update
+            apt install pandoc
+      - run:
+          name: Convert markdown files
+          command: |
+            pandoc README.md -s --self-contained -t html5 -c .circleci/github-pandoc.css \
+              | sed -e "s/CHANGELOG.md/CHANGELOG.html/g" > README.html
+            pandoc CHANGELOG.md -s --self-contained -t html5 -c .circleci/github-pandoc.css > CHANGELOG.html
+      - run:
+          name: Upload html files to S3
+          command: |
+            aws s3 cp README.html s3://pypi.anymotion.jp/encore-api-cli/README.html
+            aws s3 cp CHANGELOG.html s3://pypi.anymotion.jp/encore-api-cli/CHANGELOG.html
       - run:
           name: Notify slack
           command: |
-            sed -e "s/<version>/${CIRCLE_TAG}/" .circleci/slack-message.json > message.json
+            sed -e "s/<version>/${CIRCLE_TAG}/g" .circleci/slack-message.json > message.json
             curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
 
 workflows:
