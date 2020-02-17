@@ -12,29 +12,20 @@ The encore-api-cli package works on Python versions:
 
 ## Installation
 
-Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/).
-
-### Latest version
-
-**NOTICE**: You need an SSH key to install.
+Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/) by pointing the `--extra-index-url`:
 
 ```sh
-$ pip install -U git+ssh://git@bitbucket.org/nttpc-datascience/encore-api-cli.git
+$ pip install -U encore-api-cli --extra-index-url https://pypi.anymotion.jp
 ```
 
-### Specific version
+Alternatively, you can configure the index URL in `~/.pip/pip.conf`:
+
+```text
+[global]
+extra-index-url = https://pypi.anymotion.jp
+```
 
 **NOTICE**: You can only install from the internal network.
-
-```sh
-$ pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-<version>-py3-none-any.whl
-```
-
-To install version 1.0.0:
-
-```sh
-$ pip install -U https://encore-api-cli.s3-ap-northeast-1.amazonaws.com/encore_api_cli-1.0.0-py3-none-any.whl
-```
 
 ## Getting Started
 
@@ -49,7 +40,7 @@ The quickest way to get started is to run the `amcli configure` command:
 
 ```sh
 $ amcli configure
-AnyMotion API URL [https://api.customer.jp/]:
+AnyMotion API URL [https://api.customer.jp/anymotion/v1/]:
 AnyMotion Client ID: your_client_id
 AnyMotion Client Secret: your_client_secret
 ```

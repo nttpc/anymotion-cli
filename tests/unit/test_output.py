@@ -16,9 +16,9 @@ from encore_api_cli.output import (
     [("True", "message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo(capfd, monkeypatch, is_show, expected):
-    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    monkeypatch.delenv("ANYMOTION_STDOUT_ISSHOW", raising=False)
     if is_show:
-        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
+        monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", is_show)
 
     echo("message")
 
@@ -32,9 +32,9 @@ def test_echo(capfd, monkeypatch, is_show, expected):
     [("True", "Success: message\n"), ("False", ""), (None, ""), ("invalid", "")],
 )
 def test_echo_success(capfd, monkeypatch, is_show, expected):
-    monkeypatch.delenv("STDOUT_ISSHOW", raising=False)
+    monkeypatch.delenv("ANYMOTION_STDOUT_ISSHOW", raising=False)
     if is_show:
-        monkeypatch.setenv("STDOUT_ISSHOW", is_show)
+        monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", is_show)
 
     echo_success("message")
 
@@ -96,12 +96,16 @@ def test_echo_json(capfd):
         (None, None, "POST http://example.com\n\n"),
     ],
 )
-def test_echo_request(capfd, monkeypatch, headers, json, expected):
-    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
+    monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
-    echo_request(
-        "http://example.com", "POST", headers=headers, json=json,
-    )
+    request_mock = mocker.MagicMock()
+    request_mock.return_value.url = "http://example.com"
+    request_mock.return_value.method = "POST"
+    request_mock.return_value.headers = headers
+    request_mock.return_value.json = json
+
+    echo_request(request_mock())
 
     out, err = capfd.readouterr()
     assert out == expected
@@ -164,11 +168,18 @@ def test_echo_request(capfd, monkeypatch, headers, json, expected):
     ],
 )
 def test_echo_response(
-    capfd, monkeypatch, status_code, reason, version, headers, json, expected
+    mocker, capfd, monkeypatch, status_code, reason, version, headers, json, expected
 ):
-    monkeypatch.setenv("STDOUT_ISSHOW", "True")
+    monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
-    echo_response(status_code, reason, version, headers, json)
+    response_mock = mocker.MagicMock()
+    response_mock.return_value.status_code = status_code
+    response_mock.return_value.reason = reason
+    response_mock.return_value.raw.version = version
+    response_mock.return_value.headers = headers
+    response_mock.return_value.json.return_value = json
+
+    echo_response(response_mock())
 
     out, err = capfd.readouterr()
     assert out == expected

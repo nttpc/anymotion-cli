@@ -3,48 +3,56 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
-from click.testing import CliRunner
 
 from encore_api_cli.commands.download import check_download, cli
+from encore_api_cli.sdk.exceptions import RequestsError
 
 
 class TestDownload(object):
-    # TODO: --out_dir option test
-
-    @pytest.fixture
-    def client_mock(self, mocker):
-        client_mock = mocker.MagicMock()
-        client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
-        client_mock.return_value.download.return_value = None
-        mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
-        yield client_mock
-
     @pytest.mark.parametrize(
-        "wait_for_drawing_return, expected",
+        "args, status, expected",
         [
+            (["download", "111"], "SUCCESS", "Downloaded the file to {path}.\n",),
             (
-                ("SUCCESS", "http://example.com/image.jpg"),
-                "Downloaded the file to image.jpg.\n",
+                ["download", "111", "-o", "."],
+                "SUCCESS",
+                "Downloaded the file to {path}.\n",
             ),
-            (("SUCCESS", None), "Unable to download because drawing failed.\n"),
-            (("FAILURE", None), "Unable to download because drawing failed.\n"),
-            (("TIMEOUT", None), "Unable to download because drawing failed.\n"),
+            (
+                ["download", "111", "--out-dir", "."],
+                "SUCCESS",
+                "Downloaded the file to {path}.\n",
+            ),
+            (
+                ["download", "-o", ".", "111"],
+                "SUCCESS",
+                "Downloaded the file to {path}.\n",
+            ),
+            (
+                ["download", "111"],
+                "FAILURE",
+                "Error: Unable to download because drawing failed.\n",
+            ),
+            (
+                ["download", "111"],
+                "TIMEOUT",
+                "Error: Unable to download because drawing failed.\n",
+            ),
         ],
     )
-    def test_valid(self, mocker, wait_for_drawing_return, expected):
-        client_mock = mocker.MagicMock()
-        client_mock.return_value.wait_for_drawing.return_value = wait_for_drawing_return
-        client_mock.return_value.download.return_value = None
-        mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
+    def test_valid(self, runner, make_client_mock, args, status, expected):
+        path = (Path(".") / "image.jpg").resolve()
+        expected = expected.format(path=path)
+        client_mock = make_client_mock(status)
 
-        runner = CliRunner()
-        result = runner.invoke(cli, ["download", "111"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == expected
 
-    def test_valid_skip_donwload(self, mocker, client_mock):
+    def test_valid_skip_download(self, mocker, runner, make_client_mock):
+        client_mock = make_client_mock()
         message = dedent(
             """\
                 Skip download. To download it, run the following command.
@@ -57,39 +65,108 @@ class TestDownload(object):
             "encore_api_cli.commands.download.check_download", check_download_mock
         )
 
-        runner = CliRunner()
         result = runner.invoke(cli, ["download", "111"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == message % {"prog": "amcli", "drawing_id": "111"} + "\n"
 
-    def test_missing_args(self, client_mock):
-        runner = CliRunner()
-        result = runner.invoke(cli, ["download"])
+    @pytest.mark.parametrize(
+        "with_wait_exception, with_download_exception", [(True, True), (False, True)]
+    )
+    def test_with_error(
+        self, runner, make_client_mock, with_wait_exception, with_download_exception
+    ):
+        client_mock = make_client_mock(
+            with_wait_exception=with_wait_exception,
+            with_download_exception=with_download_exception,
+        )
+        result = runner.invoke(cli, ["download", "111"])
 
-        assert client_mock.call_count == 0
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
+        assert "Error" in result.output
+
+    @pytest.mark.parametrize(
+        "args, expected",
+        [
+            (["download"], 'Error: Missing argument "DRAWING_ID".\n'),
+            (
+                ["download", "invalid_id"],
+                (
+                    'Error: Invalid value for "DRAWING_ID": '
+                    "invalid_id is not a valid integer\n",
+                ),
+            ),
+            (["download", "-o"], "Error: -o option requires an argument\n"),
+            (
+                ["download", "--out-dir"],
+                "Error: --out-dir option requires an argument\n",
+            ),
+            (
+                ["download", "-o", "not_exist"],
+                (
+                    'Error: Invalid value for "-o" / "--out-dir": '
+                    'Directory "not_exist" does not exist.\n'
+                ),
+            ),
+        ],
+    )
+    def test_invalid_params(self, runner, args, expected):
+        result = runner.invoke(cli, args)
         assert result.exit_code == 2
-        assert 'Error: Missing argument "DRAWING_ID".' in result.output
+        assert result.output.endswith(expected)
 
-    def test_invalid_params(self, client_mock):
-        runner = CliRunner()
-        result = runner.invoke(cli, ["download", "invalid_id"])
+    def test_invalid_params_with_not_directory(self, runner, make_path):
+        path = make_path("image.jpg", is_file=True)
+        expected = (
+            'Error: Invalid value for "-o" / "--out-dir": '
+            f'Directory "{path}" is a file.\n'
+        )
+        result = runner.invoke(cli, ["download", "-o", str(path)])
 
-        assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert 'Error: Invalid value for "DRAWING_ID"' in result.output
+        assert result.output.endswith(expected)
+
+    @pytest.fixture
+    def make_client_mock(self, mocker):
+        def _make_client_mock(
+            status="SUCCESS", with_wait_exception=False, with_download_exception=False
+        ):
+            if status == "SUCCESS":
+                url = "http://example.com/image.jpg"
+            else:
+                url = None
+
+            client_mock = mocker.MagicMock()
+
+            if with_wait_exception:
+                client_mock.return_value.wait_for_drawing.side_effect = RequestsError()
+            else:
+                client_mock.return_value.wait_for_drawing.return_value = (status, url)
+
+            if with_download_exception:
+                client_mock.return_value.download.side_effect = RequestsError()
+            else:
+                client_mock.return_value.download.return_value = None
+
+            client_mock.return_value.get_name_from_drawing_id.return_value = "image"
+
+            mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
+            return client_mock
+
+        return _make_client_mock
 
 
 class TestCheckDownload(object):
-    def test_not_exists(self, tmp_path):
-        out_dir = str(tmp_path)
+    def test_not_exists(self, make_path):
+        out_dir = make_path("out", is_dir=True)
         url = "https://example.com/image.jpg"
         is_ok, message, path = check_download(out_dir, url)
 
         assert is_ok is True
-        assert message == f"Downloaded the file to \x1b[34m{tmp_path}/image.jpg\x1b[0m."
-        assert path == Path(f"{tmp_path}/image.jpg")
+        assert message == f"Downloaded the file to \x1b[34m{out_dir}/image.jpg\x1b[0m."
+        assert path == Path(f"{out_dir}/image.jpg")
 
     def test_exists_yes(self, monkeypatch, tmp_path):
         monkeypatch.setattr("sys.stdin", io.StringIO("y"))

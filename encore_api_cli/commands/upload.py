@@ -1,19 +1,21 @@
 import click
+from click_help_colors import HelpColorsGroup
 
+from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_success
-from ..sdk.exceptions import InvalidFileType, RequestsError
+from ..sdk import FileTypeError, RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, color_path, get_client
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
-@click.argument("path", type=click.Path(exists=True))
+@cli.command(short_help="Upload the local movie or image file to the cloud storage.")
+@click.argument("path", type=click.Path(exists=True, dir_okay=False))
 @common_options
 @pass_state
 def upload(state: State, path: str) -> None:
@@ -22,10 +24,10 @@ def upload(state: State, path: str) -> None:
 
     try:
         media_id, media_type = client.upload_to_s3(path)
-    except InvalidFileType as e:
+    except FileTypeError as e:
         raise click.BadParameter(str(e))
     except RequestsError as e:
-        raise click.ClickException(str(e))
+        raise ClickException(str(e))
 
     cpath = color_path(path)
     cid = color_id(media_id)

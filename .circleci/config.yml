@@ -43,6 +43,10 @@ jobs:
       version:
         type: string
         default: "3.8"
+      test-type:
+        type: enum
+        enum: ["unit", "integration"]
+        default: unit
     executor:
       name: python
       version: << parameters.version >>
@@ -51,10 +55,11 @@ jobs:
       - setup_python:
           version: << parameters.version >>
       - run:
-          name: Run unit test with pytest
+          name: Run << parameters.test-type >> test with pytest
           command: |
             mkdir test-reports
-            poetry run pytest -v --junitxml=test-reports/junit.xml
+            poetry run pytest tests/<< parameters.test-type >> \
+              -v --junitxml=test-reports/junit.xml
       - store_test_results:
           path: test-reports
 
@@ -66,7 +71,7 @@ jobs:
       - setup_python
       - run:
           name: Run unit test with pytest
-          command: poetry run pytest --cov --cov-report=xml
+          command: poetry run pytest tests/unit --cov --cov-report=xml
       - codecov/upload:
           flags: unittest
 
@@ -96,25 +101,39 @@ jobs:
           name: Check security with bandit
           command: poetry run bandit -r encore_api_cli -s B303
 
-  build-and-upload:
+  release:
     executor:
       name: python
     steps:
       - checkout
-      - aws-cli/setup
+      - setup_python
       - run:
           name: Build
           command: poetry build
       - run:
-          name: Upload build file to S3
+          name: Distributing packages
+          command: s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
+      - aws-cli/setup
+      - run:
+          name: Install pandoc
           command: |
-            aws s3 sync dist s3://encore-api-cli
-            aws s3 cp README.md s3://encore-api-cli
-            aws s3 cp CHANGELOG.md s3://encore-api-cli
+            apt update
+            apt install pandoc
+      - run:
+          name: Convert markdown files
+          command: |
+            pandoc README.md -s --self-contained -t html5 -c .circleci/github-pandoc.css \
+              | sed -e "s/CHANGELOG.md/CHANGELOG.html/g" > README.html
+            pandoc CHANGELOG.md -s --self-contained -t html5 -c .circleci/github-pandoc.css > CHANGELOG.html
+      - run:
+          name: Upload html files to S3
+          command: |
+            aws s3 cp README.html s3://pypi.anymotion.jp/encore-api-cli/README.html
+            aws s3 cp CHANGELOG.html s3://pypi.anymotion.jp/encore-api-cli/CHANGELOG.html
       - run:
           name: Notify slack
           command: |
-            sed -e "s/<version>/${CIRCLE_TAG}/" .circleci/slack-message.json > message.json
+            sed -e "s/<version>/${CIRCLE_TAG}/g" .circleci/slack-message.json > message.json
             curl -X POST --data-urlencode payload@message.json ${SLACK_WEB_HOOK}
 
 workflows:
@@ -123,45 +142,54 @@ workflows:
       - setup-py38:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
       - test:
           name: test-py36
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           version: "3.6"
       - test:
           name: test-py37
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           version: "3.7"
       - test:
-          name: test-py38
+          name: py38-unit-test
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
+      - test:
+          name: py38-integration-test
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - setup-py38
+          test-type: integration
       - measure-coverage:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
-            - test-py38
+            - py38-unit-test
       - check-syntax:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
       - check-security:
           filters:
             tags:
-              only: /^\d.*/
+              only: /.*/
           requires:
             - setup-py38
-      - build-and-upload:
+      - approval-release:
+          type: approval
           filters:
             tags:
               only: /^\d.*/
@@ -170,6 +198,15 @@ workflows:
           requires:
             - test-py36
             - test-py37
+            - py38-integration-test
             - measure-coverage
             - check-syntax
             - check-security
+      - release:
+          filters:
+            tags:
+              only: /^\d.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - approval-release

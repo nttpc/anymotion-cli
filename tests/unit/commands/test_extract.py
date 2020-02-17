@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
-from click.testing import CliRunner
 
 from encore_api_cli.commands.extract import cli
+from encore_api_cli.sdk.exceptions import RequestsError
 
 
 class TestExtract(object):
@@ -23,42 +23,65 @@ class TestExtract(object):
             (
                 ["extract", "--movie-id", "111"],
                 "TIMEOUT",
-                "Keypoint extraction is timed out.",
+                "Error: Keypoint extraction is timed out.",
             ),
             (
                 ["extract", "--image-id", "111"],
                 "TIMEOUT",
-                "Keypoint extraction is timed out.",
+                "Error: Keypoint extraction is timed out.",
             ),
             (
                 ["extract", "--movie-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed: message",
+                "Error: Keypoint extraction failed.\nmessage",
             ),
             (
                 ["extract", "--image-id", "111"],
                 "FAILURE",
-                "Keypoint extraction failed: message",
+                "Error: Keypoint extraction failed.\nmessage",
             ),
         ],
     )
-    def test_valid(self, mocker, args, status, expected):
+    def test_valid(self, mocker, runner, args, status, expected):
         keypoint_id = 111
         client_mock = self._get_client_mock(
             mocker, status=status, keypoint_id=keypoint_id
         )
 
-        runner = CliRunner()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            f"""\
-                Keypoint extraction started. (keypoint id: {keypoint_id})
-                {expected}
-            """
+            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
         )
+
+    def test_with_spinner(self, mocker, monkeypatch, runner):
+        monkeypatch.setenv("ANYMOTION_USE_SPINNER", "true")
+        client_mock = self._get_client_mock(mocker)
+
+        result = runner.invoke(cli, ["extract", "--movie-id", "111"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert "Processing..." in result.output
+
+    @pytest.mark.parametrize(
+        "with_extract_exception, with_wait_exception", [(True, True), (False, True)]
+    )
+    def test_with_error(
+        self, mocker, runner, with_extract_exception, with_wait_exception
+    ):
+        client_mock = self._get_client_mock(
+            mocker,
+            with_extract_exception=with_extract_exception,
+            with_wait_exception=with_wait_exception,
+        )
+        result = runner.invoke(cli, ["extract", "--movie-id", "111"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
+        assert "Error" in result.output
 
     @pytest.mark.parametrize(
         "args, expected",
@@ -86,29 +109,47 @@ class TestExtract(object):
             ),
         ],
     )
-    def test_invalid_params(self, mocker, args, expected):
+    def test_invalid_params(self, mocker, runner, args, expected):
         client_mock = self._get_client_mock(mocker)
-        runner = CliRunner()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert expected in result.output
 
-    def _get_client_mock(self, mocker, status="SUCCESS", keypoint_id=111):
+    def _get_client_mock(
+        self,
+        mocker,
+        status="SUCCESS",
+        keypoint_id=111,
+        with_extract_exception=False,
+        with_wait_exception=False,
+    ):
         client_mock = mocker.MagicMock()
-        client_mock.return_value.wait_for_extraction.return_value.status = status
-        client_mock.return_value.wait_for_extraction.return_value.failure_detail = (
-            "message"
-        )
-        client_mock.return_value.extract_keypoint_from_movie.return_value = keypoint_id
-        client_mock.return_value.extract_keypoint_from_image.return_value = keypoint_id
+
+        extract_image_mock = client_mock.return_value.extract_keypoint_from_movie
+        extract_movie_mock = client_mock.return_value.extract_keypoint_from_image
+        if with_extract_exception:
+            extract_image_mock.side_effect = RequestsError()
+            extract_movie_mock.side_effect = RequestsError()
+        else:
+            extract_image_mock.return_value = keypoint_id
+            extract_movie_mock.return_value = keypoint_id
+
+        wait_mock = client_mock.return_value.wait_for_extraction
+        if with_wait_exception:
+            wait_mock.side_effect = RequestsError()
+        else:
+            wait_mock.return_value.status = status
+            if status == "FAILURE":
+                wait_mock.return_value.failure_detail = "message"
+
         mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
         return client_mock
 
 
 # TODO: refactor
-def test_keypoint_extract_with_drawing(mocker):
+def test_keypoint_extract_with_drawing(mocker, runner):
     image_id = 111
     keypoint_id = 222
 
@@ -118,11 +159,11 @@ def test_keypoint_extract_with_drawing(mocker):
     extract_keypoint_mock.return_value = keypoint_id
     client_mock.return_value.draw_keypoint.return_value = 333
     client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
+    client_mock.return_value.get_name_from_drawing_id.return_value = "image"
     client_mock.return_value.download.return_value = None
     mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
 
-    runner = CliRunner()
     result = runner.invoke(cli, ["extract", "--image-id", image_id, "--with-drawing"])
 
     assert client_mock.call_count == 2
@@ -133,6 +174,7 @@ def test_keypoint_extract_with_drawing(mocker):
         (keypoint_id,),
         {"rule": None},
     )
+    assert client_mock.return_value.get_name_from_drawing_id.call_count == 1
     assert client_mock.return_value.download.call_count == 1
 
     assert result.exit_code == 0

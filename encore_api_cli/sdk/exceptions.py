@@ -1,14 +1,18 @@
 class ClientException(Exception):
-    pass
+    """Base class for exceptions in the SDK package."""
 
 
-class InvalidFileType(ClientException):
-    pass
+class ClientValueError(ClientException):
+    """Raised for invalid value."""
+
+
+class FileTypeError(ClientException):
+    """Raised when trying to use an unallowable file type."""
 
 
 class RequestsError(ClientException):
-    pass
+    """Raised when an HTTP request fails."""
 
 
-class InvalidResponse(ClientException):
-    pass
+class ResponseError(ClientException):
+    """Raised when an HTTP response is invalid."""

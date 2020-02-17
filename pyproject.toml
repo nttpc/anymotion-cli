@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "encore-api-cli"
-version = "0.7.1"
+version = "0.8.0"
 description = "Command Line Interface for AnyMotion API."
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
+repository = "https://bitbucket.org/nttpc-datascience/encore-api-cli/"
 include = ["CHANGELOG.md"]
 classifiers = [
     "Programming Language :: Python :: 3.6",
@@ -14,6 +15,8 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6 || ^3.7 || ^3.8"
 click = "^7.0"
+click_help_colors = "^0.6"
+click_repl = "^0.1.6"
 pygments = "^2.5.2"
 requests = "^2.22.0"
 tabulate = "^0.8.6"
@@ -32,6 +35,7 @@ pytest-cov = "^2.8.1"
 pytest-mock = "^2.0.0"
 requests-mock = "^1.7.0"
 tox = "^3.14.3"
+s3pypi = "^0.10.1"
 
 [tool.poetry.scripts]
 amcli = "encore_api_cli.core:cli"

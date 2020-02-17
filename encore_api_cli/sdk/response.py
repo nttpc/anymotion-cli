@@ -3,9 +3,10 @@ from typing import Any, Optional, Union
 
 import requests
 
-from . import InvalidResponse
+from .exceptions import ResponseError
 
 
+# TODO: refactor
 class Response(object):
     """AnyMotion API Response."""
 
@@ -50,7 +51,7 @@ class Response(object):
                     response: {self.json}
                 """
             )
-            raise InvalidResponse(message)
+            raise ResponseError(message)
         return tuple(self.json[k] for k in keys)
 
 

@@ -1,10 +1,24 @@
 # Change Log
 
+## 0.8.0
+
+Released 2020-02-17
+
+- Added `--interactive` option (You can use interactive mode).
+- Added pager (if the text to display is long, you can scroll).
+- Added `configure get`, `configure set`, and `configure clear` commands.
+- Added color to help display.
+- Made hidden the credentials value at `configure` command.
+- Moved request method on `encore_api_cli.sdk.client` to `encore_api_cli.sdk.session`.
+- Used [s3pypi](https://github.com/novemberfiveco/s3pypi) for release.
+- Improved the name of the file to be downloaded.
+- Improved error message by catching exceptions.
+
 ## 0.7.1
 
 Released 2020-02-06
 
-- Changed API format in settings.
+- Changed API URL format in settings.
 
 ## 0.7.0
 
@@ -13,7 +27,7 @@ Released 2020-02-06
 - Added `drawing` command.
 - Added alias command `enimo`.
 - Added the display of failure details when processing fails.
-- Added `--status` option to `analysis`, `drawing` and `keypoint` commands.
+- Added `--status` option to `analysis`, `drawing`, and `keypoint` commands.
 - Moved `keypoint extract` subcommand to `extract` command.
 - Moved `encore_api_cli.client` to `encore_api_cli.sdk.client`.
 - Changed all option names to kebab cases.

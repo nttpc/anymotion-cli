@@ -2,21 +2,24 @@ import io
 from typing import Optional
 
 import click
+from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_success
+from ..output import echo, echo_error, echo_success
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
 from .analysis import show
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Analyze the extracted keypoint data.")
 @click.argument("keypoint_id", type=int)
 @click.option("--rule", "rule_str", help="Analysis rules in JSON format.")
 @click.option(
@@ -49,23 +52,27 @@ def analyze(
         rule = parse_rule(rule_file.read())
 
     if rule is None:
-        raise
+        raise Exception("rule is None")
 
     client = get_client(state)
-    analysis_id = client.analyze_keypoint(keypoint_id, rule)
 
-    echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
-    if state.use_spinner:
-        with yaspin(text="Processing..."):
+    try:
+        analysis_id = client.analyze_keypoint(keypoint_id, rule)
+        echo(f"Analysis started. (analysis id: {color_id(analysis_id)})")
+
+        if state.use_spinner:
+            with yaspin(text="Processing..."):
+                response = client.wait_for_analysis(analysis_id)
+        else:
             response = client.wait_for_analysis(analysis_id)
-    else:
-        response = client.wait_for_analysis(analysis_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if response.status == "SUCCESS":
         echo_success("Analysis is complete.")
         if show_result:
             ctx.invoke(show, analysis_id=analysis_id)
     elif response.status == "TIMEOUT":
-        echo("Analysis is timed out.")
+        echo_error("Analysis is timed out.")
     else:
-        echo(f"Analysis failed: {response.failure_detail}")
+        echo_error(f"Analysis failed.\n{response.failure_detail}")

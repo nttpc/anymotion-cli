@@ -2,10 +2,13 @@ import io
 from typing import Callable, Optional
 
 import click
+from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_success
+from ..output import echo, echo_error, echo_success
+from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
 from .download import check_download
@@ -22,19 +25,19 @@ def draw_options(f: Callable) -> Callable:
         "-o",
         "--out-dir",
         default=".",
-        type=click.Path(),
+        type=click.Path(exists=True, file_okay=False),
         show_default=True,
         help="Path of directory to output drawn file.",
     )(f)
     return f
 
 
-@click.group()
+@click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command()
+@cli.command(short_help="Draw points and/or lines on uploaded movie or image.")
 @click.argument("keypoint_id", type=int)
 @draw_options
 @common_options
@@ -60,27 +63,35 @@ def draw(
         rule = parse_rule(rule_file.read())
 
     client = get_client(state)
-    drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
 
-    echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
-    if state.use_spinner:
-        with yaspin(text="Processing..."):
+    try:
+        drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
+        echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
+
+        if state.use_spinner:
+            with yaspin(text="Processing..."):
+                status, url = client.wait_for_drawing(drawing_id)
+        else:
             status, url = client.wait_for_drawing(drawing_id)
-    else:
-        status, url = client.wait_for_drawing(drawing_id)
+        name = client.get_name_from_drawing_id(drawing_id)
+    except RequestsError as e:
+        raise ClickException(str(e))
 
     if status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
         if no_download:
             return
 
-        is_ok, message, path = check_download(out_dir, url)
+        is_ok, message, path = check_download(out_dir, url, name)
         if is_ok:
-            client.download(url, path)
+            try:
+                client.download(url, path)
+            except RequestsError as e:
+                raise ClickException(str(e))
         else:
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     elif status == "TIMEOUT":
-        echo("Drawing is timed out.")
+        echo_error("Drawing is timed out.")
     else:
-        echo("Drawing failed.")
+        echo_error("Drawing failed.")
