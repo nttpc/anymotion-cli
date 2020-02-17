@@ -75,7 +75,7 @@ jobs:
       - codecov/upload:
           flags: unittest
 
-  check-syntax:
+  check-lint:
     executor:
       name: python
     steps:
@@ -90,6 +90,9 @@ jobs:
       - run:
           name: Lint with mypy
           command: poetry run mypy
+      - run:
+          name: Lint with isort
+          command: poetry run isort --check-only
 
   check-security:
     executor:
@@ -176,7 +179,7 @@ workflows:
               only: /.*/
           requires:
             - py38-unit-test
-      - check-syntax:
+      - check-lint:
           filters:
             tags:
               only: /.*/
@@ -200,7 +203,7 @@ workflows:
             - test-py37
             - py38-integration-test
             - measure-coverage
-            - check-syntax
+            - check-lint
             - check-security
       - release:
           filters:
