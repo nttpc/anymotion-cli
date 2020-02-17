@@ -8,7 +8,7 @@ from yaspin import yaspin
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_error, echo_success
-from ..sdk import RequestsError
+from encore_sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
 from .download import check_download

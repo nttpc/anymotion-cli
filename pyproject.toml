@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "encore-api-cli"
 version = "0.8.0"
-description = "Command Line Interface for AnyMotion API."
+description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
 repository = "https://bitbucket.org/nttpc-datascience/encore-api-cli/"
@@ -21,6 +21,8 @@ pygments = "^2.5.2"
 requests = "^2.22.0"
 tabulate = "^0.8.6"
 yaspin = "^0.16.0"
+encore-sdk = "^0.1.0"
+# encore-sdk = {git = "ssh://y_kumiha@bitbucket.org/y_kumiha/encore-sdk.git", rev = "0.1.0"}
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"
@@ -41,6 +43,10 @@ s3pypi = "^0.10.1"
 amcli = "encore_api_cli.core:cli"
 enimo = "encore_api_cli.core:cli"
 encore = "encore_api_cli.core:cli"
+
+[[tool.poetry.source]]
+name = "anymotion"
+url = "https://pypi.anymotion.jp"
 
 [tool.coverage.run]
 source = ["encore_api_cli"]

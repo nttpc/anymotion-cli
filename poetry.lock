@@ -184,6 +184,21 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "0.15.2"
 
 [[package]]
+category = "main"
+description = ""
+name = "encore-sdk"
+optional = false
+python-versions = "^3.6 || ^3.7 || ^3.8"
+version = "0.1.0"
+
+[package.dependencies]
+requests = "^2.22.0"
+
+[package.source]
+reference = "22658120b0190e5505f1b40fe92894d0600d72a8"
+type = "git"
+url = "ssh://y_kumiha@bitbucket.org/y_kumiha/encore-sdk.git"
+[[package]]
 category = "dev"
 description = "Discover and load entry points from installed packages."
 name = "entrypoints"
@@ -231,7 +246,7 @@ description = "Git Object Database"
 name = "gitdb2"
 optional = false
 python-versions = ">=3.4"
-version = "3.0.0"
+version = "3.0.2"
 
 [package.dependencies]
 smmap2 = ">=2.0.0"
@@ -242,10 +257,10 @@ description = "Python Git Library"
 name = "gitpython"
 optional = false
 python-versions = ">=3.4"
-version = "3.0.7"
+version = "3.0.8"
 
 [package.dependencies]
-gitdb2 = ">=2.0.0"
+gitdb2 = ">=3"
 
 [[package]]
 category = "main"
@@ -671,7 +686,7 @@ description = "tox is a generic virtualenv management and test command line tool
 name = "tox"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
-version = "3.14.4"
+version = "3.14.5"
 
 [package.dependencies]
 colorama = ">=0.4.1"
@@ -787,7 +802,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools"]
 
 [metadata]
-content-hash = "87ce86727f901675f41b7d3657d194018492c6c782d75232ef4a866d51916c4e"
+content-hash = "78ebcd4286430a724df5d34879e38bb6aa8bdbea396b50add81ab9c0c30e081d"
 python-versions = "^3.6 || ^3.7 || ^3.8"
 
 [metadata.files]
@@ -884,6 +899,7 @@ docutils = [
     {file = "docutils-0.15.2-py3-none-any.whl", hash = "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0"},
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
+encore-sdk = []
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
@@ -901,12 +917,12 @@ flake8-docstrings = [
     {file = "flake8_docstrings-1.5.0-py2.py3-none-any.whl", hash = "sha256:a256ba91bc52307bef1de59e2a009c3cf61c3d0952dbe035d6ff7208940c2edc"},
 ]
 gitdb2 = [
-    {file = "gitdb2-3.0.0-py2.py3-none-any.whl", hash = "sha256:0a84c85d07166cefaf10fa4b728a8a1b847a7f0d081e2fbe083185462158c126"},
-    {file = "gitdb2-3.0.0.tar.gz", hash = "sha256:51380b9d8b977b42ac9fc3a8e17af90a56ffc573ca9c6b79f99033b04f29f457"},
+    {file = "gitdb2-3.0.2-py2.py3-none-any.whl", hash = "sha256:b2b3a67090c17dc61f8407ca485e79ae811225ab5ebcd98ac5ee01448e8987b5"},
+    {file = "gitdb2-3.0.2.tar.gz", hash = "sha256:0375d983fd887d03c8942e81b1b0abc6c320cfb500cd3fe0d9c0eac87fbf2b52"},
 ]
 gitpython = [
-    {file = "GitPython-3.0.7-py3-none-any.whl", hash = "sha256:99c77677f31f255e130f3fed4c8e0eebb35f1a09df98ff965fff6774f71688cf"},
-    {file = "GitPython-3.0.7.tar.gz", hash = "sha256:99cd0403cecd8a13b95d2e045b9fcaa7837137fcc5ec3105f2c413305d82c143"},
+    {file = "GitPython-3.0.8-py3-none-any.whl", hash = "sha256:a43a5d88a5bbc3cf32bb5223e4b4e68fd716db5e9996cad6e561bbfee6e5f4af"},
+    {file = "GitPython-3.0.8.tar.gz", hash = "sha256:620b3c729bbc143b498cfea77e302999deedc55faec5b1067086c9ef90e101bc"},
 ]
 idna = [
     {file = "idna-2.8-py2.py3-none-any.whl", hash = "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"},
@@ -1127,8 +1143,8 @@ toml = [
     {file = "toml-0.10.0.tar.gz", hash = "sha256:229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c"},
 ]
 tox = [
-    {file = "tox-3.14.4-py2.py3-none-any.whl", hash = "sha256:5c45d08f1dcc9bc97cdea3e5a69c8f4ad042cc37cbe6cf53e126f4a9005b7d3b"},
-    {file = "tox-3.14.4.tar.gz", hash = "sha256:73e2ade68cd71a2765ee739ecc27c8c92e9b9c09acbad0f2c5307b20214e0d13"},
+    {file = "tox-3.14.5-py2.py3-none-any.whl", hash = "sha256:0cbe98369081fa16bd6f1163d3d0b2a62afa29d402ccfad2bd09fb2668be0956"},
+    {file = "tox-3.14.5.tar.gz", hash = "sha256:676f1e3e7de245ad870f956436b84ea226210587d1f72c8dfb8cd5ac7b6f0e70"},
 ]
 typed-ast = [
     {file = "typed_ast-1.4.1-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:73d785a950fc82dd2a25897d525d003f6378d1cb23ab305578394694202a58c3"},

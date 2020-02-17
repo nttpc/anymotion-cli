@@ -4,7 +4,7 @@ from click_help_colors import HelpColorsGroup
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_success
-from ..sdk import FileTypeError, RequestsError
+from encore_sdk import FileTypeError, RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, color_path, get_client
 

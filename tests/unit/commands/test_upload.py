@@ -1,7 +1,7 @@
 import pytest
 
 from encore_api_cli.commands.upload import cli
-from encore_api_cli.sdk.exceptions import FileTypeError, RequestsError
+from encore_sdk import FileTypeError, RequestsError
 
 
 class TestUpload(object):

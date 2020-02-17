@@ -3,7 +3,7 @@ from textwrap import dedent
 import pytest
 
 from encore_api_cli.commands.extract import cli
-from encore_api_cli.sdk.exceptions import RequestsError
+from encore_sdk import RequestsError
 
 
 class TestExtract(object):
