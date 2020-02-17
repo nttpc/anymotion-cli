@@ -2,7 +2,7 @@
 
 ## 0.8.0
 
-Unreleased
+Released 2020-02-17
 
 - Added `--interactive` option (You can use interactive mode).
 - Added pager (if the text to display is long, you can scroll).
