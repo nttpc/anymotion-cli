@@ -112,13 +112,13 @@ jobs:
           command: poetry build
       - run:
           name: Distributing packages
-          command: poetry run s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
+          command: poetry run s3pypi --bucket pypi.anymotion.jp --dist-path dist --private --force
       - aws-cli/setup
       - run:
           name: Install pandoc
           command: |
-            apt update
-            apt install pandoc
+            sudo apt update
+            sudo apt install pandoc
       - run:
           name: Convert markdown files
           command: |
