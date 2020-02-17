@@ -112,7 +112,7 @@ jobs:
           command: poetry build
       - run:
           name: Distributing packages
-          command: s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
+          command: poetry run s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
       - aws-cli/setup
       - run:
           name: Install pandoc
