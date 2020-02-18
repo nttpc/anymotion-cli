@@ -42,6 +42,11 @@ amcli = "encore_api_cli.core:cli"
 enimo = "encore_api_cli.core:cli"
 encore = "encore_api_cli.core:cli"
 
+[tool.isort]
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+
 [tool.coverage.run]
 source = ["encore_api_cli"]
 branch = true
