@@ -2,9 +2,9 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.draw import cli
-from encore_sdk import RequestsError
 
 
 class TestDraw(object):
@@ -198,17 +198,19 @@ class TestDraw(object):
         client_mock.return_value.draw_keypoint.return_value = 111
         if status == "SUCCESS":
             url = "http://example.com/image.jpg"
-            client_mock.return_value.get_name_from_drawing_id.return_value = "image"
+            mocker.patch(
+                "encore_api_cli.commands.draw.get_name_from_drawing_id",
+                mocker.MagicMock(return_value="image"),
+            )
         else:
             url = None
 
+        wait_mock = client_mock.return_value.wait_for_drawing
         if with_drawing_exception:
-            client_mock.return_value.wait_for_drawing.side_effect = RequestsError()
+            wait_mock.side_effect = RequestsError()
         else:
-            client_mock.return_value.wait_for_drawing.return_value = (
-                status,
-                url,
-            )
+            wait_mock.return_value.status = status
+            wait_mock.return_value.get.return_value = url
 
         if with_download_exception:
             client_mock.return_value.download.side_effect = RequestsError()
@@ -216,4 +218,5 @@ class TestDraw(object):
             client_mock.return_value.download.return_value = None
 
         mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
+
         return client_mock

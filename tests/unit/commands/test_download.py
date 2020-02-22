@@ -140,19 +140,24 @@ class TestDownload(object):
 
             client_mock = mocker.MagicMock()
 
+            wait_mock = client_mock.return_value.wait_for_drawing
             if with_wait_exception:
-                client_mock.return_value.wait_for_drawing.side_effect = RequestsError()
+                wait_mock.side_effect = RequestsError()
             else:
-                client_mock.return_value.wait_for_drawing.return_value = (status, url)
+                wait_mock.return_value.status = status
+                wait_mock.return_value.get.return_value = url
 
             if with_download_exception:
                 client_mock.return_value.download.side_effect = RequestsError()
             else:
                 client_mock.return_value.download.return_value = None
 
-            client_mock.return_value.get_name_from_drawing_id.return_value = "image"
-
             mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
+            mocker.patch(
+                "encore_api_cli.commands.download.get_name_from_drawing_id",
+                mocker.MagicMock(return_value="image"),
+            )
+
             return client_mock
 
         return _make_client_mock

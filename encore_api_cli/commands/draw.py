@@ -10,7 +10,7 @@ from ..options import common_options
 from ..output import echo, echo_error, echo_success
 from encore_sdk import RequestsError
 from ..state import State, pass_state
-from ..utils import color_id, get_client, parse_rule
+from ..utils import color_id, get_client, parse_rule, get_name_from_drawing_id
 from .download import check_download
 
 
@@ -70,14 +70,15 @@ def draw(
 
         if state.use_spinner:
             with yaspin(text="Processing..."):
-                status, url = client.wait_for_drawing(drawing_id)
+                response = client.wait_for_drawing(drawing_id)
         else:
-            status, url = client.wait_for_drawing(drawing_id)
-        name = client.get_name_from_drawing_id(drawing_id)
+            response = client.wait_for_drawing(drawing_id)
+        name = get_name_from_drawing_id(client, drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
-    if status == "SUCCESS" and url is not None:
+    url = response.get("drawingUrl")
+    if response.status == "SUCCESS" and url is not None:
         echo_success("Drawing is complete.")
         if no_download:
             return
@@ -85,13 +86,13 @@ def draw(
         is_ok, message, path = check_download(out_dir, url, name)
         if is_ok:
             try:
-                client.download(url, path)
+                client.download(drawing_id, path)
             except RequestsError as e:
                 raise ClickException(str(e))
         else:
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
-    elif status == "TIMEOUT":
+    elif response.status == "TIMEOUT":
         echo_error("Drawing is timed out.")
     else:
         echo_error("Drawing failed.")

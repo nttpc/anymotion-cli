@@ -57,10 +57,9 @@ def extract(
 
     client = get_client(state)
     try:
-        if movie_id is not None:
-            keypoint_id = client.extract_keypoint_from_movie(movie_id)
-        elif image_id is not None:
-            keypoint_id = client.extract_keypoint_from_image(image_id)
+        keypoint_id = client.extract_keypoint(
+            data={"image_id": image_id, "movie_id": movie_id}
+        )
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
 
         if state.use_spinner:

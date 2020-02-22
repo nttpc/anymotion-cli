@@ -42,6 +42,28 @@ def get_client(state: State) -> Client:
     return client
 
 
+def get_name_from_drawing_id(client: Client, drawing_id: int) -> str:
+    """Get image or movie name from drawing_id.
+
+    Raises:
+        RequestsError: HTTP request fails.
+    """
+    data = client.get_one_data("drawings", drawing_id)
+    keypoint_id = data.get("keypoint")
+
+    data = client.get_one_data("keypoints", keypoint_id)
+    image_id = data.get("image")
+    movie_id = data.get("movie")
+
+    if image_id:
+        data = client.get_one_data("images", image_id)
+    elif movie_id:
+        data = client.get_one_data("movies", movie_id)
+    else:
+        raise
+    return data.get("name", "")
+
+
 # TODO: remove?
 def get_settings(profile: str, use_env: bool = True) -> Settings:
     """Get settings from profile."""

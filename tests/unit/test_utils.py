@@ -1,9 +1,14 @@
 import pytest
+from encore_sdk.client import Client
 
 from encore_api_cli.exceptions import ClickException, SettingsValueError
-from encore_sdk.client import Client
 from encore_api_cli.state import State
-from encore_api_cli.utils import get_client, get_settings, parse_rule
+from encore_api_cli.utils import (
+    get_client,
+    get_name_from_drawing_id,
+    get_settings,
+    parse_rule,
+)
 
 
 class TestGetClient(object):
@@ -82,3 +87,36 @@ class TestParseRule(object):
     def test_invalid(self, rule):
         with pytest.raises(ClickException):
             parse_rule(rule)
+
+
+@pytest.mark.parametrize("image_id, movie_id", [(3, None), (None, 4)])
+def test_get_name_from_drawing_id(requests_mock, image_id, movie_id):
+    # TODO: use mock of client.get_one_data instead of requests_mock
+    client = Client(
+        "client_id", "client_secret", "http://api.example.com/anymotion/v1/"
+    )
+    oauth_url = f"{client._base_url}/v1/oauth/accesstokens"
+    requests_mock.post(oauth_url, json={"accessToken": "token"})
+
+    drawing_id = 1
+    keypoint_id = 2
+    expected = "file_name"
+
+    requests_mock.get(
+        f"{client._api_url}drawings/{drawing_id}/",
+        json={"execStatus": "SUCCESS", "keypoint": keypoint_id},
+    )
+    requests_mock.get(
+        f"{client._api_url}keypoints/{keypoint_id}/",
+        json={"execStatus": "SUCCESS", "image": image_id, "movie": movie_id},
+    )
+    requests_mock.get(
+        f"{client._api_url}images/{image_id}/", json={"name": expected},
+    )
+    requests_mock.get(
+        f"{client._api_url}movies/{movie_id}/", json={"name": expected},
+    )
+
+    name = get_name_from_drawing_id(client, drawing_id)
+
+    assert name == expected

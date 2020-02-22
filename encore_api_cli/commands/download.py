@@ -5,13 +5,13 @@ from urllib.parse import urlparse
 
 import click
 from click_help_colors import HelpColorsGroup
+from encore_sdk import RequestsError
 
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_error
-from encore_sdk import RequestsError
 from ..state import State, pass_state
-from ..utils import color_path, get_client
+from ..utils import color_path, get_client, get_name_from_drawing_id
 
 
 @click.group(cls=HelpColorsGroup, help_options_color="cyan")
@@ -36,16 +36,17 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
     client = get_client(state)
 
     try:
-        status, url = client.wait_for_drawing(drawing_id)
-        name = client.get_name_from_drawing_id(drawing_id)
+        response = client.wait_for_drawing(drawing_id)
+        name = get_name_from_drawing_id(client, drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
-    if status == "SUCCESS" and url is not None:
+    if response.status == "SUCCESS":
+        url = response.get("drawingUrl")
         is_ok, message, path = check_download(out_dir, url, name)
         if is_ok:
             try:
-                client.download(url, path)
+                client.download(drawing_id, path)
             except RequestsError as e:
                 raise ClickException(str(e))
         else:

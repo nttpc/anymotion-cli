@@ -16,19 +16,30 @@ def cli() -> None:  # noqa: D103
 
 @cli.command(short_help="Upload the local movie or image file to the cloud storage.")
 @click.argument("path", type=click.Path(exists=True, dir_okay=False))
+@click.option(
+    "--text",
+    default="Created by encore-api-cli.",
+    help="Description of the upload file.",
+)
 @common_options
 @pass_state
-def upload(state: State, path: str) -> None:
+def upload(state: State, path: str, text: str) -> None:
     """Upload the local movie or image file to the cloud storage."""
     client = get_client(state)
 
     try:
-        media_id, media_type = client.upload_to_s3(path)
+        result = client.upload(path, text=text)
     except FileTypeError as e:
         raise click.BadParameter(str(e))
     except RequestsError as e:
         raise ClickException(str(e))
 
     cpath = color_path(path)
-    cid = color_id(media_id)
+
+    if result.image_id:
+        cid = color_id(result.image_id)
+        media_type = "image"
+    else:
+        cid = color_id(result.movie_id)
+        media_type = "movie"
     echo_success(f"Uploaded {cpath} to the cloud storage. ({media_type} id: {cid})")
