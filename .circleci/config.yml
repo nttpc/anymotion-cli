@@ -95,6 +95,9 @@ jobs:
       - run:
           name: Lint with mypy
           command: poetry run mypy
+      - run:
+          name: Lint with isort
+          command: poetry run isort --check-only
 
   check-security:
     executor:

@@ -48,6 +48,11 @@ name = "anymotion"
 # url = "https://pypi.anymotion.jp"
 url = "http://pypi.anymotion.jp.s3-website-ap-northeast-1.amazonaws.com"
 
+[tool.isort]
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+
 [tool.coverage.run]
 source = ["encore_api_cli"]
 branch = true
