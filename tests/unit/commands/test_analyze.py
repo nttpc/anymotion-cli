@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.analyze import cli
-from encore_sdk import RequestsError
 
 
 class TestAnalyze(object):

@@ -3,9 +3,9 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.download import check_download, cli
-from encore_sdk import RequestsError
 
 
 class TestDownload(object):
