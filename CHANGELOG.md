@@ -4,7 +4,7 @@
 
 Unreleased
 
-- Moved sdk to another package `encore_sdk`.
+- Moved sdk to another package [encore_sdk](https://bitbucket.org/nttpc-datascience/encore-sdk).
 
 ## 0.8.0
 
