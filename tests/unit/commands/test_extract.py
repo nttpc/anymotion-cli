@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.extract import cli
-from encore_api_cli.sdk.exceptions import RequestsError
 
 
 class TestExtract(object):
@@ -127,14 +127,11 @@ class TestExtract(object):
     ):
         client_mock = mocker.MagicMock()
 
-        extract_image_mock = client_mock.return_value.extract_keypoint_from_movie
-        extract_movie_mock = client_mock.return_value.extract_keypoint_from_image
+        extract_mock = client_mock.return_value.extract_keypoint
         if with_extract_exception:
-            extract_image_mock.side_effect = RequestsError()
-            extract_movie_mock.side_effect = RequestsError()
+            extract_mock.side_effect = RequestsError()
         else:
-            extract_image_mock.return_value = keypoint_id
-            extract_movie_mock.return_value = keypoint_id
+            extract_mock.return_value = keypoint_id
 
         wait_mock = client_mock.return_value.wait_for_extraction
         if with_wait_exception:
@@ -155,26 +152,27 @@ def test_keypoint_extract_with_drawing(mocker, runner):
 
     client_mock = mocker.MagicMock()
     client_mock.return_value.wait_for_extraction.return_value.status = "SUCCESS"
-    extract_keypoint_mock = client_mock.return_value.extract_keypoint_from_image
-    extract_keypoint_mock.return_value = keypoint_id
+    client_mock.return_value.extract_keypoint.return_value = keypoint_id
     client_mock.return_value.draw_keypoint.return_value = 333
-    client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
-    client_mock.return_value.get_name_from_drawing_id.return_value = "image"
+    wait_mock = client_mock.return_value.wait_for_drawing
+    wait_mock.return_value.status = "SUCCESS"
+    wait_mock.return_value.get.return_value = "url"
     client_mock.return_value.download.return_value = None
     mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
     mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
+    mocker.patch(
+        "encore_api_cli.commands.draw.get_name_from_drawing_id",
+        mocker.MagicMock(return_value="image"),
+    )
 
     result = runner.invoke(cli, ["extract", "--image-id", image_id, "--with-drawing"])
 
     assert client_mock.call_count == 2
-    assert extract_keypoint_mock.call_count == 1
-    assert extract_keypoint_mock.call_args == ((image_id,),)
     assert client_mock.return_value.draw_keypoint.call_count == 1
     assert client_mock.return_value.draw_keypoint.call_args == (
         (keypoint_id,),
         {"rule": None},
     )
-    assert client_mock.return_value.get_name_from_drawing_id.call_count == 1
     assert client_mock.return_value.download.call_count == 1
 
     assert result.exit_code == 0

@@ -1,11 +1,11 @@
 import click
 from click_help_colors import HelpColorsGroup
+from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_json
-from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import get_client
 

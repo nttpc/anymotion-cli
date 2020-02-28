@@ -3,12 +3,12 @@ from typing import Optional
 
 import click
 from click_help_colors import HelpColorsGroup
+from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_error, echo_success
-from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import color_id, get_client
 from .draw import draw, draw_options
@@ -57,10 +57,9 @@ def extract(
 
     client = get_client(state)
     try:
-        if movie_id is not None:
-            keypoint_id = client.extract_keypoint_from_movie(movie_id)
-        elif image_id is not None:
-            keypoint_id = client.extract_keypoint_from_image(image_id)
+        keypoint_id = client.extract_keypoint(
+            data={"image_id": image_id, "movie_id": movie_id}
+        )
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
 
         if state.use_spinner:

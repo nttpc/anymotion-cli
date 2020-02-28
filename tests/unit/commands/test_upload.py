@@ -1,7 +1,7 @@
 import pytest
+from encore_sdk import FileTypeError, RequestsError
 
 from encore_api_cli.commands.upload import cli
-from encore_api_cli.sdk.exceptions import FileTypeError, RequestsError
 
 
 class TestUpload(object):
@@ -98,11 +98,12 @@ class TestUpload(object):
             client_mock = mocker.MagicMock()
 
             if with_file_type_error:
-                client_mock.return_value.upload_to_s3.side_effect = FileTypeError()
+                client_mock.return_value.upload.side_effect = FileTypeError()
             elif with_requests_error:
-                client_mock.return_value.upload_to_s3.side_effect = RequestsError()
+                client_mock.return_value.upload.side_effect = RequestsError()
             else:
-                client_mock.return_value.upload_to_s3.return_value = ("1", "image")
+                client_mock.return_value.upload.return_value.image_id = 1
+                client_mock.return_value.upload.return_value.movie_id = None
 
             mocker.patch("encore_api_cli.commands.upload.get_client", client_mock)
 

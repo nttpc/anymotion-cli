@@ -31,7 +31,7 @@ commands:
             - /home/circleci/.cache/pypoetry/virtualenvs
 
 jobs:
-  setup-py38:
+  py38-setup:
     executor:
       name: python
     steps:
@@ -73,7 +73,12 @@ jobs:
           name: Run unit test with pytest
           command: poetry run pytest tests/unit --cov --cov-report=xml
       - codecov/upload:
-          flags: unittest
+          flags: unit
+      - run:
+          name: Run integration test with pytest
+          command: poetry run pytest tests/integration --cov --cov-report=xml
+      - codecov/upload:
+          flags: integration
 
   check-lint:
     executor:
@@ -102,7 +107,7 @@ jobs:
       - setup_python
       - run:
           name: Check security with bandit
-          command: poetry run bandit -r encore_api_cli -s B303
+          command: poetry run bandit -r encore_api_cli
 
   release:
     executor:
@@ -115,7 +120,7 @@ jobs:
           command: poetry build
       - run:
           name: Distributing packages
-          command: poetry run s3pypi --bucket pypi.anymotion.jp --dist-path dist --private --force
+          command: poetry run s3pypi --bucket pypi.anymotion.jp --dist-path dist --private
       - aws-cli/setup
       - run:
           name: Install pandoc
@@ -142,18 +147,18 @@ jobs:
 workflows:
   workflow:
     jobs:
-      - setup-py38:
+      - py38-setup:
           filters:
             tags:
               only: /.*/
       - test:
-          name: test-py36
+          name: py36-test
           filters:
             tags:
               only: /.*/
           version: "3.6"
       - test:
-          name: test-py37
+          name: py37-test
           filters:
             tags:
               only: /.*/
@@ -164,14 +169,14 @@ workflows:
             tags:
               only: /.*/
           requires:
-            - setup-py38
+            - py38-setup
       - test:
           name: py38-integration-test
           filters:
             tags:
               only: /.*/
           requires:
-            - setup-py38
+            - py38-setup
           test-type: integration
       - measure-coverage:
           filters:
@@ -179,18 +184,19 @@ workflows:
               only: /.*/
           requires:
             - py38-unit-test
+            - py38-integration-test
       - check-lint:
           filters:
             tags:
               only: /.*/
           requires:
-            - setup-py38
+            - py38-setup
       - check-security:
           filters:
             tags:
               only: /.*/
           requires:
-            - setup-py38
+            - py38-setup
       - approval-release:
           type: approval
           filters:
@@ -199,9 +205,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-py36
-            - test-py37
-            - py38-integration-test
+            - py36-test
+            - py37-test
             - measure-coverage
             - check-lint
             - check-security
