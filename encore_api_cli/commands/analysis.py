@@ -32,7 +32,7 @@ def show(state: State, analysis_id: int) -> None:
     client = get_client(state)
 
     try:
-        response = client.get_one_data("analyses", analysis_id)
+        response = client.get_analysis(analysis_id)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):

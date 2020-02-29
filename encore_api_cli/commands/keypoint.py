@@ -33,7 +33,7 @@ def show(state: State, keypoint_id: int) -> None:
     client = get_client(state)
 
     try:
-        response = client.get_one_data("keypoints", keypoint_id)
+        response = client.get_keypoint(keypoint_id)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):

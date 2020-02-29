@@ -12,7 +12,7 @@ def test_drawing(runner):
 
 
 class TestDrawingShow(object):
-    def test_valid(self, mocker, runner):
+    def test_valid(self, runner, make_client):
         expected = dedent(
             """\
 
@@ -24,7 +24,7 @@ class TestDrawingShow(object):
             """
         )
 
-        client_mock = self._get_client_mock(mocker)
+        client_mock = make_client()
         result = runner.invoke(cli, ["drawing", "show", "1"])
 
         assert client_mock.call_count == 1
@@ -44,33 +44,37 @@ class TestDrawingShow(object):
             ),
         ],
     )
-    def test_invalid_params(self, mocker, runner, args, expected):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_params(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert result.output.endswith(expected)
 
-    def test_with_error(self, mocker, runner):
-        client_mock = self._get_client_mock(mocker, with_exception=True)
+    def test_with_error(self, runner, make_client):
+        client_mock = make_client(with_exception=True)
         result = runner.invoke(cli, ["drawing", "show", "1"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 1
-        assert "Error" in result.output
+        assert result.output == "Error: \n"
 
-    def _get_client_mock(self, mocker, with_exception=False):
-        client_mock = mocker.MagicMock()
-        if with_exception:
-            client_mock.return_value.get_one_data.side_effect = RequestsError()
-        else:
-            client_mock.return_value.get_one_data.return_value = {
-                "id": 1,
-                "execStatus": "SUCCESS",
-            }
-        mocker.patch("encore_api_cli.commands.drawing.get_client", client_mock)
-        return client_mock
+    @pytest.fixture
+    def make_client(self, mocker):
+        def _make_client(status="SUCCESS", with_exception=False):
+            client_mock = mocker.MagicMock()
+            if with_exception:
+                client_mock.return_value.get_drawing.side_effect = RequestsError()
+            else:
+                client_mock.return_value.get_drawing.return_value = {
+                    "id": 1,
+                    "execStatus": status,
+                }
+            mocker.patch("encore_api_cli.commands.drawing.get_client", client_mock)
+            return client_mock
+
+        return _make_client
 
 
 class TestDrawingList(object):

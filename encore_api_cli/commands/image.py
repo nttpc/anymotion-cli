@@ -30,7 +30,7 @@ def show(state: State, image_id: int) -> None:
     client = get_client(state)
 
     try:
-        data = client.get_one_data("images", image_id)
+        data = client.get_image(image_id)
     except RequestsError as e:
         raise ClickException(str(e))
 

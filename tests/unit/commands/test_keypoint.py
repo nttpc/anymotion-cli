@@ -12,8 +12,8 @@ def test_keypoint(runner):
 
 
 class TestKeypointShow(object):
-    def test_valid(self, mocker, runner):
-        client_mock = self._get_client_mock(mocker)
+    def test_valid(self, runner, make_client):
+        client_mock = make_client()
         result = runner.invoke(cli, ["keypoint", "show", "1"])
 
         assert client_mock.call_count == 1
@@ -33,8 +33,8 @@ class TestKeypointShow(object):
             """
         )
 
-    def test_valid_not_success(self, mocker, runner):
-        client_mock = self._get_client_mock(mocker, status="FAILURE")
+    def test_valid_not_success(self, runner, make_client):
+        client_mock = make_client(status="FAILURE")
         result = runner.invoke(cli, ["keypoint", "show", "1"])
 
         assert client_mock.call_count == 1
@@ -54,16 +54,16 @@ class TestKeypointShow(object):
             ),
         ],
     )
-    def test_invalid_params(self, mocker, runner, args, expected):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_params(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert result.output.endswith(expected)
 
-    def test_with_pager(self, mocker, runner):
-        client_mock = self._get_client_mock(mocker, num_data=10)
+    def test_with_pager(self, runner, make_client):
+        client_mock = make_client(num_data=10)
 
         result = runner.invoke(cli, ["keypoint", "show", "1"])
 
@@ -71,32 +71,34 @@ class TestKeypointShow(object):
         assert result.exit_code == 0
         assert '"1": [\n      10,\n      81\n    ]\n' in result.output
 
-    def test_with_error(self, mocker, runner):
-        client_mock = self._get_client_mock(mocker, with_exception=True)
+    def test_with_error(self, runner, make_client):
+        client_mock = make_client(with_exception=True)
         result = runner.invoke(cli, ["keypoint", "show", "1"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 1
-        assert "Error" in result.output
+        assert result.output == "Error: \n"
 
-    def _get_client_mock(
-        self, mocker, status="SUCCESS", num_data=1, with_exception=False
-    ):
-        if status == "SUCCESS":
-            data = [{"1": [i + 1, i * i]} for i in range(num_data)]
-        else:
-            data = None
-        client_mock = mocker.MagicMock()
-        if with_exception:
-            client_mock.return_value.get_one_data.side_effect = RequestsError()
-        else:
-            client_mock.return_value.get_one_data.return_value = {
-                "id": 111,
-                "keypoint": data,
-                "execStatus": status,
-            }
-        mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
-        return client_mock
+    @pytest.fixture
+    def make_client(self, mocker):
+        def _make_client(status="SUCCESS", num_data=1, with_exception=False):
+            if status == "SUCCESS":
+                data = [{"1": [i + 1, i * i]} for i in range(num_data)]
+            else:
+                data = None
+            client_mock = mocker.MagicMock()
+            if with_exception:
+                client_mock.return_value.get_keypoint.side_effect = RequestsError()
+            else:
+                client_mock.return_value.get_keypoint.return_value = {
+                    "id": 111,
+                    "keypoint": data,
+                    "execStatus": status,
+                }
+            mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
+            return client_mock
+
+        return _make_client
 
 
 class TestKeypointList(object):

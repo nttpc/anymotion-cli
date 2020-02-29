@@ -32,7 +32,7 @@ def show(state: State, drawing_id: int) -> None:
     client = get_client(state)
 
     try:
-        data = client.get_one_data("drawings", drawing_id)
+        data = client.get_drawing(drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 

@@ -30,7 +30,7 @@ def show(state: State, movie_id: int) -> None:
     client = get_client(state)
 
     try:
-        data = client.get_one_data("movies", movie_id)
+        data = client.get_movie(movie_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
