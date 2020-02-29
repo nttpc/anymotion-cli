@@ -47,9 +47,9 @@ def list(state: State) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("movies")
+                data = client.get_movies()
         else:
-            data = client.get_list_data("movies")
+            data = client.get_movies()
     except RequestsError as e:
         raise ClickException(str(e))
 

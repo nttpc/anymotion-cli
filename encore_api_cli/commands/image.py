@@ -47,9 +47,9 @@ def list(state: State) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("images")
+                data = client.get_images()
         else:
-            data = client.get_list_data("images")
+            data = client.get_images()
     except RequestsError as e:
         raise ClickException(str(e))
 

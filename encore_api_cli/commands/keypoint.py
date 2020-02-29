@@ -72,9 +72,9 @@ def list(state: State, status: Optional[str]) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("keypoints", params=params)
+                data = client.get_keypoints(params=params)
         else:
-            data = client.get_list_data("keypoints", params=params)
+            data = client.get_keypoints(params=params)
     except RequestsError as e:
         raise ClickException(str(e))
 

@@ -201,7 +201,7 @@ workflows:
           type: approval
           filters:
             tags:
-              only: /^\d.*/
+              only: /^\d+\.\d+(\.\d+)?$/
             branches:
               ignore: /.*/
           requires:
@@ -213,7 +213,7 @@ workflows:
       - release:
           filters:
             tags:
-              only: /^\d.*/
+              only: /^\d+\.\d+(\.\d+)?$/
             branches:
               ignore: /.*/
           requires:
