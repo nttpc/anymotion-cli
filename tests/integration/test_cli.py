@@ -5,7 +5,7 @@ from encore_api_cli.core import cli
 
 class TestAnalysis(object):
     def test_show(self, runner):
-        result = runner.invoke(cli, ["analysis", "show", "444"])
+        result = runner.invoke(cli, ["analysis", "show", "444", "--only"])
 
         assert result.exit_code == 0
         assert result.output == dedent(
@@ -182,7 +182,7 @@ class TestImage(object):
 
 class TestKeypoint(object):
     def test_show(self, runner):
-        result = runner.invoke(cli, ["keypoint", "show", "222"], catch_exceptions=False)
+        result = runner.invoke(cli, ["keypoint", "show", "222", "--only"])
 
         assert result.exit_code == 0
         assert result.output == dedent(
@@ -205,7 +205,7 @@ class TestKeypoint(object):
         )
 
     def test_list(self, runner):
-        result = runner.invoke(cli, ["keypoint", "list"], catch_exceptions=False)
+        result = runner.invoke(cli, ["keypoint", "list"])
 
         assert result.exit_code == 0
         assert result.output == dedent(

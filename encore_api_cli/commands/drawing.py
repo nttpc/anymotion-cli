@@ -32,7 +32,7 @@ def show(state: State, drawing_id: int) -> None:
     client = get_client(state)
 
     try:
-        data = client.get_one_data("drawings", drawing_id)
+        data = client.get_drawing(drawing_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
@@ -60,9 +60,9 @@ def list(state: State, status: Optional[str]) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("drawings", params=params)
+                data = client.get_drawings(params=params)
         else:
-            data = client.get_list_data("drawings", params=params)
+            data = client.get_drawings(params=params)
     except RequestsError as e:
         raise ClickException(str(e))
 

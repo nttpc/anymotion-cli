@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "encore-api-cli"
-version = "0.9.0b0"
+version = "0.9.dev1"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
 repository = "https://bitbucket.org/nttpc-datascience/encore-api-cli/"
-include = ["CHANGELOG.md"]
 classifiers = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",

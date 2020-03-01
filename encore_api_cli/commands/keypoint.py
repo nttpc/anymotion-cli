@@ -25,30 +25,49 @@ def keypoint() -> None:
 
 @keypoint.command(short_help="Show extracted keypoint data.")
 @click.argument("keypoint_id", type=int)
+@click.option(
+    "--only",
+    "--only-keypoint",
+    "only_keypoint",
+    is_flag=True,
+    help="Show only keypoint data.",
+)
+@click.option("--no-keypoint", is_flag=True, help="Do not show keypoint data.")
 @common_options
 @pass_state
-def show(state: State, keypoint_id: int) -> None:
+def show(
+    state: State, keypoint_id: int, only_keypoint: bool, no_keypoint: bool
+) -> None:
     """Show extracted keypoint data."""
-    # TODO: add full option or another command
+    if only_keypoint and no_keypoint:
+        raise click.UsageError(
+            '"--only, --only-keypoint" and "--no-keypoint" options cannot be used '
+            "at the same time."
+        )
+
     client = get_client(state)
 
     try:
-        response = client.get_one_data("keypoints", keypoint_id)
+        response = client.get_keypoint(keypoint_id)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):
-        raise Exception("response is invalid.")
+        raise Exception("Response is invalid.")
 
-    status = response.get("execStatus", "FAILURE")
-    if status == "SUCCESS":
-        data = response.get("keypoint")
-        # TODO: remove type: ignore
-        if len(data) < state.pager_length:  # type: ignore
-            echo_json(data)
+    data = response.get("keypoint") or []
+    pager = len(data) >= state.pager_length
+
+    if no_keypoint:
+        response.pop("keypoint")
+        echo_json(response)
+    elif only_keypoint:
+        status = response.get("execStatus", "FAILURE")
+        if status == "SUCCESS":
+            echo_json(data, pager=pager)
         else:
-            echo_json(data, pager=True)
+            echo_error("Status is not SUCCESS.")
     else:
-        echo_error("Status is not SUCCESS.")
+        echo_json(response, pager=pager)
 
 
 @keypoint.command(short_help="Show a list of information for all keypoints.")
@@ -72,9 +91,9 @@ def list(state: State, status: Optional[str]) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("keypoints", params=params)
+                data = client.get_keypoints(params=params)
         else:
-            data = client.get_list_data("keypoints", params=params)
+            data = client.get_keypoints(params=params)
     except RequestsError as e:
         raise ClickException(str(e))
 

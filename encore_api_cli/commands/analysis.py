@@ -7,7 +7,7 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo_error, echo_json
+from ..output import echo_error, echo_json, echo_warning
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -25,24 +25,52 @@ def analysis() -> None:
 
 @analysis.command(short_help="Show the analysis result.")
 @click.argument("analysis_id", type=int)
+@click.option(
+    "--only",
+    "--only-result",
+    "only_result",
+    is_flag=True,
+    help="Show only result data.",
+)
+@click.option("--no-result", is_flag=True, help="Do not show result data.")
 @common_options
 @pass_state
-def show(state: State, analysis_id: int) -> None:
+def show(state: State, analysis_id: int, only_result: bool, no_result: bool) -> None:
     """Show the analysis result."""
+    if only_result and no_result:
+        raise click.UsageError(
+            '"--only, --only-result" and "--no-result" options cannot be used '
+            "at the same time."
+        )
+
     client = get_client(state)
 
     try:
-        response = client.get_one_data("analyses", analysis_id)
+        response = client.get_analysis(analysis_id)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):
-        raise Exception("response is invalid.")
+        raise Exception("Response is invalid.")
 
-    status = response.get("execStatus", "FAILURE")
-    if status == "SUCCESS":
-        echo_json(response.get("result"))
+    data = response.get("result") or []
+    try:
+        count = sum([len(row[0]["values"]) for row in data])
+    except Exception as e:
+        echo_warning(f"Response is invalid: {e}")
+        count = 0
+    pager = count >= state.pager_length
+
+    if no_result:
+        response.pop("result")
+        echo_json(response)
+    elif only_result:
+        status = response.get("execStatus", "FAILURE")
+        if status == "SUCCESS":
+            echo_json(data, pager=pager)
+        else:
+            echo_error("Status is not SUCCESS.")
     else:
-        echo_error("Status is not SUCCESS.")
+        echo_json(response, pager=pager)
 
 
 @analysis.command(short_help="Show the analysis list.")
@@ -66,9 +94,9 @@ def list(state: State, status: Optional[str]) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("analyses", params=params)
+                data = client.get_analyses(params=params)
         else:
-            data = client.get_list_data("analyses", params=params)
+            data = client.get_analyses(params=params)
     except RequestsError as e:
         raise ClickException(str(e))
 
