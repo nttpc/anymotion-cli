@@ -13,6 +13,94 @@ def test_analysis(runner):
 
 class TestAnalysisShow(object):
     @pytest.mark.parametrize(
+        "args, status, expected",
+        [
+            (
+                ["analysis", "show", "1"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "result": [
+                        [
+                          {
+                            "type": "angle",
+                            "values": [
+                              180
+                            ]
+                          }
+                        ]
+                      ],
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["analysis", "show", "1"],
+                "FAILURE",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "result": null,
+                      "execStatus": "FAILURE"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["analysis", "show", "1", "--no-result"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["analysis", "show", "1", "--no-result"],
+                "FAILURE",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "execStatus": "FAILURE"
+                    }
+
+                    """
+                ),
+            ),
+        ],
+    )
+    def test_valid(self, runner, make_client, args, status, expected):
+        client_mock = make_client(status)
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["analysis", "show", "1", "--only"],
+            ["analysis", "show", "1", "--only-result"],
+            ["analysis", "show", "1", "--only", "--only-result"],
+        ],
+    )
+    @pytest.mark.parametrize(
         "status, expected",
         [
             (
@@ -37,9 +125,9 @@ class TestAnalysisShow(object):
             ("FAILURE", "Error: Status is not SUCCESS.\n"),
         ],
     )
-    def test_valid(self, runner, make_client, status, expected):
+    def test_with_only(self, runner, make_client, args, status, expected):
         client_mock = make_client(status)
-        result = runner.invoke(cli, ["analysis", "show", "1"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
@@ -54,6 +142,20 @@ class TestAnalysisShow(object):
                 (
                     'Error: Invalid value for "ANALYSIS_ID": '
                     "invalid_id is not a valid integer\n",
+                ),
+            ),
+            (
+                ["analysis", "show", "1", "--only", "--no-result"],
+                (
+                    'Error: "--only, --only-result" and "--no-result" options '
+                    "cannot be used at the same time.\n"
+                ),
+            ),
+            (
+                ["analysis", "show", "1", "--only-result", "--no-result"],
+                (
+                    'Error: "--only, --only-result" and "--no-result" options '
+                    "cannot be used at the same time.\n"
                 ),
             ),
         ],

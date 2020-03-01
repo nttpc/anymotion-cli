@@ -12,34 +12,121 @@ def test_keypoint(runner):
 
 
 class TestKeypointShow(object):
-    def test_valid(self, runner, make_client):
-        client_mock = make_client()
-        result = runner.invoke(cli, ["keypoint", "show", "1"])
+    @pytest.mark.parametrize(
+        "args, status, expected",
+        [
+            (
+                ["keypoint", "show", "111"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "keypoint": [
+                        {
+                          "1": [
+                            1,
+                            0
+                          ]
+                        }
+                      ],
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["keypoint", "show", "111"],
+                "FAILURE",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "keypoint": null,
+                      "execStatus": "FAILURE"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["keypoint", "show", "111", "--no-keypoint"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
+                ["keypoint", "show", "111", "--no-keypoint"],
+                "FAILURE",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "execStatus": "FAILURE"
+                    }
+
+                    """
+                ),
+            ),
+        ],
+    )
+    def test_valid(self, runner, make_client, args, status, expected):
+        client_mock = make_client(status)
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == dedent(
-            """\
+        assert result.output == expected
 
-                [
-                  {
-                    "1": [
-                      1,
-                      0
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["keypoint", "show", "1", "--only"],
+            ["keypoint", "show", "1", "--only-keypoint"],
+        ],
+    )
+    @pytest.mark.parametrize(
+        "status, expected",
+        [
+            (
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    [
+                      {
+                        "1": [
+                          1,
+                          0
+                        ]
+                      }
                     ]
-                  }
-                ]
 
-            """
-        )
-
-    def test_valid_not_success(self, runner, make_client):
-        client_mock = make_client(status="FAILURE")
-        result = runner.invoke(cli, ["keypoint", "show", "1"])
+                    """
+                ),
+            ),
+            ("FAILURE", "Error: Status is not SUCCESS.\n"),
+        ],
+    )
+    def test_with_only(self, runner, make_client, args, status, expected):
+        client_mock = make_client(status)
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == "Error: Status is not SUCCESS.\n"
+        assert result.output == expected
 
     @pytest.mark.parametrize(
         "args, expected",
@@ -52,6 +139,20 @@ class TestKeypointShow(object):
                     "invalid_id is not a valid integer\n"
                 ),
             ),
+            (
+                ["keypoint", "show", "1", "--only", "--no-keypoint"],
+                (
+                    'Error: "--only, --only-keypoint" and "--no-keypoint" options '
+                    "cannot be used at the same time.\n"
+                ),
+            ),
+            (
+                ["keypoint", "show", "1", "--only-keypoint", "--no-keypoint"],
+                (
+                    'Error: "--only, --only-keypoint" and "--no-keypoint" options '
+                    "cannot be used at the same time.\n"
+                ),
+            ),
         ],
     )
     def test_invalid_params(self, runner, make_client, args, expected):
@@ -62,10 +163,17 @@ class TestKeypointShow(object):
         assert result.exit_code == 2
         assert result.output.endswith(expected)
 
-    def test_with_pager(self, runner, make_client):
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["keypoint", "show", "1", "--only"],
+            ["keypoint", "show", "1", "--only-keypoint"],
+        ],
+    )
+    def test_with_pager(self, runner, make_client, args):
         client_mock = make_client(num_data=10)
 
-        result = runner.invoke(cli, ["keypoint", "show", "1"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
