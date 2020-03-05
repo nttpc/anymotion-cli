@@ -24,14 +24,12 @@ class TestAnalysisShow(object):
                     {
                       "id": 111,
                       "result": [
-                        [
-                          {
-                            "type": "angle",
-                            "values": [
-                              180
-                            ]
-                          }
-                        ]
+                        {
+                          "analysisType": "angle",
+                          "values": [
+                            180
+                          ]
+                        }
                       ],
                       "execStatus": "SUCCESS"
                     }
@@ -109,14 +107,12 @@ class TestAnalysisShow(object):
                     """\
 
                     [
-                      [
-                        {
-                          "type": "angle",
-                          "values": [
-                            180
-                          ]
-                        }
-                      ]
+                      {
+                        "analysisType": "angle",
+                        "values": [
+                          180
+                        ]
+                      }
                     ]
 
                     """
@@ -181,7 +177,7 @@ class TestAnalysisShow(object):
         def _make_client(status="SUCCESS", with_exception=False):
             client_mock = mocker.MagicMock()
             if status == "SUCCESS":
-                data = [[{"type": "angle", "values": [180]}]]
+                data = [{"analysisType": "angle", "values": [180]}]
             else:
                 data = None
             if with_exception:

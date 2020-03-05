@@ -179,13 +179,11 @@ def api_requests_mock(requests_mock):
             "keypoint": 222,
             "execStatus": "SUCCESS",
             "result": [
-                [
-                    {
-                        "type": "angle",
-                        "description": "leftShoulder, leftHip and leftKnee angles",
-                        "values": [120],
-                    }
-                ]
+                {
+                    "analysisType": "angle",
+                    "description": "leftShoulder, leftHip and leftKnee angles",
+                    "values": [120],
+                }
             ],
         },
     )
