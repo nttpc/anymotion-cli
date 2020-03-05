@@ -12,15 +12,13 @@ class TestAnalysis(object):
             """\
 
             [
-              [
-                {
-                  "type": "angle",
-                  "description": "leftShoulder, leftHip and leftKnee angles",
-                  "values": [
-                    120
-                  ]
-                }
-              ]
+              {
+                "analysisType": "angle",
+                "description": "leftShoulder, leftHip and leftKnee angles",
+                "values": [
+                  120
+                ]
+              }
             ]
 
             """

@@ -54,7 +54,7 @@ def show(state: State, analysis_id: int, only_result: bool, no_result: bool) -> 
 
     data = response.get("result") or []
     try:
-        count = sum([len(row[0]["values"]) for row in data])
+        count = sum([len(row["values"]) for row in data])
     except Exception as e:
         echo_warning(f"Response is invalid: {e}")
         count = 0
