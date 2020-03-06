@@ -1,4 +1,3 @@
-from pathlib import Path
 from textwrap import dedent
 
 import pytest
@@ -12,58 +11,34 @@ class TestDraw(object):
         "args",
         [["draw", "1"], ["draw", "1", "--rule", "[]"], ["draw", "--rule", "[]", "1"]],
     )
-    def test_valid(self, mocker, runner, args):
-        path = (Path(".") / "image.jpg").resolve()
-        client_mock = self._get_client_mock(mocker)
+    def test_valid(self, runner, make_client, args):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing id: 111)
-                Success: Drawing is complete.
-                Downloaded the file to {path}.
+            Drawing started. (drawing id: 111)
+            Success: Drawing is complete.
+
             """
         )
 
     @pytest.mark.parametrize(
         "args", [["draw", "1", "--no-download"], ["draw", "--no-download", "1"]]
     )
-    def test_valid_no_download(self, mocker, runner, args):
-        client_mock = self._get_client_mock(mocker)
+    def test_valid_no_download(self, runner, make_client, args):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing id: 111)
-                Success: Drawing is complete.
+            Drawing started. (drawing id: 111)
+            Success: Drawing is complete.
             """
-        )
-
-    def test_valid_skip_donwload(self, mocker, runner):
-        message = dedent(
-            """\
-                Skip download. To download it, run the following command.
-
-                "%(prog)s download %(drawing_id)s"
-            """
-        )
-        client_mock = self._get_client_mock(mocker)
-        check_download_mock = mocker.MagicMock(return_value=(False, message, None))
-        mocker.patch("encore_api_cli.commands.draw.check_download", check_download_mock)
-
-        result = runner.invoke(cli, ["draw", "1"])
-
-        assert client_mock.call_count == 1
-        assert result.exit_code == 0
-        message = message % {"prog": "amcli", "drawing_id": "111"}
-        assert result.output == (
-            "Drawing started. (drawing id: 111)\n"
-            "Success: Drawing is complete.\n"
-            f"{message}\n"
         )
 
     @pytest.mark.parametrize(
@@ -73,22 +48,21 @@ class TestDraw(object):
             ("FAILURE", "Error: Drawing failed."),
         ],
     )
-    def test_valid_not_success(self, mocker, runner, status, expected):
-        client_mock = self._get_client_mock(mocker, status)
+    def test_valid_not_success(self, runner, make_client, status, expected):
+        client_mock = make_client(status=status)
         result = runner.invoke(cli, ["draw", "1"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 1
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing id: 111)
-                {expected}
+            Drawing started. (drawing id: 111)
+            {expected}
             """
         )
 
-    def test_valid_rule_file(self, mocker, tmp_path, runner):
-        path = (Path(".") / "image.jpg").resolve()
-        client_mock = self._get_client_mock(mocker)
+    def test_valid_rule_file(self, tmp_path, runner, make_client):
+        client_mock = make_client()
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
 
@@ -98,15 +72,15 @@ class TestDraw(object):
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
-                Drawing started. (drawing id: 111)
-                Success: Drawing is complete.
-                Downloaded the file to {path}.
+            Drawing started. (drawing id: 111)
+            Success: Drawing is complete.
+
             """
         )
 
-    def test_with_spinner(self, mocker, monkeypatch, runner):
+    def test_with_spinner(self, monkeypatch, runner, make_client):
         monkeypatch.setenv("ANYMOTION_USE_SPINNER", "true")
-        client_mock = self._get_client_mock(mocker)
+        client_mock = make_client()
 
         result = runner.invoke(cli, ["draw", "1"])
 
@@ -127,25 +101,16 @@ class TestDraw(object):
             ),
         ],
     )
-    def test_invalid_rule(self, mocker, runner, args, expected):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_rule(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 1
         assert result.output == expected
 
-    @pytest.mark.parametrize(
-        "with_drawing_exception, with_download_exception", [(True, True), (False, True)]
-    )
-    def test_with_error(
-        self, mocker, runner, with_drawing_exception, with_download_exception
-    ):
-        client_mock = self._get_client_mock(
-            mocker,
-            with_drawing_exception=with_drawing_exception,
-            with_download_exception=with_download_exception,
-        )
+    def test_with_error(self, runner, make_client):
+        client_mock = make_client(with_exception=True)
         result = runner.invoke(cli, ["draw", "1"])
 
         assert client_mock.call_count == 1
@@ -163,16 +128,16 @@ class TestDraw(object):
             (["draw", "1", "--rule"], "Error: --rule option requires an argument"),
         ],
     )
-    def test_invalid_params(self, mocker, runner, args, expected):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_params(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert expected in result.output
 
-    def test_invalid_params_both_rule(self, mocker, tmp_path, runner):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_params_both_rule(self, tmp_path, runner, make_client):
+        client_mock = make_client()
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
 
@@ -187,36 +152,26 @@ class TestDraw(object):
             in result.output
         )
 
-    def _get_client_mock(
-        self,
-        mocker,
-        status="SUCCESS",
-        with_drawing_exception=False,
-        with_download_exception=False,
-    ):
-        client_mock = mocker.MagicMock()
-        client_mock.return_value.draw_keypoint.return_value = 111
-        if status == "SUCCESS":
-            url = "http://example.com/image.jpg"
-            mocker.patch(
-                "encore_api_cli.commands.draw.get_name_from_drawing_id",
-                mocker.MagicMock(return_value="image"),
-            )
-        else:
-            url = None
+    @pytest.fixture
+    def make_client(self, mocker):
+        def _make_client(status="SUCCESS", with_exception=False):
+            client_mock = mocker.MagicMock()
+            client_mock.return_value.draw_keypoint.return_value = 111
+            if status == "SUCCESS":
+                url = "http://example.com/image.jpg"
+            else:
+                url = None
 
-        wait_mock = client_mock.return_value.wait_for_drawing
-        if with_drawing_exception:
-            wait_mock.side_effect = RequestsError()
-        else:
-            wait_mock.return_value.status = status
-            wait_mock.return_value.get.return_value = url
+            wait_mock = client_mock.return_value.wait_for_drawing
+            if with_exception:
+                wait_mock.side_effect = RequestsError()
+            else:
+                wait_mock.return_value.status = status
+                wait_mock.return_value.get.return_value = url
 
-        if with_download_exception:
-            client_mock.return_value.download.side_effect = RequestsError()
-        else:
-            client_mock.return_value.download.return_value = None
+            mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
+            mocker.patch("encore_api_cli.commands.draw.download", mocker.MagicMock())
 
-        mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
+            return client_mock
 
-        return client_mock
+        return _make_client

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
-from encore_sdk import Client, ClientValueError, RequestsError
+from encore_sdk import Client, ClientValueError
 
 from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response
@@ -40,32 +40,6 @@ def get_client(state: State) -> Client:
         client.session.add_response_callback(echo_response)
 
     return client
-
-
-def get_name_from_drawing_id(client: Client, drawing_id: int) -> str:
-    """Get image or movie name from drawing_id.
-
-    Raises:
-        RequestsError: HTTP request fails.
-    """
-    try:
-        data = client.get_drawing(drawing_id)
-        keypoint_id = data.get("keypoint")
-
-        data = client.get_keypoint(keypoint_id)
-        image_id = data.get("image")
-        movie_id = data.get("movie")
-
-        if image_id:
-            data = client.get_image(image_id)
-        elif movie_id:
-            data = client.get_movie(movie_id)
-        else:
-            raise
-    except RequestsError as e:
-        raise ClickException(str(e))
-
-    return data.get("name", "")
 
 
 # TODO: remove?

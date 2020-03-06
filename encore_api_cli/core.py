@@ -16,9 +16,9 @@ from .commands.image import cli as image
 from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
+from .config import get_app_dir
 from .options import profile_option
 from .state import State, pass_state
-from .config import get_app_dir
 
 
 class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):

@@ -25,7 +25,7 @@ Alternatively, you can configure the index URL in `~/.pip/pip.conf`:
 extra-index-url = https://pypi.anymotion.jp
 ```
 
-**NOTICE**: You can only install from the internal network.
+**Notice**: You can only install from the internal network.
 
 ## Getting Started
 
@@ -111,7 +111,8 @@ $ amcli upload image.jpg
 Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image id`. Extract keypoints using this `image id`.
+When the upload is complete, you get an `image id`.
+Extract keypoints using this `image id`.
 
 ```sh
 $ amcli extract --image-id 111
@@ -130,22 +131,6 @@ Downloaded the file to image_xxx.jpg.
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
 To save to a specific directory, use the `--out-dir` option.
-
-### Tips
-
-You can use [jq](https://stedolan.github.io/jq/) to filter according to conditions.
-
-Get a list of keypoints whose execStatus is SUCCESS:
-
-```sh
-$ amcli keypoint list | jq '.[] | select(.execStatus == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
-```
-
-Get a list of keypoint_id for only movie:
-
-```sh
-$ amcli keypoint list | jq '.[] | select(.movie != null) | .id'
-```
 
 ## Bash Complete
 

@@ -1,4 +1,3 @@
-from pathlib import Path
 from textwrap import dedent
 
 import pytest
@@ -37,23 +36,17 @@ class TestExtract(object):
         assert "Processing..." in result.output
 
     def test_with_drawing(self, runner, make_client):
-        path = (Path(".") / "image.jpg").resolve()
         client_mock = make_client(with_drawing=True)
 
         result = runner.invoke(cli, ["extract", "--image-id", "111", "--with-drawing"])
 
-        assert client_mock.call_count == 2
-        assert client_mock.return_value.draw_keypoint.call_count == 1
-        assert client_mock.return_value.download.call_count == 1
+        assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
             f"""\
             Keypoint extraction started. (keypoint id: 111)
             Success: Keypoint extraction is complete.
 
-            Drawing started. (drawing id: 333)
-            Success: Drawing is complete.
-            Downloaded the file to {path}.
             """
         )
 
@@ -155,18 +148,7 @@ class TestExtract(object):
                     wait_mock.return_value.failure_detail = "message"
 
             if with_drawing:
-                client_mock.return_value.draw_keypoint.return_value = 333
-                client_mock.return_value.download.return_value = None
-
-                wait_mock = client_mock.return_value.wait_for_drawing
-                wait_mock.return_value.status = "SUCCESS"
-                wait_mock.return_value.get.return_value = "http://example.com/image.jpg"
-
-                mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
-                mocker.patch(
-                    "encore_api_cli.commands.draw.get_name_from_drawing_id",
-                    mocker.MagicMock(return_value="image"),
-                )
+                mocker.patch("encore_api_cli.commands.extract.draw", mocker.MagicMock())
 
             mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
             return client_mock
