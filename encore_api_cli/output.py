@@ -89,7 +89,9 @@ def echo_response(response: requests.Response) -> None:
         }
     """
     status = click.style(str(response.status_code), fg="blue")
-    reason = click.style(response.reason, fg="cyan")
+    reason = ""
+    if response.reason:
+        reason = click.style(response.reason, fg="cyan")
     http_version = "HTTP"
     if response.raw.version == 10:
         http_version = "HTTP/1.0"
