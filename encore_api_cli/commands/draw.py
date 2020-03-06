@@ -8,7 +8,7 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_error, echo_success
+from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client, get_name_from_drawing_id, parse_rule
 from .download import check_download
@@ -93,6 +93,6 @@ def draw(
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     elif response.status == "TIMEOUT":
-        echo_error("Drawing is timed out.")
+        raise ClickException("Drawing is timed out.")
     else:
-        echo_error("Drawing failed.")
+        raise ClickException("Drawing failed.")

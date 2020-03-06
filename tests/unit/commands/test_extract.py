@@ -12,12 +12,7 @@ class TestExtract(object):
         "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
     )
     @pytest.mark.parametrize(
-        "status, expected",
-        [
-            ("SUCCESS", "Success: Keypoint extraction is complete.",),
-            ("TIMEOUT", "Error: Keypoint extraction is timed out.",),
-            ("FAILURE", "Error: Keypoint extraction failed.\nmessage",),
-        ],
+        "status, expected", [("SUCCESS", "Success: Keypoint extraction is complete.",)],
     )
     def test_valid(self, runner, make_client, args, status, expected):
         keypoint_id = 111
@@ -63,9 +58,31 @@ class TestExtract(object):
         )
 
     @pytest.mark.parametrize(
+        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
+    )
+    @pytest.mark.parametrize(
+        "status, expected",
+        [
+            ("TIMEOUT", "Error: Keypoint extraction is timed out.",),
+            ("FAILURE", "Error: Keypoint extraction failed.\nmessage",),
+        ],
+    )
+    def test_with_extract_error(self, runner, make_client, args, status, expected):
+        keypoint_id = 111
+        client_mock = make_client(status=status, keypoint_id=keypoint_id)
+
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
+        assert result.output == dedent(
+            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
+        )
+
+    @pytest.mark.parametrize(
         "with_extract_exception, with_wait_exception", [(True, True), (False, True)]
     )
-    def test_with_error(
+    def test_with_requests_error(
         self, runner, make_client, with_extract_exception, with_wait_exception
     ):
         client_mock = make_client(

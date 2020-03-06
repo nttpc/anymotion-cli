@@ -118,7 +118,6 @@ class TestAnalysisShow(object):
                     """
                 ),
             ),
-            ("FAILURE", "Error: Status is not SUCCESS.\n"),
         ],
     )
     def test_with_only(self, runner, make_client, args, status, expected):
@@ -127,6 +126,25 @@ class TestAnalysisShow(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["analysis", "show", "1", "--only"],
+            ["analysis", "show", "1", "--only-result"],
+            ["analysis", "show", "1", "--only", "--only-result"],
+        ],
+    )
+    @pytest.mark.parametrize(
+        "status, expected", [("FAILURE", "Error: Status is not SUCCESS.\n")],
+    )
+    def test_with_only_with_error(self, runner, make_client, args, status, expected):
+        client_mock = make_client(status)
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
         assert result.output == expected
 
     @pytest.mark.parametrize(

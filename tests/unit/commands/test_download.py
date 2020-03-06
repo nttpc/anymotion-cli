@@ -28,16 +28,6 @@ class TestDownload(object):
                 "SUCCESS",
                 "Downloaded the file to {path}.\n",
             ),
-            (
-                ["download", "111"],
-                "FAILURE",
-                "Error: Unable to download because drawing failed.\n",
-            ),
-            (
-                ["download", "111"],
-                "TIMEOUT",
-                "Error: Unable to download because drawing failed.\n",
-            ),
         ],
     )
     def test_valid(self, runner, make_client_mock, args, status, expected):
@@ -71,10 +61,20 @@ class TestDownload(object):
         assert result.exit_code == 0
         assert result.output == message % {"prog": "amcli", "drawing_id": "111"} + "\n"
 
+    @pytest.mark.parametrize("status", ["FAILURE", "TIMEOUT"])
+    def test_with_response_error(self, runner, make_client_mock, status):
+        client_mock = make_client_mock(status)
+
+        result = runner.invoke(cli, ["download", "111"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
+        assert result.output == "Error: Unable to download because drawing failed.\n"
+
     @pytest.mark.parametrize(
         "with_wait_exception, with_download_exception", [(True, True), (False, True)]
     )
-    def test_with_error(
+    def test_with_requests_error(
         self, runner, make_client_mock, with_wait_exception, with_download_exception
     ):
         client_mock = make_client_mock(

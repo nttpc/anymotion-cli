@@ -7,7 +7,7 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo_error, echo_json
+from ..output import echo_json
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -65,7 +65,7 @@ def show(
         if status == "SUCCESS":
             echo_json(data, pager=pager)
         else:
-            echo_error("Status is not SUCCESS.")
+            raise ClickException("Status is not SUCCESS.")
     else:
         echo_json(response, pager=pager)
 

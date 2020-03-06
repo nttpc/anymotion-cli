@@ -9,7 +9,7 @@ from encore_sdk import RequestsError
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_error
+from ..output import echo
 from ..state import State, pass_state
 from ..utils import color_path, get_client, get_name_from_drawing_id
 
@@ -53,7 +53,7 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
             message = message % {"prog": state.cli_name, "drawing_id": drawing_id}
         echo(message)
     else:
-        echo_error("Unable to download because drawing failed.")
+        raise ClickException("Unable to download because drawing failed.")
 
 
 def check_download(

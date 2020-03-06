@@ -116,8 +116,7 @@ class TestKeypointShow(object):
 
                     """
                 ),
-            ),
-            ("FAILURE", "Error: Status is not SUCCESS.\n"),
+            )
         ],
     )
     def test_with_only(self, runner, make_client, args, status, expected):
@@ -126,6 +125,24 @@ class TestKeypointShow(object):
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["keypoint", "show", "1", "--only"],
+            ["keypoint", "show", "1", "--only-keypoint"],
+        ],
+    )
+    @pytest.mark.parametrize(
+        "status, expected", [("FAILURE", "Error: Status is not SUCCESS.\n")],
+    )
+    def test_with_only_not_success(self, runner, make_client, args, status, expected):
+        client_mock = make_client(status)
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
         assert result.output == expected
 
     @pytest.mark.parametrize(

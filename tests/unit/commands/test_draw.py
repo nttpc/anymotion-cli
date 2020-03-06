@@ -78,7 +78,7 @@ class TestDraw(object):
         result = runner.invoke(cli, ["draw", "1"])
 
         assert client_mock.call_count == 1
-        assert result.exit_code == 0
+        assert result.exit_code == 1
         assert result.output == dedent(
             f"""\
                 Drawing started. (drawing id: 111)

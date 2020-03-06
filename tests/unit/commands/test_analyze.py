@@ -65,7 +65,7 @@ class TestAnalyze(object):
         result = runner.invoke(cli, ["analyze", "1", "--rule", "[]"])
 
         assert client_mock.call_count == 1
-        assert result.exit_code == 0
+        assert result.exit_code == 1
         assert result.output == message
 
     def test_valid_rule_file(self, mocker, runner, tmp_path):
