@@ -20,7 +20,7 @@ pygments = "^2.5.2"
 requests = "^2.22.0"
 tabulate = "^0.8.6"
 yaspin = "^0.16.0"
-encore-sdk = "^0.1.0"
+encore-sdk = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"

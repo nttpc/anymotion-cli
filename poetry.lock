@@ -189,7 +189,7 @@ description = "AnyMotion SDK for Python"
 name = "encore-sdk"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.1"
+version = "0.2.0"
 
 [package.dependencies]
 requests = ">=2.22.0,<3.0.0"
@@ -814,7 +814,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "0d47a37733998d9c31b0fe1e390483d617f0a96b7721c1631fdbdca4e6e88fe5"
+content-hash = "9765512e5fbb7a66ab214f30581948e9413f3b84fc339af3630c8712866c0a26"
 python-versions = "^3.6 || ^3.7 || ^3.8"
 
 [metadata.files]
