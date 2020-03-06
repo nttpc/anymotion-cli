@@ -66,9 +66,9 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
         try:
             if state.use_spinner:
                 with yaspin(text="Downloading..."):
-                    client.download(drawing_id, path)
+                    client.download(drawing_id, path, exist_ok=True)
             else:
-                client.download(drawing_id, path)
+                client.download(drawing_id, path, exist_ok=True)
         except RequestsError as e:
             raise ClickException(str(e))
 
