@@ -6,8 +6,8 @@ Unreleased
 
 - Added `--only` option to `keypoint show` and `analysis show` commands.
 - Moved sdk to another package [encore_sdk](https://bitbucket.org/nttpc-datascience/encore-sdk).
-- Make it possible to handle for changing analysis result response.
-- Fix bug when response.reason is None at output.py.
+- Made it possible to handle for changing analysis result response.
+- Fixed bug when response.reason is None at output.py.
 
 ## 0.8.0
 

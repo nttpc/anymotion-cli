@@ -28,7 +28,7 @@ def make_path(tmp_path):
     """
 
     def _make_path(name, exists=True, is_file=False, is_dir=False, content=None):
-        if not (is_file ^ is_dir):
+        if exists and not (is_file ^ is_dir):
             raise Exception("Either is_file or is_dir must be True.")
 
         path = tmp_path / name

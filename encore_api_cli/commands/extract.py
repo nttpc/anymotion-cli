@@ -8,7 +8,7 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_error, echo_success
+from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client
 from .draw import draw, draw_options
@@ -73,9 +73,9 @@ def extract(
     if response.status == "SUCCESS":
         echo_success("Keypoint extraction is complete.")
     elif response.status == "TIMEOUT":
-        echo_error("Keypoint extraction is timed out.")
+        raise ClickException("Keypoint extraction is timed out.")
     else:
-        echo_error(f"Keypoint extraction failed.\n{response.failure_detail}")
+        raise ClickException(f"Keypoint extraction failed.\n{response.failure_detail}")
 
     if with_drawing:
         echo()

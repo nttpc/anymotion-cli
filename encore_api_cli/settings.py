@@ -3,12 +3,8 @@ from configparser import ConfigParser, SectionProxy
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
+from .config import API_URL, POLLING_INTERVAL, TIMEOUT, get_app_dir
 from .exceptions import SettingsValueError
-
-# default values
-API_URL = "https://api.customer.jp/anymotion/v1/"
-POLLING_INTERVAL = 5
-TIMEOUT = 600
 
 
 class Settings(object):
@@ -27,9 +23,7 @@ class Settings(object):
     """
 
     def __init__(self, profile_name: str, use_env: bool = True):
-        settings_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
-        settings_dir.mkdir(exist_ok=True)
-
+        settings_dir = get_app_dir()
         config_file = settings_dir / "config"
         credentials_file = settings_dir / "credentials"
 

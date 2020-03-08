@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 import click
 from click_help_colors import HelpColorsMixin
 from click_repl import repl
@@ -19,6 +16,7 @@ from .commands.image import cli as image
 from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
+from .config import get_app_dir
 from .options import profile_option
 from .state import State, pass_state
 
@@ -66,17 +64,6 @@ def cli(ctx: click.Context, state: State, interactive: bool) -> None:
         else:
             click.echo(cli.get_help(ctx))
 
-    # TODO: future warning
-    # if state.cli_name != "amcli":
-    #     warning = click.style("Warning", fg="yellow")
-    #     old_cmd = click.style(state.cli_name, fg="cyan")
-    #     new_cmd = click.style("amcli", fg="cyan")
-    #     click.echo(
-    #         f'{warning}: {old_cmd} command is deprecated. Use {new_cmd} command.',
-    #         err=True,
-    #     )
-    #     click.echo()
-
 
 def _run_interactive_mode(state):
     click.echo(f"Start interactive mode.")
@@ -95,15 +82,11 @@ def _run_interactive_mode(state):
         ("class:pound", "> "),
     ]
 
-    # TODO: move utils.py
-    app_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
-    app_dir.mkdir(exist_ok=True)
-
     repl(
         click.get_current_context(),
         prompt_kwargs={
             "message": message,
             "style": style,
-            "history": FileHistory(app_dir / ".repl-history"),
+            "history": FileHistory(get_app_dir() / ".repl-history"),
         },
     )

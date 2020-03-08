@@ -86,6 +86,7 @@ def test_draw(tmp_path, runner):
         f"""\
         Drawing started. (drawing id: 333)
         Success: Drawing is complete.
+
         Downloaded the file to {path.resolve()}.
         """
     )

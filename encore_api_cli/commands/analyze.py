@@ -8,7 +8,7 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo, echo_error, echo_success
+from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
 from .analysis import show
@@ -73,6 +73,6 @@ def analyze(
         if show_result:
             ctx.invoke(show, analysis_id=analysis_id)
     elif response.status == "TIMEOUT":
-        echo_error("Analysis is timed out.")
+        raise ClickException("Analysis is timed out.")
     else:
-        echo_error(f"Analysis failed.\n{response.failure_detail}")
+        raise ClickException(f"Analysis failed.\n{response.failure_detail}")

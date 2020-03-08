@@ -27,12 +27,6 @@ def echo_warning(message: str) -> None:
     click.echo(f"{click.style('Warning', fg='yellow')}: {message}", err=True)
 
 
-def echo_error(message: str) -> None:
-    """Output error message."""
-    click.echo(f"{click.style('Error', fg='red')}: {message}", err=True)
-    # TODO: exit?
-
-
 def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> None:
     """Output json data."""
     if is_show():
