@@ -1,5 +1,6 @@
 import io
 from typing import Callable, Optional
+from textwrap import dedent
 
 import click
 from click_help_colors import HelpColorsGroup
@@ -11,24 +12,24 @@ from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client, parse_rule
-from .download import download
+from .download import download, download_options
 
 
 def draw_options(f: Callable) -> Callable:
     """Set draw options."""
-    f = click.option("--no-download", is_flag=True, help="Disable download.")(f)
-    f = click.option("--rule", "rule_str", help="Drawing rules in JSON format.")(f)
+    f = click.option(
+        "--download/--no-download",
+        "is_download",
+        default=None,
+        help=(
+            "Whether to download the drawn file. "
+            'If you change the default value, run "configure set is_download".'
+        ),
+    )(f)
     f = click.option(
         "--rule-file", type=click.File(), help="Drawing rules file in JSON format."
     )(f)
-    f = click.option(
-        "-o",
-        "--out-dir",
-        default=".",
-        type=click.Path(exists=True, file_okay=False),
-        show_default=True,
-        help="Path of directory to output drawn file.",
-    )(f)
+    f = click.option("--rule", "rule_str", help="Drawing rules in JSON format.")(f)
     return f
 
 
@@ -40,6 +41,7 @@ def cli() -> None:  # noqa: D103
 @cli.command(short_help="Draw points and/or lines on uploaded movie or image.")
 @click.argument("keypoint_id", type=int)
 @draw_options
+@download_options
 @common_options
 @pass_state
 @click.pass_context
@@ -47,10 +49,10 @@ def draw(
     ctx: click.Context,
     state: State,
     keypoint_id: int,
-    out_dir: str,
     rule_str: Optional[str],
     rule_file: Optional[io.TextIOWrapper],
-    no_download: bool,
+    is_download: Optional[bool],
+    **kwargs,
 ) -> None:
     """Draw points and/or lines on uploaded movie or image."""
     if rule_str is not None and rule_file is not None:
@@ -78,13 +80,24 @@ def draw(
     except RequestsError as e:
         raise ClickException(str(e))
 
-    url = response.get("drawingUrl")
-    if response.status == "SUCCESS" and url is not None:
+    if response.status == "SUCCESS":
         echo_success("Drawing is complete.")
-        if not no_download:
-            echo()
-            ctx.invoke(download, drawing_id=drawing_id, out_dir=out_dir)
     elif response.status == "TIMEOUT":
         raise ClickException("Drawing is timed out.")
     else:
         raise ClickException("Drawing failed.")
+
+    echo()
+    if is_download is None:
+        is_download = click.confirm("Download the drawn file?")
+    if is_download:
+        ctx.invoke(download, drawing_id=drawing_id, **kwargs)
+    else:
+        message = dedent(
+            f"""\
+            Skip download. To download it, run the following command.
+
+            "{state.cli_name} download {drawing_id}"
+            """
+        )
+        echo(message)
