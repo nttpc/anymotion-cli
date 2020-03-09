@@ -9,9 +9,17 @@ from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo
+from ..output import echo, echo_warning
 from ..state import State, pass_state
 from ..utils import color_path, get_client
+
+
+def validate_path(ctx, param, value):
+    """Validate path."""
+    path = Path(value)
+    if path.parent.exists() is False:
+        raise click.BadParameter(f'File "{path}" is not writable.')
+    return path.expanduser().resolve()
 
 
 @click.group(cls=HelpColorsGroup, help_options_color="cyan")
@@ -23,18 +31,18 @@ def cli() -> None:  # noqa: D103
 @click.argument("drawing_id", type=int)
 @click.option(
     "-o",
-    "--out-dir",
+    "--out",
     default=".",
-    type=click.Path(exists=True, file_okay=False),
+    callback=validate_path,
     show_default=True,
-    help="Path of directory to output drawn file.",
+    help="Path of file or directory to output drawn file.",
 )
 # @click.option(
 #     "--overwrite", is_flag=True, help="If the file exists, overwrite it.",
 # )
 @common_options
 @pass_state
-def download(state: State, drawing_id: int, out_dir: str) -> None:
+def download(state: State, drawing_id: int, out: Path) -> None:
     """Download the drawn file."""
     client = get_client(state)
 
@@ -50,16 +58,25 @@ def download(state: State, drawing_id: int, out_dir: str) -> None:
     if status != "SUCCESS" or url is None:
         raise ClickException("Unable to download because drawing failed.")
 
-    try:
-        name = _get_name_from_keypoint_id(client, keypoint_id)
-    except RequestsError as e:
-        raise ClickException(str(e))
+    url_path = Path(str(urlparse(url).path))
+    if out.is_dir():
+        try:
+            name = _get_name_from_keypoint_id(client, keypoint_id)
+        except RequestsError as e:
+            raise ClickException(str(e))
 
-    if name:
-        file_name = name + Path(str(urlparse(url).path)).suffix
+        if name:
+            file_name = name + url_path.suffix
+        else:
+            file_name = url_path.name
+        path = out / file_name
     else:
-        file_name = Path(str(urlparse(url).path)).name
-    path = (Path(out_dir) / file_name).resolve()
+        path = out
+        if path.suffix.lower() != url_path.suffix.lower():
+            echo_warning(f'"{path.suffix}" is not a valid extension.')
+            expected_name = path.with_suffix(url_path.suffix).name
+            if click.confirm(f'Change from "{path.name}" to "{expected_name}"?'):
+                path = path.with_suffix(url_path.suffix)
 
     # if overwrite or not _is_skip(path):
     if not _is_skip(path):
