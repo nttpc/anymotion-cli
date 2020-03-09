@@ -9,7 +9,11 @@ from encore_api_cli.commands.draw import cli
 class TestDraw(object):
     @pytest.mark.parametrize(
         "args",
-        [["draw", "1"], ["draw", "1", "--rule", "[]"], ["draw", "--rule", "[]", "1"]],
+        [
+            ["draw", "1", "--download"],
+            ["draw", "1", "--rule", "[]", "--download"],
+            ["draw", "--rule", "[]", "1", "--download"],
+        ],
     )
     def test_valid(self, runner, make_client, args):
         client_mock = make_client()
@@ -38,6 +42,11 @@ class TestDraw(object):
             f"""\
             Drawing started. (drawing id: 111)
             Success: Drawing is complete.
+
+            Skip download. To download it, run the following command.
+
+            "amcli download 111"
+
             """
         )
 
@@ -66,7 +75,9 @@ class TestDraw(object):
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
 
-        result = runner.invoke(cli, ["draw", "1", "--rule-file", rule_file])
+        result = runner.invoke(
+            cli, ["draw", "1", "--rule-file", rule_file, "--download"]
+        )
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0

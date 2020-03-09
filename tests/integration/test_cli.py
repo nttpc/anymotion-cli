@@ -69,6 +69,7 @@ def test_download(tmp_path, runner):
     assert result.output == dedent(
         f"""\
         Downloaded the file to {path.resolve()}.
+        Open the Downloaded file? [y/N]: {""}
         """
     )
     assert path.exists()
@@ -79,7 +80,7 @@ def test_draw(tmp_path, runner):
 
     assert not path.exists()
 
-    result = runner.invoke(cli, ["draw", "222", "-o", str(tmp_path)])
+    result = runner.invoke(cli, ["draw", "222", "-o", str(tmp_path), "--download"])
 
     assert result.exit_code == 0
     assert result.output == dedent(
@@ -88,6 +89,7 @@ def test_draw(tmp_path, runner):
         Success: Drawing is complete.
 
         Downloaded the file to {path.resolve()}.
+        Open the Downloaded file? [y/N]: {""}
         """
     )
     assert path.exists()

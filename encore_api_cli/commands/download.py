@@ -1,7 +1,7 @@
 from pathlib import Path
 from textwrap import dedent
-from urllib.parse import urlparse
 from typing import Callable, Optional
+from urllib.parse import urlparse
 
 import click
 from click_help_colors import HelpColorsGroup

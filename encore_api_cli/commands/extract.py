@@ -10,8 +10,8 @@ from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client
-from .draw import draw, draw_options
 from .download import download_options
+from .draw import draw, draw_options
 
 
 @click.group(cls=HelpColorsGroup, help_options_color="cyan")

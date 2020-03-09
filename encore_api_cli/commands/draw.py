@@ -1,6 +1,6 @@
 import io
-from typing import Callable, Optional
 from textwrap import dedent
+from typing import Callable, Optional
 
 import click
 from click_help_colors import HelpColorsGroup
