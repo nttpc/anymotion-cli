@@ -32,6 +32,7 @@ def cli() -> None:  # noqa: D103
 @click.option(
     "-o",
     "--out",
+    "path",
     default=".",
     callback=validate_path,
     show_default=True,
@@ -42,7 +43,7 @@ def cli() -> None:  # noqa: D103
 # )
 @common_options
 @pass_state
-def download(state: State, drawing_id: int, out: Path) -> None:
+def download(state: State, drawing_id: int, path: Path) -> None:
     """Download the drawn file."""
     client = get_client(state)
 
@@ -59,7 +60,7 @@ def download(state: State, drawing_id: int, out: Path) -> None:
         raise ClickException("Unable to download because drawing failed.")
 
     url_path = Path(str(urlparse(url).path))
-    if out.is_dir():
+    if path.is_dir():
         try:
             name = _get_name_from_keypoint_id(client, keypoint_id)
         except RequestsError as e:
@@ -69,14 +70,13 @@ def download(state: State, drawing_id: int, out: Path) -> None:
             file_name = name + url_path.suffix
         else:
             file_name = url_path.name
-        path = out / file_name
-    else:
-        path = out
-        if path.suffix.lower() != url_path.suffix.lower():
-            echo_warning(f'"{path.suffix}" is not a valid extension.')
-            expected_name = path.with_suffix(url_path.suffix).name
-            if click.confirm(f'Change from "{path.name}" to "{expected_name}"?'):
-                path = path.with_suffix(url_path.suffix)
+        path /= file_name
+
+    if path.suffix.lower() != url_path.suffix.lower():
+        echo_warning(f'"{path.suffix}" is not a valid extension.')
+        expected_name = path.with_suffix(url_path.suffix).name
+        if click.confirm(f'Change from "{path.name}" to "{expected_name}"?'):
+            path = path.with_suffix(url_path.suffix)
 
     # if overwrite or not _is_skip(path):
     if not _is_skip(path):
