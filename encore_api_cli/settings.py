@@ -1,8 +1,9 @@
 import os
 from configparser import ConfigParser, SectionProxy
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
-from distutils.util import strtobool
+
 from .config import (
     API_URL,
     IS_DOWNLOAD,

@@ -1,4 +1,4 @@
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 import click
 from click_help_colors import HelpColorsGroup
