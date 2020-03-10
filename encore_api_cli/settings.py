@@ -173,6 +173,7 @@ class Settings(object):
             except ValueError:
                 message = f"The {name} value is invalid: {value}"
                 raise SettingsValueError(message)
+            return value
         else:
             raise Exception(f"The {name} value is invalid: {value}")
 
