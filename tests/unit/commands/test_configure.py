@@ -187,14 +187,8 @@ class TestConfigureGet(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (
-                ["configure", "get"],
-                "Error: Missing argument"
-            ),
-            (
-                ["configure", "get", "invalid_value"],
-                "Error: Invalid value"
-            ),
+            (["configure", "get"], "Error: Missing argument"),
+            (["configure", "get", "invalid_value"], "Error: Invalid value"),
         ],
     )
     def test_invalid_params(self, runner, args, expected):
