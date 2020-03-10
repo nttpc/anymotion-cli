@@ -37,8 +37,9 @@ def download_options(f: Callable) -> Callable:
     f = click.option(
         "-o",
         "--out",
+        "path",
         default=".",
-        type=validate_path,
+        callback=validate_path,
         show_default=True,
         help="Path of directory to output drawn file.",
     )(f)
@@ -89,7 +90,9 @@ def download(
     if path.suffix.lower() != url_path.suffix.lower():
         echo_warning(f'"{path.suffix}" is not a valid extension.')
         expected_name = path.with_suffix(url_path.suffix).name
-        if click.confirm(f'Change from "{path.name}" to "{expected_name}"?'):
+        if click.confirm(
+            f'Change output path from "{path.name}" to "{expected_name}"?'
+        ):
             path = path.with_suffix(url_path.suffix)
 
     if force or not _is_skip(path):

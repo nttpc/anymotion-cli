@@ -23,7 +23,7 @@ class TestDownload(object):
                 "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
             ),
             (
-                ["download", "111", "--out-dir", "."],
+                ["download", "111", "--out", "."],
                 "SUCCESS",
                 "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
             ),
@@ -40,6 +40,32 @@ class TestDownload(object):
         client_mock = make_client(status)
 
         result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == expected
+
+    @pytest.mark.parametrize(
+        "input, expected_suffix",
+        [("y", ".jpg"), ("Y", ".jpg"), ("n", ".png"), ("N", ".png"), ("", ".png")],
+    )
+    def test_invalid_suffix(
+        self, runner, make_path, make_client, input, expected_suffix
+    ):
+        path = make_path("image.png", exists=False)
+        expected = dedent(
+            f"""\
+            Warning: ".png" is not a valid extension.
+            Change output path from "image.png" to "image.jpg"? [y/N]: {input}
+            Downloaded the file to {path.with_suffix(expected_suffix)}.
+            Open the Downloaded file? [y/N]: {""}
+            """
+        )
+        client_mock = make_client()
+
+        result = runner.invoke(
+            cli, ["download", "111", "-o", str(path)], input=f"{input}\n"
+        )
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
@@ -120,33 +146,22 @@ class TestDownload(object):
                     "invalid_id is not a valid integer\n",
                 ),
             ),
-            (["download", "-o"], "Error: -o option requires an argument\n"),
+            (["download", "111", "-o"], "Error: -o option requires an argument\n"),
+            (["download", "--out"], "Error: --out option requires an argument\n",),
             (
-                ["download", "--out-dir"],
-                "Error: --out-dir option requires an argument\n",
-            ),
-            (
-                ["download", "-o", "not_exist"],
+                ["download", "111", "-o", "not_exist_dir/file_name"],
                 (
-                    'Error: Invalid value for "-o" / "--out-dir": '
-                    'Directory "not_exist" does not exist.\n'
+                    'Error: Invalid value for "-o" / "--out": '
+                    'File "not_exist_dir/file_name" is not writable.\n'
                 ),
             ),
         ],
     )
-    def test_invalid_params(self, runner, args, expected):
+    def test_invalid_params(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
-        assert result.exit_code == 2
-        assert result.output.endswith(expected)
 
-    def test_invalid_params_with_not_directory(self, runner, make_path):
-        path = make_path("image.jpg", is_file=True)
-        expected = (
-            'Error: Invalid value for "-o" / "--out-dir": '
-            f'Directory "{path}" is a file.\n'
-        )
-        result = runner.invoke(cli, ["download", "-o", str(path)])
-
+        assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert result.output.endswith(expected)
 
