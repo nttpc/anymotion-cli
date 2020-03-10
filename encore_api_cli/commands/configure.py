@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 import click
 from click_help_colors import HelpColorsGroup
@@ -110,13 +110,13 @@ def get(state: State, key: str) -> None:
     elif key == "api_url":
         echo(settings.api_url)
     elif key == "polling_interval":
-        echo(settings.interval)
+        echo(_to_str(settings.interval))
     elif key == "timeout":
-        echo(settings.timeout)
+        echo(_to_str(settings.timeout))
     elif key == "is_download":
-        echo(settings.is_download)
+        echo(_to_str(settings.is_download))
     elif key == "is_open":
-        echo(settings.is_open)
+        echo(_to_str(settings.is_open))
 
 
 @configure.command(short_help="Set a configuration value in the file.")
@@ -130,17 +130,11 @@ def set(state: State, key: str, value: str) -> None:
     """Set a configuration value in the file."""
     settings = get_settings(state.profile, use_env=False)
 
-    def to_str(value: Optional[str]) -> str:
-        if value is None:
-            return ""
-        else:
-            return value
-
     if key == "client_id":
-        client_secret = to_str(settings.client_secret)
+        client_secret = _to_str(settings.client_secret)
         settings.write_credentials(value, client_secret)
     elif key == "client_secret":
-        client_id = to_str(settings.client_id)
+        client_id = _to_str(settings.client_id)
         settings.write_credentials(client_id, value)
 
 
@@ -180,3 +174,10 @@ def make_hidden(
         return HiddenCredential(value)
     else:
         return default
+
+
+def _to_str(value: Any) -> str:
+    if value is None:
+        return ""
+    else:
+        return str(value)

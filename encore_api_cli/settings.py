@@ -80,8 +80,7 @@ class Settings(object):
             SettingsValueError
         """
         interval = self._config.polling_interval or POLLING_INTERVAL
-        interval = self._to_int_with_check(interval, "polling_interval", 1)
-        return interval
+        return self._to_int_with_check(interval, "polling_interval", 1)
 
     @property
     def timeout(self) -> int:
@@ -93,22 +92,19 @@ class Settings(object):
             SettingsValueError
         """
         timeout = self._config.timeout or TIMEOUT
-        timeout = self._to_int_with_check(timeout, "timeout", 1)
-        return timeout
+        return self._to_int_with_check(timeout, "timeout", 1)
 
     @property
     def is_download(self) -> Optional[bool]:
         """Return default download flag."""
         is_download = self._config.is_download or IS_DOWNLOAD
-        is_download = self._to_optional_bool_with_check(is_download, "is_download")
-        return is_download
+        return self._to_optional_bool_with_check(is_download, "is_download")
 
     @property
     def is_open(self) -> Optional[bool]:
         """Return default open flag."""
         is_open = self._config.is_open or IS_OPEN
-        is_open = self._to_optional_bool_with_check(is_open, "is_open")
-        return is_open
+        return self._to_optional_bool_with_check(is_open, "is_open")
 
     def write_config(self, api_url: str) -> None:
         """Update config file.
