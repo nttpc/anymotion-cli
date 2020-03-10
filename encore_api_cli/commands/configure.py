@@ -83,7 +83,19 @@ def list(state: State) -> None:
 
 @configure.command(short_help="Get a configuration value from the file.")
 @click.argument(
-    "key", type=click.Choice(["client_id", "client_secret"], case_sensitive=False)
+    "key",
+    type=click.Choice(
+        [
+            "client_id",
+            "client_secret",
+            "api_url",
+            "polling_interval",
+            "timeout",
+            "is_download",
+            "is_open",
+        ],
+        case_sensitive=False,
+    ),
 )
 @common_options
 @pass_state
@@ -95,6 +107,16 @@ def get(state: State, key: str) -> None:
         echo(settings.client_id)
     elif key == "client_secret":
         echo(settings.client_secret)
+    elif key == "api_url":
+        echo(settings.api_url)
+    elif key == "polling_interval":
+        echo(settings.interval)
+    elif key == "timeout":
+        echo(settings.timeout)
+    elif key == "is_download":
+        echo(settings.is_download)
+    elif key == "is_open":
+        echo(settings.is_open)
 
 
 @configure.command(short_help="Set a configuration value in the file.")

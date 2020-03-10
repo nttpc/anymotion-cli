@@ -189,18 +189,11 @@ class TestConfigureGet(object):
         [
             (
                 ["configure", "get"],
-                (
-                    'Error: Missing argument "[client_id|client_secret]".  '
-                    "Choose from:\n\tclient_id,\n\tclient_secret.\n"
-                ),
+                "Error: Missing argument"
             ),
             (
                 ["configure", "get", "invalid_value"],
-                (
-                    'Error: Invalid value for "[client_id|client_secret]": '
-                    "invalid choice: invalid_value. "
-                    "(choose from client_id, client_secret)\n"
-                ),
+                "Error: Invalid value"
             ),
         ],
     )
@@ -208,7 +201,7 @@ class TestConfigureGet(object):
         result = runner.invoke(cli, args)
 
         assert result.exit_code == 2
-        assert result.output.endswith(expected)
+        assert expected in result.output
 
 
 class TestConfigureSet(object):
