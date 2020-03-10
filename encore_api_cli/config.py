@@ -13,3 +13,5 @@ def get_app_dir() -> Path:
 API_URL = "https://api.customer.jp/anymotion/v1/"
 POLLING_INTERVAL = 5
 TIMEOUT = 600
+IS_DOWNLOAD = True
+IS_OPEN = False

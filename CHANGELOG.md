@@ -5,6 +5,8 @@
 Unreleased
 
 - Added `--only` option to `keypoint show` and `analysis show` commands.
+- Added `--download / --no-download` option to `draw` command.
+- Added `--open / --no-open` option to `download` command.
 - Moved sdk to another package [encore_sdk](https://bitbucket.org/nttpc-datascience/encore-sdk).
 - Made it possible to handle for changing analysis result response.
 - Allowed files with `--out` option.

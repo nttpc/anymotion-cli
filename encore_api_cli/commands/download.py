@@ -1,5 +1,6 @@
 from pathlib import Path
 from textwrap import dedent
+from typing import Callable, Optional
 from urllib.parse import urlparse
 
 import click
@@ -22,6 +23,28 @@ def validate_path(ctx, param, value):
     return path.expanduser().resolve()
 
 
+def download_options(f: Callable) -> Callable:
+    """Set download options."""
+    f = click.option(
+        "--open/--no-open",
+        "is_open",
+        default=None,
+        help="Whether to open downloaded the file.",
+    )(f)
+    f = click.option(
+        "--force", is_flag=True, help="If the file exists, download it by overwriting.",
+    )(f)
+    f = click.option(
+        "-o",
+        "--out",
+        default=".",
+        type=validate_path,
+        show_default=True,
+        help="Path of directory to output drawn file.",
+    )(f)
+    return f
+
+
 @click.group(cls=HelpColorsGroup, help_options_color="cyan")
 def cli() -> None:  # noqa: D103
     pass
@@ -29,21 +52,12 @@ def cli() -> None:  # noqa: D103
 
 @cli.command(short_help="Download the drawn file.")
 @click.argument("drawing_id", type=int)
-@click.option(
-    "-o",
-    "--out",
-    "path",
-    default=".",
-    callback=validate_path,
-    show_default=True,
-    help="Path of file or directory to output drawn file.",
-)
-# @click.option(
-#     "--overwrite", is_flag=True, help="If the file exists, overwrite it.",
-# )
+@download_options
 @common_options
 @pass_state
-def download(state: State, drawing_id: int, path: Path) -> None:
+def download(
+    state: State, drawing_id: int, path: Path, force: bool, is_open: Optional[bool]
+) -> None:
     """Download the drawn file."""
     client = get_client(state)
 
@@ -78,8 +92,7 @@ def download(state: State, drawing_id: int, path: Path) -> None:
         if click.confirm(f'Change from "{path.name}" to "{expected_name}"?'):
             path = path.with_suffix(url_path.suffix)
 
-    # if overwrite or not _is_skip(path):
-    if not _is_skip(path):
+    if force or not _is_skip(path):
         try:
             if state.use_spinner:
                 with yaspin(text="Downloading..."):
@@ -90,7 +103,13 @@ def download(state: State, drawing_id: int, path: Path) -> None:
             raise ClickException(str(e))
 
         echo(f"Downloaded the file to {color_path(path)}.")
-        # click.launch(str(path))
+
+        if is_open is None:
+            is_open = state.is_open
+        if is_open is None:
+            is_open = click.confirm("Open the Downloaded file?")
+        if is_open:
+            click.launch(str(path))
     else:
         message = dedent(
             f"""\

@@ -1,4 +1,3 @@
-import io
 from typing import Optional
 
 import click
@@ -11,6 +10,7 @@ from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client
+from .download import download_options
 from .draw import draw, draw_options
 
 
@@ -37,6 +37,7 @@ def cli() -> None:  # noqa: D103
     help="Flag for whether to draw at the same time.",
 )
 @draw_options
+@download_options
 @common_options
 @pass_state
 @click.pass_context
@@ -46,10 +47,7 @@ def extract(
     movie_id: Optional[int],
     image_id: Optional[int],
     with_drawing: bool,
-    out_dir: str,
-    rule_str: Optional[str],
-    rule_file: Optional[io.TextIOWrapper],
-    no_download: bool,
+    **kwargs,
 ) -> None:
     """Extract keypoints from uploaded images or movies."""
     if [movie_id, image_id].count(None) in [0, 2]:
@@ -79,11 +77,4 @@ def extract(
 
     if with_drawing:
         echo()
-        ctx.invoke(
-            draw,
-            keypoint_id=keypoint_id,
-            out_dir=out_dir,
-            rule_str=rule_str,
-            rule_file=rule_file,
-            no_download=no_download,
-        )
+        ctx.invoke(draw, keypoint_id=keypoint_id, **kwargs)
