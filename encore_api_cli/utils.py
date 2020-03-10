@@ -39,6 +39,10 @@ def get_client(state: State) -> Client:
         client.session.add_request_callback(echo_request)
         client.session.add_response_callback(echo_response)
 
+    # TODO: refactor
+    state.is_download = settings.is_download
+    state.is_open = settings.is_open
+
     return client
 
 

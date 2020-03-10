@@ -12,21 +12,25 @@ class TestDownload(object):
     @pytest.mark.parametrize(
         "args, status, expected",
         [
-            (["download", "111"], "SUCCESS", "Downloaded the file to {path}.\n",),
+            (
+                ["download", "111"],
+                "SUCCESS",
+                "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
+            ),
             (
                 ["download", "111", "-o", "."],
                 "SUCCESS",
-                "Downloaded the file to {path}.\n",
+                "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
             ),
             (
                 ["download", "111", "--out-dir", "."],
                 "SUCCESS",
-                "Downloaded the file to {path}.\n",
+                "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
             ),
             (
                 ["download", "-o", ".", "111"],
                 "SUCCESS",
-                "Downloaded the file to {path}.\n",
+                "Downloaded the file to {path}.\nOpen the Downloaded file? [y/N]: \n",
             ),
         ],
     )

@@ -187,28 +187,15 @@ class TestConfigureGet(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (
-                ["configure", "get"],
-                (
-                    'Error: Missing argument "[client_id|client_secret]".  '
-                    "Choose from:\n\tclient_id,\n\tclient_secret.\n"
-                ),
-            ),
-            (
-                ["configure", "get", "invalid_value"],
-                (
-                    'Error: Invalid value for "[client_id|client_secret]": '
-                    "invalid choice: invalid_value. "
-                    "(choose from client_id, client_secret)\n"
-                ),
-            ),
+            (["configure", "get"], "Error: Missing argument"),
+            (["configure", "get", "invalid_value"], "Error: Invalid value"),
         ],
     )
     def test_invalid_params(self, runner, args, expected):
         result = runner.invoke(cli, args)
 
         assert result.exit_code == 2
-        assert result.output.endswith(expected)
+        assert expected in result.output
 
 
 class TestConfigureSet(object):
