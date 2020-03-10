@@ -89,6 +89,8 @@ def download(
         echo(f"Downloaded the file to {color_path(path)}.")
 
         if is_open is None:
+            is_open = state.is_open
+        if is_open is None:
             is_open = click.confirm("Open the Downloaded file?")
         if is_open:
             click.launch(str(path))

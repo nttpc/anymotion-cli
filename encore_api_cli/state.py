@@ -12,6 +12,9 @@ class State(object):
         self.cli_name = "amcli"
         self.pager_length = 10
 
+        self.is_download = None
+        self.is_open = None
+
     @property
     def use_spinner(self) -> bool:
         """Flag to use spinner.

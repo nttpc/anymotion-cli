@@ -2,8 +2,15 @@ import os
 from configparser import ConfigParser, SectionProxy
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
-
-from .config import API_URL, POLLING_INTERVAL, TIMEOUT, get_app_dir
+from distutils.util import strtobool
+from .config import (
+    API_URL,
+    IS_DOWNLOAD,
+    IS_OPEN,
+    POLLING_INTERVAL,
+    TIMEOUT,
+    get_app_dir,
+)
 from .exceptions import SettingsValueError
 
 
@@ -89,6 +96,20 @@ class Settings(object):
         timeout = self._to_int_with_check(timeout, "timeout", 1)
         return timeout
 
+    @property
+    def is_download(self) -> Optional[bool]:
+        """Return default download flag."""
+        is_download = self._config.is_download or IS_DOWNLOAD
+        is_download = self._to_optional_bool_with_check(is_download, "is_download")
+        return is_download
+
+    @property
+    def is_open(self) -> Optional[bool]:
+        """Return default open flag."""
+        is_open = self._config.is_open or IS_OPEN
+        is_open = self._to_optional_bool_with_check(is_open, "is_open")
+        return is_open
+
     def write_config(self, api_url: str) -> None:
         """Update config file.
 
@@ -140,6 +161,20 @@ class Settings(object):
             message = f"The {name} value must be greater than {th}: {x}"
             raise SettingsValueError(message)
         return x
+
+    def _to_optional_bool_with_check(
+        self, value: Optional[Union[bool, str]], name: str
+    ) -> Optional[bool]:
+        if value is None or isinstance(value, bool):
+            return value
+        elif isinstance(value, str):
+            try:
+                value = bool(strtobool(value))
+            except ValueError:
+                message = f"The {name} value is invalid: {value}"
+                raise SettingsValueError(message)
+        else:
+            raise Exception(f"The {name} value is invalid: {value}")
 
 
 class _Profile(object):

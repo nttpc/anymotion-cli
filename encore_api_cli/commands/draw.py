@@ -89,6 +89,8 @@ def draw(
 
     echo()
     if is_download is None:
+        is_download = state.is_download
+    if is_download is None:
         is_download = click.confirm("Download the drawn file?")
     if is_download:
         ctx.invoke(download, drawing_id=drawing_id, **kwargs)
