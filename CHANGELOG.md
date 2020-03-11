@@ -9,6 +9,7 @@ Unreleased
 - Added `--open / --no-open` option to `download` command.
 - Moved sdk to another package [encore_sdk](https://bitbucket.org/nttpc-datascience/encore-sdk).
 - Made it possible to handle for changing analysis result response.
+- Allowed files with `--out` option.
 - Fixed bug when response.reason is None at output.py.
 
 ## 0.8.0
