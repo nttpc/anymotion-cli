@@ -148,11 +148,11 @@ class TestKeypointShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["keypoint", "show"], 'Error: Missing argument "KEYPOINT_ID".\n',),
+            (["keypoint", "show"], "Error: Missing argument 'KEYPOINT_ID'.\n",),
             (
                 ["keypoint", "show", "invalid_id"],
                 (
-                    'Error: Invalid value for "KEYPOINT_ID": '
+                    "Error: Invalid value for 'KEYPOINT_ID': "
                     "invalid_id is not a valid integer\n"
                 ),
             ),
@@ -285,7 +285,7 @@ class TestKeypointList(object):
             (
                 ["keypoint", "list", "--status", "INVALID_STATUS"],
                 (
-                    'Error: Invalid value for "--status": invalid choice: '
+                    "Error: Invalid value for '--status': invalid choice: "
                     "INVALID_STATUS. "
                     "(choose from SUCCESS, FAILURE, PROCESSING, UNPROCESSED)\n"
                 ),

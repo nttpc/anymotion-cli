@@ -34,11 +34,11 @@ class TestDrawingShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["drawing", "show"], 'Error: Missing argument "DRAWING_ID".\n'),
+            (["drawing", "show"], "Error: Missing argument 'DRAWING_ID'.\n"),
             (
                 ["drawing", "show", "invalid_id"],
                 (
-                    'Error: Invalid value for "DRAWING_ID": '
+                    "Error: Invalid value for 'DRAWING_ID': "
                     "invalid_id is not a valid integer\n"
                 ),
             ),
@@ -136,7 +136,7 @@ class TestDrawingList(object):
             (
                 ["drawing", "list", "--status", "INVALID_STATUS"],
                 (
-                    'Error: Invalid value for "--status": invalid choice: '
+                    "Error: Invalid value for '--status': invalid choice: "
                     "INVALID_STATUS. "
                     "(choose from SUCCESS, FAILURE, PROCESSING, UNPROCESSED)\n"
                 ),

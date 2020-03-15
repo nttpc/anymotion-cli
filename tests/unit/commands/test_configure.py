@@ -259,22 +259,22 @@ class TestConfigureSet(object):
             (
                 ["configure", "set"],
                 (
-                    'Error: Missing argument "[client_id|client_secret]".  '
+                    "Error: Missing argument '[client_id|client_secret]'.  "
                     "Choose from:\n\tclient_id,\n\tclient_secret.\n"
                 ),
             ),
             (
                 ["configure", "set", "invalid_key"],
                 (
-                    'Error: Invalid value for "[client_id|client_secret]": '
+                    "Error: Invalid value for '[client_id|client_secret]': "
                     "invalid choice: invalid_key. "
                     "(choose from client_id, client_secret)\n"
                 ),
             ),
-            (["configure", "set", "client_id"], 'Error: Missing argument "VALUE".\n'),
+            (["configure", "set", "client_id"], "Error: Missing argument 'VALUE'.\n"),
             (
                 ["configure", "set", "client_secret"],
-                'Error: Missing argument "VALUE".\n',
+                "Error: Missing argument 'VALUE'.\n",
             ),
         ],
     )

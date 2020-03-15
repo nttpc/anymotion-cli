@@ -147,11 +147,11 @@ class TestDownload(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["download"], 'Error: Missing argument "DRAWING_ID".\n'),
+            (["download"], "Error: Missing argument 'DRAWING_ID'.\n"),
             (
                 ["download", "invalid_id"],
                 (
-                    'Error: Invalid value for "DRAWING_ID": '
+                    "Error: Invalid value for 'DRAWING_ID': "
                     "invalid_id is not a valid integer\n",
                 ),
             ),
@@ -160,7 +160,7 @@ class TestDownload(object):
             (
                 ["download", "111", "-o", "not_exist_dir/file_name"],
                 (
-                    'Error: Invalid value for "-o" / "--out": '
+                    "Error: Invalid value for '-o' / '--out': "
                     'File "not_exist_dir/file_name" is not writable.\n'
                 ),
             ),

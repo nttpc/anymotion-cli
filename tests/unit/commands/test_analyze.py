@@ -143,10 +143,10 @@ class TestAnalyze(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["analyze", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
-            (["analyze"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["analyze", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["analyze", "--show-result"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "invalid_id"], "Error: Invalid value for 'KEYPOINT_ID'"),
+            (["analyze"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["analyze", "--rule", "1"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["analyze", "--show-result"], "Error: Missing argument 'KEYPOINT_ID'"),
             (["analyze", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1"], 'Either "rule" or "rule-file" options is required.'),

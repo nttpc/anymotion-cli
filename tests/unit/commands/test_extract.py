@@ -91,10 +91,10 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["extract"], 'Error: Either "--movie-id" or "--image-id" is required',),
+            (["extract"], "Error: Either '--movie-id' or '--image-id' is required",),
             (
                 ["extract", "--image-id", "1", "--movie-id", "1"],
-                'Error: Either "--movie-id" or "--image-id" is required',
+                "Error: Either '--movie-id' or '--image-id' is required",
             ),
             (
                 ["extract", "--image-id"],
@@ -106,11 +106,11 @@ class TestExtract(object):
             ),
             (
                 ["extract", "--movie-id", "invalid_id"],
-                'Error: Invalid value for "--movie-id"',
+                "Error: Invalid value for '--movie-id'",
             ),
             (
                 ["extract", "--image-id", "invalid_id"],
-                'Error: Invalid value for "--image-id"',
+                "Error: Invalid value for '--image-id'",
             ),
         ],
     )
