@@ -164,6 +164,15 @@ class TestConfigureGet(object):
             (["configure", "get", "CLIENT_SECRET"], "client_secret\n", True),
             (["configure", "get", "client_id"], "\n", False),
             (["configure", "get", "client_secret"], "\n", False),
+            (
+                ["configure", "get", "api_url"],
+                "https://api.customer.jp/anymotion/v1/\n",
+                False,
+            ),
+            (["configure", "get", "polling_interval"], "5\n", False),
+            (["configure", "get", "timeout"], "600\n", False),
+            (["configure", "get", "is_download"], "True\n", False),
+            (["configure", "get", "is_open"], "False\n", False),
         ],
     )
     def test_valid(self, runner, make_configure_file, args, expected, exists):
