@@ -41,7 +41,7 @@ def download_options(f: Callable) -> Callable:
         default=".",
         callback=validate_path,
         show_default=True,
-        help="Path of directory to output drawn file.",
+        help="Path of file or directory to output drawn file.",
     )(f)
     return f
 
