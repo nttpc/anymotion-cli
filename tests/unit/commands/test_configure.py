@@ -164,6 +164,15 @@ class TestConfigureGet(object):
             (["configure", "get", "CLIENT_SECRET"], "client_secret\n", True),
             (["configure", "get", "client_id"], "\n", False),
             (["configure", "get", "client_secret"], "\n", False),
+            (
+                ["configure", "get", "api_url"],
+                "https://api.customer.jp/anymotion/v1/\n",
+                False,
+            ),
+            (["configure", "get", "polling_interval"], "5\n", False),
+            (["configure", "get", "timeout"], "600\n", False),
+            (["configure", "get", "is_download"], "True\n", False),
+            (["configure", "get", "is_open"], "False\n", False),
         ],
     )
     def test_valid(self, runner, make_configure_file, args, expected, exists):
@@ -187,28 +196,15 @@ class TestConfigureGet(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (
-                ["configure", "get"],
-                (
-                    'Error: Missing argument "[client_id|client_secret]".  '
-                    "Choose from:\n\tclient_id,\n\tclient_secret.\n"
-                ),
-            ),
-            (
-                ["configure", "get", "invalid_value"],
-                (
-                    'Error: Invalid value for "[client_id|client_secret]": '
-                    "invalid choice: invalid_value. "
-                    "(choose from client_id, client_secret)\n"
-                ),
-            ),
+            (["configure", "get"], "Error: Missing argument"),
+            (["configure", "get", "invalid_value"], "Error: Invalid value"),
         ],
     )
     def test_invalid_params(self, runner, args, expected):
         result = runner.invoke(cli, args)
 
         assert result.exit_code == 2
-        assert result.output.endswith(expected)
+        assert expected in result.output
 
 
 class TestConfigureSet(object):
@@ -263,22 +259,22 @@ class TestConfigureSet(object):
             (
                 ["configure", "set"],
                 (
-                    'Error: Missing argument "[client_id|client_secret]".  '
+                    "Error: Missing argument '[client_id|client_secret]'.  "
                     "Choose from:\n\tclient_id,\n\tclient_secret.\n"
                 ),
             ),
             (
                 ["configure", "set", "invalid_key"],
                 (
-                    'Error: Invalid value for "[client_id|client_secret]": '
+                    "Error: Invalid value for '[client_id|client_secret]': "
                     "invalid choice: invalid_key. "
                     "(choose from client_id, client_secret)\n"
                 ),
             ),
-            (["configure", "set", "client_id"], 'Error: Missing argument "VALUE".\n'),
+            (["configure", "set", "client_id"], "Error: Missing argument 'VALUE'.\n"),
             (
                 ["configure", "set", "client_secret"],
-                'Error: Missing argument "VALUE".\n',
+                "Error: Missing argument 'VALUE'.\n",
             ),
         ],
     )

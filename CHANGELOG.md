@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.9.0
+
+Released 2020-03-17
+
+- Added `--only` option to `keypoint show` and `analysis show` commands.
+- Added `--download / --no-download` option to `draw` command.
+- Added `--open / --no-open` option to `download` command.
+- Moved sdk to another package [encore_sdk](https://bitbucket.org/nttpc-datascience/encore-sdk).
+- Made it possible to handle for changing analysis result response.
+- Allowed files with `--out` option.
+- Fixed bug when response.reason is None at output.py.
+
 ## 0.8.0
 
 Released 2020-02-17

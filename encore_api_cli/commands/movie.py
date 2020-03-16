@@ -1,11 +1,11 @@
 import click
 from click_help_colors import HelpColorsGroup
+from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_json
-from ..sdk import RequestsError
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -30,7 +30,7 @@ def show(state: State, movie_id: int) -> None:
     client = get_client(state)
 
     try:
-        data = client.get_one_data("movies", movie_id)
+        data = client.get_movie(movie_id)
     except RequestsError as e:
         raise ClickException(str(e))
 
@@ -47,9 +47,9 @@ def list(state: State) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_list_data("movies")
+                data = client.get_movies()
         else:
-            data = client.get_list_data("movies")
+            data = client.get_movies()
     except RequestsError as e:
         raise ClickException(str(e))
 

@@ -1,7 +1,7 @@
 import pytest
+from encore_sdk.client import Client
 
 from encore_api_cli.exceptions import ClickException, SettingsValueError
-from encore_api_cli.sdk.client import Client
 from encore_api_cli.state import State
 from encore_api_cli.utils import get_client, get_settings, parse_rule
 

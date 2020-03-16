@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from .output import is_show
@@ -11,6 +13,9 @@ class State(object):
         self.profile = "default"
         self.cli_name = "amcli"
         self.pager_length = 10
+
+        self.is_download: Optional[bool] = None
+        self.is_open: Optional[bool] = None
 
     @property
     def use_spinner(self) -> bool:

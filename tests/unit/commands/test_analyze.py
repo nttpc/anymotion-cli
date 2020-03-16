@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.analyze import cli
-from encore_api_cli.sdk.exceptions import RequestsError
 
 
 class TestAnalyze(object):
@@ -65,7 +65,7 @@ class TestAnalyze(object):
         result = runner.invoke(cli, ["analyze", "1", "--rule", "[]"])
 
         assert client_mock.call_count == 1
-        assert result.exit_code == 0
+        assert result.exit_code == 1
         assert result.output == message
 
     def test_valid_rule_file(self, mocker, runner, tmp_path):
@@ -143,10 +143,10 @@ class TestAnalyze(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["analyze", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
-            (["analyze"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["analyze", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["analyze", "--show-result"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["analyze", "invalid_id"], "Error: Invalid value for 'KEYPOINT_ID'"),
+            (["analyze"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["analyze", "--rule", "1"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["analyze", "--show-result"], "Error: Missing argument 'KEYPOINT_ID'"),
             (["analyze", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1"], 'Either "rule" or "rule-file" options is required.'),

@@ -1,52 +1,21 @@
 from textwrap import dedent
 
 import pytest
+from encore_sdk import RequestsError
 
 from encore_api_cli.commands.extract import cli
-from encore_api_cli.sdk.exceptions import RequestsError
 
 
 class TestExtract(object):
     @pytest.mark.parametrize(
-        "args, status, expected",
-        [
-            (
-                ["extract", "--movie-id", "111"],
-                "SUCCESS",
-                "Success: Keypoint extraction is complete.",
-            ),
-            (
-                ["extract", "--image-id", "111"],
-                "SUCCESS",
-                "Success: Keypoint extraction is complete.",
-            ),
-            (
-                ["extract", "--movie-id", "111"],
-                "TIMEOUT",
-                "Error: Keypoint extraction is timed out.",
-            ),
-            (
-                ["extract", "--image-id", "111"],
-                "TIMEOUT",
-                "Error: Keypoint extraction is timed out.",
-            ),
-            (
-                ["extract", "--movie-id", "111"],
-                "FAILURE",
-                "Error: Keypoint extraction failed.\nmessage",
-            ),
-            (
-                ["extract", "--image-id", "111"],
-                "FAILURE",
-                "Error: Keypoint extraction failed.\nmessage",
-            ),
-        ],
+        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
     )
-    def test_valid(self, mocker, runner, args, status, expected):
+    @pytest.mark.parametrize(
+        "status, expected", [("SUCCESS", "Success: Keypoint extraction is complete.",)],
+    )
+    def test_valid(self, runner, make_client, args, status, expected):
         keypoint_id = 111
-        client_mock = self._get_client_mock(
-            mocker, status=status, keypoint_id=keypoint_id
-        )
+        client_mock = make_client(status=status, keypoint_id=keypoint_id)
 
         result = runner.invoke(cli, args)
 
@@ -56,24 +25,60 @@ class TestExtract(object):
             f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
         )
 
-    def test_with_spinner(self, mocker, monkeypatch, runner):
+    def test_with_spinner(self, monkeypatch, runner, make_client):
         monkeypatch.setenv("ANYMOTION_USE_SPINNER", "true")
-        client_mock = self._get_client_mock(mocker)
+        client_mock = make_client()
 
-        result = runner.invoke(cli, ["extract", "--movie-id", "111"])
+        result = runner.invoke(cli, ["extract", "--image-id", "111"])
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert "Processing..." in result.output
 
+    def test_with_drawing(self, runner, make_client):
+        client_mock = make_client(with_drawing=True)
+
+        result = runner.invoke(cli, ["extract", "--image-id", "111", "--with-drawing"])
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 0
+        assert result.output == dedent(
+            f"""\
+            Keypoint extraction started. (keypoint id: 111)
+            Success: Keypoint extraction is complete.
+
+            """
+        )
+
+    @pytest.mark.parametrize(
+        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
+    )
+    @pytest.mark.parametrize(
+        "status, expected",
+        [
+            ("TIMEOUT", "Error: Keypoint extraction is timed out.",),
+            ("FAILURE", "Error: Keypoint extraction failed.\nmessage",),
+        ],
+    )
+    def test_with_extract_error(self, runner, make_client, args, status, expected):
+        keypoint_id = 111
+        client_mock = make_client(status=status, keypoint_id=keypoint_id)
+
+        result = runner.invoke(cli, args)
+
+        assert client_mock.call_count == 1
+        assert result.exit_code == 1
+        assert result.output == dedent(
+            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
+        )
+
     @pytest.mark.parametrize(
         "with_extract_exception, with_wait_exception", [(True, True), (False, True)]
     )
-    def test_with_error(
-        self, mocker, runner, with_extract_exception, with_wait_exception
+    def test_with_requests_error(
+        self, runner, make_client, with_extract_exception, with_wait_exception
     ):
-        client_mock = self._get_client_mock(
-            mocker,
+        client_mock = make_client(
             with_extract_exception=with_extract_exception,
             with_wait_exception=with_wait_exception,
         )
@@ -86,10 +91,10 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["extract"], 'Error: Either "--movie-id" or "--image-id" is required',),
+            (["extract"], "Error: Either '--movie-id' or '--image-id' is required",),
             (
                 ["extract", "--image-id", "1", "--movie-id", "1"],
-                'Error: Either "--movie-id" or "--image-id" is required',
+                "Error: Either '--movie-id' or '--image-id' is required",
             ),
             (
                 ["extract", "--image-id"],
@@ -101,80 +106,51 @@ class TestExtract(object):
             ),
             (
                 ["extract", "--movie-id", "invalid_id"],
-                'Error: Invalid value for "--movie-id"',
+                "Error: Invalid value for '--movie-id'",
             ),
             (
                 ["extract", "--image-id", "invalid_id"],
-                'Error: Invalid value for "--image-id"',
+                "Error: Invalid value for '--image-id'",
             ),
         ],
     )
-    def test_invalid_params(self, mocker, runner, args, expected):
-        client_mock = self._get_client_mock(mocker)
+    def test_invalid_params(self, runner, make_client, args, expected):
+        client_mock = make_client()
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert expected in result.output
 
-    def _get_client_mock(
-        self,
-        mocker,
-        status="SUCCESS",
-        keypoint_id=111,
-        with_extract_exception=False,
-        with_wait_exception=False,
-    ):
-        client_mock = mocker.MagicMock()
+    @pytest.fixture
+    def make_client(self, mocker):
+        def _make_client(
+            status="SUCCESS",
+            keypoint_id=111,
+            with_extract_exception=False,
+            with_wait_exception=False,
+            with_drawing=False,
+        ):
+            client_mock = mocker.MagicMock()
 
-        extract_image_mock = client_mock.return_value.extract_keypoint_from_movie
-        extract_movie_mock = client_mock.return_value.extract_keypoint_from_image
-        if with_extract_exception:
-            extract_image_mock.side_effect = RequestsError()
-            extract_movie_mock.side_effect = RequestsError()
-        else:
-            extract_image_mock.return_value = keypoint_id
-            extract_movie_mock.return_value = keypoint_id
+            extract_mock = client_mock.return_value.extract_keypoint
+            if with_extract_exception:
+                extract_mock.side_effect = RequestsError()
+            else:
+                extract_mock.return_value = keypoint_id
 
-        wait_mock = client_mock.return_value.wait_for_extraction
-        if with_wait_exception:
-            wait_mock.side_effect = RequestsError()
-        else:
-            wait_mock.return_value.status = status
-            if status == "FAILURE":
-                wait_mock.return_value.failure_detail = "message"
+            wait_mock = client_mock.return_value.wait_for_extraction
+            if with_wait_exception:
+                wait_mock.side_effect = RequestsError()
+            else:
+                wait_mock.return_value.status = status
+                if status == "FAILURE":
+                    wait_mock.return_value.failure_detail = "message"
 
-        mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
-        return client_mock
+            if with_drawing:
+                mocker.patch("encore_api_cli.commands.extract.draw", mocker.MagicMock())
 
+            mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
+            return client_mock
 
-# TODO: refactor
-def test_keypoint_extract_with_drawing(mocker, runner):
-    image_id = 111
-    keypoint_id = 222
-
-    client_mock = mocker.MagicMock()
-    client_mock.return_value.wait_for_extraction.return_value.status = "SUCCESS"
-    extract_keypoint_mock = client_mock.return_value.extract_keypoint_from_image
-    extract_keypoint_mock.return_value = keypoint_id
-    client_mock.return_value.draw_keypoint.return_value = 333
-    client_mock.return_value.wait_for_drawing.return_value = ("SUCCESS", "url")
-    client_mock.return_value.get_name_from_drawing_id.return_value = "image"
-    client_mock.return_value.download.return_value = None
-    mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
-    mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
-
-    result = runner.invoke(cli, ["extract", "--image-id", image_id, "--with-drawing"])
-
-    assert client_mock.call_count == 2
-    assert extract_keypoint_mock.call_count == 1
-    assert extract_keypoint_mock.call_args == ((image_id,),)
-    assert client_mock.return_value.draw_keypoint.call_count == 1
-    assert client_mock.return_value.draw_keypoint.call_args == (
-        (keypoint_id,),
-        {"rule": None},
-    )
-    assert client_mock.return_value.get_name_from_drawing_id.call_count == 1
-    assert client_mock.return_value.download.call_count == 1
-
-    assert result.exit_code == 0
+        return _make_client

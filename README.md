@@ -25,7 +25,7 @@ Alternatively, you can configure the index URL in `~/.pip/pip.conf`:
 extra-index-url = https://pypi.anymotion.jp
 ```
 
-**NOTICE**: You can only install from the internal network.
+**Notice**: You can only install from the internal network.
 
 ## Getting Started
 
@@ -111,7 +111,8 @@ $ amcli upload image.jpg
 Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image id`. Extract keypoints using this `image id`.
+When the upload is complete, you get an `image id`.
+Extract keypoints using this `image id`.
 
 ```sh
 $ amcli extract --image-id 111
@@ -125,41 +126,32 @@ Draw points/lines to image using `keypoint id`.
 $ amcli draw 222
 Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
-Downloaded the file to image_xxx.jpg.
+Downloaded the file to image.jpg.
 ```
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
-To save to a specific directory, use the `--out-dir` option.
+To save to a specific file or directory, use the `--out` option.
 
-### Tips
+## Shell Complete
 
-You can use [jq](https://stedolan.github.io/jq/) to filter according to conditions.
+The encore-api-cli supports Shell completion.
 
-Get a list of keypoints whose execStatus is SUCCESS:
+For Bash, add this to `~/.bashrc`:
 
 ```sh
-$ amcli keypoint list | jq '.[] | select(.execStatus == "SUCCESS"  | {id: .id, image: .image, movie: .movie}'
+eval "$(_AMCLI_COMPLETE=source amcli)"
 ```
 
-Get a list of keypoint_id for only movie:
+For Zsh, add this to `~/.zshrc`:
 
 ```sh
-$ amcli keypoint list | jq '.[] | select(.movie != null) | .id'
+eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
 ```
 
-## Bash Complete
-
-The encore-api-cli supports Bash completion.
-To enable Bash completion, you would need to put into your `.bashrc`:
+For Fish, add this to `~/.config/fish/completions/amcli.fish`:
 
 ```sh
-$ eval "$(_AMCLI_COMPLETE=source amcli)"
-```
-
-For zsh users add this to your `.zshrc`:
-
-```sh
-$ eval "$(_AMCLI_COMPLETE=source_zsh amcli)"
+eval (env _AMCLI_COMPLETE=source_fish amcli)
 ```
 
 ## Change Log

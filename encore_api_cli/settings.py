@@ -1,14 +1,18 @@
 import os
 from configparser import ConfigParser, SectionProxy
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
+from .config import (
+    API_URL,
+    IS_DOWNLOAD,
+    IS_OPEN,
+    POLLING_INTERVAL,
+    TIMEOUT,
+    get_app_dir,
+)
 from .exceptions import SettingsValueError
-
-# default values
-API_URL = "https://api.customer.jp/anymotion/v1/"
-POLLING_INTERVAL = 5
-TIMEOUT = 600
 
 
 class Settings(object):
@@ -27,9 +31,7 @@ class Settings(object):
     """
 
     def __init__(self, profile_name: str, use_env: bool = True):
-        settings_dir = Path(os.getenv("ANYMOTION_ROOT", Path.home())) / ".anymotion"
-        settings_dir.mkdir(exist_ok=True)
-
+        settings_dir = get_app_dir()
         config_file = settings_dir / "config"
         credentials_file = settings_dir / "credentials"
 
@@ -79,8 +81,7 @@ class Settings(object):
             SettingsValueError
         """
         interval = self._config.polling_interval or POLLING_INTERVAL
-        interval = self._to_int_with_check(interval, "polling_interval", 1)
-        return interval
+        return self._to_int_with_check(interval, "polling_interval", 1)
 
     @property
     def timeout(self) -> int:
@@ -92,8 +93,19 @@ class Settings(object):
             SettingsValueError
         """
         timeout = self._config.timeout or TIMEOUT
-        timeout = self._to_int_with_check(timeout, "timeout", 1)
-        return timeout
+        return self._to_int_with_check(timeout, "timeout", 1)
+
+    @property
+    def is_download(self) -> Optional[bool]:
+        """Return default download flag."""
+        is_download = self._config.is_download or IS_DOWNLOAD
+        return self._to_optional_bool_with_check(is_download, "is_download")
+
+    @property
+    def is_open(self) -> Optional[bool]:
+        """Return default open flag."""
+        is_open = self._config.is_open or IS_OPEN
+        return self._to_optional_bool_with_check(is_open, "is_open")
 
     def write_config(self, api_url: str) -> None:
         """Update config file.
@@ -146,6 +158,21 @@ class Settings(object):
             message = f"The {name} value must be greater than {th}: {x}"
             raise SettingsValueError(message)
         return x
+
+    def _to_optional_bool_with_check(
+        self, value: Optional[Union[bool, str]], name: str
+    ) -> Optional[bool]:
+        if value is None or isinstance(value, bool):
+            return value
+        elif isinstance(value, str):
+            try:
+                value = bool(strtobool(value))
+            except ValueError:
+                message = f"The {name} value is invalid: {value}"
+                raise SettingsValueError(message)
+            return value
+        else:
+            raise Exception(f"The {name} value is invalid: {value}")
 
 
 class _Profile(object):

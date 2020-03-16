@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
+from encore_sdk import Client, ClientValueError
 
 from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response
-from .sdk import Client, ClientValueError
 from .settings import Settings
 from .state import State
 
@@ -38,6 +38,10 @@ def get_client(state: State) -> Client:
     if state.verbose:
         client.session.add_request_callback(echo_request)
         client.session.add_response_callback(echo_response)
+
+    # TODO: refactor
+    state.is_download = settings.is_download
+    state.is_open = settings.is_open
 
     return client
 
