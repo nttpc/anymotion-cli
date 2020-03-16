@@ -2,7 +2,7 @@
 
 ## 0.9.0
 
-Unreleased
+Released 2020-03-17
 
 - Added `--only` option to `keypoint show` and `analysis show` commands.
 - Added `--download / --no-download` option to `draw` command.
