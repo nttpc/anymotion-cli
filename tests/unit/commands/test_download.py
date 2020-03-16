@@ -81,26 +81,35 @@ class TestDownload(object):
         assert result.exit_code == 0
         assert "Downloading..." in result.output
 
-    def test_valid_skip_download(self, mocker, runner, make_client):
+    @pytest.mark.parametrize(
+        "force, is_skip, expected",
+        [
+            (True, True, "Downloaded the file to {path}."),
+            (True, False, "Downloaded the file to {path}."),
+            (False, True, "Skip download. To download it, run the following command."),
+            (False, False, "Downloaded the file to {path}."),
+        ],
+    )
+    def test_with_exists(self, mocker, runner, make_client, force, is_skip, expected):
         client_mock = make_client()
-        message = dedent(
-            """\
-            Skip download. To download it, run the following command.
 
-            "amcli download 111"
+        path = (Path(".") / "image.jpg").resolve()
+        expected = expected.format(path=path)
 
-            """
-        )
+        args = ["download", "111"]
+        if force:
+            args += ["--force"]
+
         mocker.patch(
             "encore_api_cli.commands.download._is_skip",
-            mocker.MagicMock(return_value=True),
+            mocker.MagicMock(return_value=is_skip),
         )
 
-        result = runner.invoke(cli, ["download", "111"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0
-        assert result.output == message
+        assert result.output.startswith(expected)
 
     @pytest.mark.parametrize("status", ["FAILURE", "TIMEOUT"])
     def test_with_response_error(self, runner, make_client, status):
@@ -138,11 +147,11 @@ class TestDownload(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["download"], 'Error: Missing argument "DRAWING_ID".\n'),
+            (["download"], "Error: Missing argument 'DRAWING_ID'.\n"),
             (
                 ["download", "invalid_id"],
                 (
-                    'Error: Invalid value for "DRAWING_ID": '
+                    "Error: Invalid value for 'DRAWING_ID': "
                     "invalid_id is not a valid integer\n",
                 ),
             ),
@@ -151,7 +160,7 @@ class TestDownload(object):
             (
                 ["download", "111", "-o", "not_exist_dir/file_name"],
                 (
-                    'Error: Invalid value for "-o" / "--out": '
+                    "Error: Invalid value for '-o' / '--out': "
                     'File "not_exist_dir/file_name" is not writable.\n'
                 ),
             ),

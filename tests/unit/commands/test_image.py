@@ -34,8 +34,8 @@ class TestImageShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["image", "show"], 'Error: Missing argument "IMAGE_ID"'),
-            (["image", "show", "not_value"], 'Error: Invalid value for "IMAGE_ID"'),
+            (["image", "show"], "Error: Missing argument 'IMAGE_ID'"),
+            (["image", "show", "not_value"], "Error: Invalid value for 'IMAGE_ID'"),
         ],
     )
     def test_invalid_params(self, runner, make_client, args, expected):

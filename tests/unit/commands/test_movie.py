@@ -34,8 +34,8 @@ class TestMovieShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["movie", "show"], 'Error: Missing argument "MOVIE_ID"'),
-            (["movie", "show", "not_value"], 'Error: Invalid value for "MOVIE_ID"'),
+            (["movie", "show"], "Error: Missing argument 'MOVIE_ID'"),
+            (["movie", "show", "not_value"], "Error: Invalid value for 'MOVIE_ID'"),
         ],
     )
     def test_invalid_params(self, runner, make_client, args, expected):

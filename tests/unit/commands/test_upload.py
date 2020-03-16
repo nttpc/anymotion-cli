@@ -47,7 +47,7 @@ class TestUpload(object):
         result = runner.invoke(cli, ["upload"])
 
         assert result.exit_code == 2
-        assert result.output.endswith('Error: Missing argument "PATH".\n')
+        assert result.output.endswith("Error: Missing argument 'PATH'.\n")
         assert client_mock.call_count == 0
 
     @pytest.mark.parametrize(
@@ -58,21 +58,21 @@ class TestUpload(object):
                 True,
                 False,
                 False,
-                'Error: Invalid value for "PATH": File "{}" does not exist.\n',
+                "Error: Invalid value for 'PATH': File '{}' does not exist.\n",
             ),
             (
                 "dir",
                 False,
                 True,
                 False,
-                'Error: Invalid value for "PATH": File "{}" does not exist.\n',
+                "Error: Invalid value for 'PATH': File '{}' does not exist.\n",
             ),
             (
                 "dir",
                 False,
                 True,
                 True,
-                'Error: Invalid value for "PATH": File "{}" is a directory.\n',
+                "Error: Invalid value for 'PATH': File '{}' is a directory.\n",
             ),
         ],
     )

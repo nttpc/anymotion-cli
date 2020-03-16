@@ -131,10 +131,10 @@ class TestDraw(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["draw", "invalid_id"], 'Error: Invalid value for "KEYPOINT_ID"'),
-            (["draw"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["draw", "--rule", "1"], 'Error: Missing argument "KEYPOINT_ID"'),
-            (["draw", "--no-download"], 'Error: Missing argument "KEYPOINT_ID"'),
+            (["draw", "invalid_id"], "Error: Invalid value for 'KEYPOINT_ID'"),
+            (["draw"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["draw", "--rule", "1"], "Error: Missing argument 'KEYPOINT_ID'"),
+            (["draw", "--no-download"], "Error: Missing argument 'KEYPOINT_ID'"),
             (["draw", "--rule"], "Error: --rule option requires an argument"),
             (["draw", "1", "--rule"], "Error: --rule option requires an argument"),
         ],

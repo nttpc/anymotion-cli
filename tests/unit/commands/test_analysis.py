@@ -150,11 +150,11 @@ class TestAnalysisShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["analysis", "show"], 'Error: Missing argument "ANALYSIS_ID".\n'),
+            (["analysis", "show"], "Error: Missing argument 'ANALYSIS_ID'.\n"),
             (
                 ["analysis", "show", "invalid_id"],
                 (
-                    'Error: Invalid value for "ANALYSIS_ID": '
+                    "Error: Invalid value for 'ANALYSIS_ID': "
                     "invalid_id is not a valid integer\n",
                 ),
             ),
@@ -271,7 +271,7 @@ class TestAnalysisList(object):
             (
                 ["analysis", "list", "--status", "INVALID_STATUS"],
                 (
-                    'Error: Invalid value for "--status": invalid choice: '
+                    "Error: Invalid value for '--status': invalid choice: "
                     "INVALID_STATUS. "
                     "(choose from SUCCESS, FAILURE, PROCESSING, UNPROCESSED)\n"
                 ),
