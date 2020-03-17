@@ -94,14 +94,22 @@ def echo_response(response: requests.Response) -> None:
     http_version = click.style(http_version, fg="blue")
     click.echo(f"{http_version} {status} {reason}")
 
-    if response.headers is not None:
+    content_type = None
+    if isinstance(response.headers, dict):
         for key, value in response.headers.items():
             key = click.style(key, fg="cyan")
             click.echo(f"{key}: {value}")
+        content_type = response.headers.get("Content-Type")
 
-    json = response.json()
-    if json is not None:
-        echo_json(json)
+    if content_type == "application/json":
+        json = response.json()
+        if json is not None:
+            echo_json(json)
+    else:
+        text = response.text
+        if text:
+            click.echo()
+            click.echo(text)
 
     click.echo()
     click.echo()
