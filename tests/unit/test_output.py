@@ -113,13 +113,14 @@ def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
 
 
 @pytest.mark.parametrize(
-    "status_code, reason, version, headers, json, expected",
+    "status_code, reason, version, headers, json, text, expected",
     [
         (
             200,
             "OK",
             11,
             {"Content-Type": "application/json"},
+            None,
             None,
             dedent(
                 """\
@@ -136,6 +137,7 @@ def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
             10,
             {"Content-Type": "application/json"},
             None,
+            None,
             dedent(
                 """\
                     HTTP/1.0 201 Created
@@ -151,6 +153,7 @@ def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
             11,
             {"Content-Type": "application/json"},
             {"id": 1},
+            None,
             dedent(
                 """\
                     HTTP/1.1 200 OK
@@ -165,10 +168,52 @@ def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
                 """
             ),
         ),
+        (
+            200,
+            "OK",
+            11,
+            None,
+            None,
+            None,
+            dedent(
+                """\
+                    HTTP/1.1 200 OK
+
+
+                """
+            ),
+        ),
+        (
+            200,
+            "OK",
+            11,
+            {"Content-Type": "text/plain"},
+            None,
+            "message",
+            dedent(
+                """\
+                    HTTP/1.1 200 OK
+                    Content-Type: text/plain
+
+                    message
+
+
+                """
+            ),
+        ),
     ],
 )
 def test_echo_response(
-    mocker, capfd, monkeypatch, status_code, reason, version, headers, json, expected
+    mocker,
+    capfd,
+    monkeypatch,
+    status_code,
+    reason,
+    version,
+    headers,
+    json,
+    text,
+    expected,
 ):
     monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
@@ -178,6 +223,7 @@ def test_echo_response(
     response_mock.return_value.raw.version = version
     response_mock.return_value.headers = headers
     response_mock.return_value.json.return_value = json
+    response_mock.return_value.text = text
 
     echo_response(response_mock())
 
