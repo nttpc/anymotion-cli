@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.9.1
+
+Released 2020-03-24
+
+- Fixed bug that caused an error with `-v` option when Content-Type header of response is not json.
+
 ## 0.9.0
 
 Released 2020-03-17
