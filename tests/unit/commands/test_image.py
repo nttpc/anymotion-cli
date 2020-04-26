@@ -3,7 +3,7 @@ from textwrap import dedent
 import pytest
 from encore_sdk import RequestsError
 
-from encore_api_cli.commands.image import cli
+from anymotion_cli.commands.image import cli
 
 
 def test_image(runner):
@@ -65,7 +65,7 @@ class TestImageShow(object):
                     "id": 1,
                     "name": "image",
                 }
-            mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.image.get_client", client_mock)
             return client_mock
 
         return _make_client
@@ -130,7 +130,7 @@ class TestImageList(object):
             else:
                 data = [{"id": i + 1, "name": "image"} for i in range(num_data)]
                 client_mock.return_value.get_images.return_value = data
-            mocker.patch("encore_api_cli.commands.image.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.image.get_client", client_mock)
             return client_mock
 
         return _make_client

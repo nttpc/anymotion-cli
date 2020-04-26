@@ -1,7 +1,7 @@
 import pytest
 from encore_sdk import FileTypeError, RequestsError
 
-from encore_api_cli.commands.upload import cli
+from anymotion_cli.commands.upload import cli
 
 
 class TestUpload(object):
@@ -115,7 +115,7 @@ class TestUpload(object):
                 client_mock.return_value.upload.return_value.image_id = None
                 client_mock.return_value.upload.return_value.movie_id = 1
 
-            mocker.patch("encore_api_cli.commands.upload.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.upload.get_client", client_mock)
 
             return client_mock
 

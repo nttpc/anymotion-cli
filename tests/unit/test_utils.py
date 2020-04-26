@@ -1,9 +1,9 @@
 import pytest
 from encore_sdk.client import Client
 
-from encore_api_cli.exceptions import ClickException, SettingsValueError
-from encore_api_cli.state import State
-from encore_api_cli.utils import get_client, get_settings, parse_rule
+from anymotion_cli.exceptions import ClickException, SettingsValueError
+from anymotion_cli.state import State
+from anymotion_cli.utils import get_client, get_settings, parse_rule
 
 
 class TestGetClient(object):
@@ -16,7 +16,7 @@ class TestGetClient(object):
         settings_mock.return_value.api_url = "http://api.example.com/anymotion/v1/"
         settings_mock.return_value.interval = 10
         settings_mock.return_value.timeout = 600
-        mocker.patch("encore_api_cli.utils.Settings", settings_mock)
+        mocker.patch("anymotion_cli.utils.Settings", settings_mock)
 
         state = State()
         state.verbose = verbose
@@ -28,7 +28,7 @@ class TestGetClient(object):
     def test_error_occurs_if_is_ok_False(self, mocker):
         settings_mock = mocker.MagicMock()
         settings_mock.return_value.is_ok = False
-        mocker.patch("encore_api_cli.utils.Settings", settings_mock)
+        mocker.patch("anymotion_cli.utils.Settings", settings_mock)
 
         state = State()
         with pytest.raises(ClickException):
@@ -44,7 +44,7 @@ class TestGetClient(object):
         settings_mock.return_value.api_url = "http://api.example.com/"
         settings_mock.return_value.interval = 10
         settings_mock.return_value.timeout = 600
-        mocker.patch("encore_api_cli.utils.Settings", settings_mock)
+        mocker.patch("anymotion_cli.utils.Settings", settings_mock)
 
         state = State()
         with pytest.raises(ClickException):
@@ -56,7 +56,7 @@ class TestGetClient(object):
 class TestGetSettings(object):
     def test_valid(self, mocker):
         settings_mock = mocker.MagicMock()
-        mocker.patch("encore_api_cli.utils.Settings", settings_mock)
+        mocker.patch("anymotion_cli.utils.Settings", settings_mock)
 
         get_settings("default")
 
@@ -64,7 +64,7 @@ class TestGetSettings(object):
 
     def test_invalid(self, mocker):
         settings_mock = mocker.MagicMock(side_effect=SettingsValueError())
-        mocker.patch("encore_api_cli.utils.Settings", settings_mock)
+        mocker.patch("anymotion_cli.utils.Settings", settings_mock)
 
         with pytest.raises(ClickException):
             get_settings("default")

@@ -3,7 +3,7 @@ from textwrap import dedent
 import pytest
 from encore_sdk import RequestsError
 
-from encore_api_cli.commands.movie import cli
+from anymotion_cli.commands.movie import cli
 
 
 def test_movie(runner):
@@ -65,7 +65,7 @@ class TestMovieShow(object):
                     "id": 1,
                     "name": "movie",
                 }
-            mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.movie.get_client", client_mock)
             return client_mock
 
         return _make_client
@@ -130,7 +130,7 @@ class TestMovieList(object):
             else:
                 data = [{"id": i + 1, "name": "movie"} for i in range(num_data)]
                 client_mock.return_value.get_movies.return_value = data
-            mocker.patch("encore_api_cli.commands.movie.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.movie.get_client", client_mock)
             return client_mock
 
         return _make_client

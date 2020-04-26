@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.output import (
+from anymotion_cli.output import (
     echo,
     echo_json,
     echo_request,

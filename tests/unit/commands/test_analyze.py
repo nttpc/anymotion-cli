@@ -3,14 +3,14 @@ from textwrap import dedent
 import pytest
 from encore_sdk import RequestsError
 
-from encore_api_cli.commands.analyze import cli
+from anymotion_cli.commands.analyze import cli
 
 
 class TestAnalyze(object):
     @pytest.fixture
     def show_mock(self, mocker):
         show_mock = mocker.MagicMock()
-        mocker.patch("encore_api_cli.commands.analyze.show", show_mock)
+        mocker.patch("anymotion_cli.commands.analyze.show", show_mock)
         yield show_mock
 
     @pytest.mark.parametrize(
@@ -206,5 +206,5 @@ class TestAnalyze(object):
             if status == "FAILURE":
                 wait_mock.return_value.failure_detail = "message"
 
-        mocker.patch("encore_api_cli.commands.analyze.get_client", client_mock)
+        mocker.patch("anymotion_cli.commands.analyze.get_client", client_mock)
         return client_mock

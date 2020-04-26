@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "encore-api-cli"
+name = "anymotion-cli"
 version = "0.9.1"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
@@ -38,14 +38,13 @@ tox = "^3.14.3"
 s3pypi = "^0.10.1"
 
 [tool.poetry.scripts]
-amcli = "encore_api_cli.core:cli"
-enimo = "encore_api_cli.core:cli"
-encore = "encore_api_cli.core:cli"
+amcli = "anymotion_cli.core:cli"
+enimo = "anymotion_cli.core:cli"
+encore = "anymotion_cli.core:cli"
 
 [[tool.poetry.source]]
 name = "anymotion"
-# url = "https://pypi.anymotion.jp"
-url = "http://pypi.anymotion.jp.s3-website-ap-northeast-1.amazonaws.com"
+url = "https://pypi.anymotion.jp"
 
 [tool.isort]
 include_trailing_comma = true
@@ -53,7 +52,7 @@ line_length = 88
 multi_line_output = 3
 
 [tool.coverage.run]
-source = ["encore_api_cli"]
+source = ["anymotion_cli"]
 branch = true
 
 [build-system]

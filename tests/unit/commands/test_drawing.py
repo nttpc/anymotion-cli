@@ -3,7 +3,7 @@ from textwrap import dedent
 import pytest
 from encore_sdk import RequestsError
 
-from encore_api_cli.commands.drawing import cli
+from anymotion_cli.commands.drawing import cli
 
 
 def test_drawing(runner):
@@ -71,7 +71,7 @@ class TestDrawingShow(object):
                     "id": 1,
                     "execStatus": status,
                 }
-            mocker.patch("encore_api_cli.commands.drawing.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.drawing.get_client", client_mock)
             return client_mock
 
         return _make_client
@@ -169,7 +169,7 @@ class TestDrawingList(object):
             else:
                 data = [{"id": i + 1, "execStatus": "SUCCESS"} for i in range(num_data)]
                 client_mock.return_value.get_drawings.return_value = data
-            mocker.patch("encore_api_cli.commands.drawing.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.drawing.get_client", client_mock)
             return client_mock
 
         return _make_client

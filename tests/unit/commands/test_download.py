@@ -5,7 +5,7 @@ from textwrap import dedent
 import pytest
 from encore_sdk import RequestsError
 
-from encore_api_cli.commands.download import _get_name_from_keypoint_id, _is_skip, cli
+from anymotion_cli.commands.download import _get_name_from_keypoint_id, _is_skip, cli
 
 
 class TestDownload(object):
@@ -101,7 +101,7 @@ class TestDownload(object):
             args += ["--force"]
 
         mocker.patch(
-            "encore_api_cli.commands.download._is_skip",
+            "anymotion_cli.commands.download._is_skip",
             mocker.MagicMock(return_value=is_skip),
         )
 
@@ -204,14 +204,14 @@ class TestDownload(object):
             else:
                 client_mock.return_value.download.return_value = None
 
-            mocker.patch("encore_api_cli.commands.download.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.download.get_client", client_mock)
 
             if with_get_name_exception:
                 get_name_mock = mocker.MagicMock(side_effect=RequestsError())
             else:
                 get_name_mock = mocker.MagicMock(return_value="image")
             mocker.patch(
-                "encore_api_cli.commands.download._get_name_from_keypoint_id",
+                "anymotion_cli.commands.download._get_name_from_keypoint_id",
                 get_name_mock,
             )
 
