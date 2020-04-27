@@ -3,8 +3,8 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.exceptions import SettingsValueError
-from encore_api_cli.settings import Settings
+from anymotion_cli.exceptions import SettingsValueError
+from anymotion_cli.settings import Settings
 
 
 @pytest.fixture

@@ -121,6 +121,6 @@ def is_show() -> bool:
     It is True for terminals and False for pipes.
     If an environment variable has been set, its value is returned.
     """
-    from encore_api_cli.utils import get_bool_env
+    from anymotion_cli.utils import get_bool_env
 
     return get_bool_env("ANYMOTION_STDOUT_ISSHOW", sys.stdout.isatty())

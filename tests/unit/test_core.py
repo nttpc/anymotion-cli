@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from encore_api_cli.core import cli
+from anymotion_cli.core import cli
 
 
 @pytest.mark.parametrize("args", [None, ["--help"]])

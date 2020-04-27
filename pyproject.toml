@@ -1,11 +1,14 @@
 [tool.poetry]
-name = "encore-api-cli"
+name = "anymotion-cli"
 version = "0.9.1"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
-repository = "https://bitbucket.org/nttpc-datascience/encore-api-cli/"
+license = "MIT"
+repository = "https://github.com/nttpc/anymotion-cli"
+homepage = "https://github.com/nttpc/anymotion-cli"
 classifiers = [
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8"
@@ -13,6 +16,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.6, <4"
+anymotion-sdk = ">=1.0, <1.1"
 click = "^7.1.1"
 click_help_colors = "^0.6"
 click_repl = "^0.1.6"
@@ -20,7 +24,6 @@ pygments = "^2.6.1"
 requests = "^2.23.0"
 tabulate = "^0.8.6"
 yaspin = "^0.16.0"
-encore-sdk = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"
@@ -35,17 +38,9 @@ pytest-cov = "^2.8.1"
 pytest-mock = "^2.0.0"
 requests-mock = "^1.7.0"
 tox = "^3.14.3"
-s3pypi = "^0.10.1"
 
 [tool.poetry.scripts]
-amcli = "encore_api_cli.core:cli"
-enimo = "encore_api_cli.core:cli"
-encore = "encore_api_cli.core:cli"
-
-[[tool.poetry.source]]
-name = "anymotion"
-# url = "https://pypi.anymotion.jp"
-url = "http://pypi.anymotion.jp.s3-website-ap-northeast-1.amazonaws.com"
+amcli = "anymotion_cli.core:cli"
 
 [tool.isort]
 include_trailing_comma = true
@@ -53,7 +48,7 @@ line_length = 88
 multi_line_output = 3
 
 [tool.coverage.run]
-source = ["encore_api_cli"]
+source = ["anymotion_cli"]
 branch = true
 
 [build-system]
