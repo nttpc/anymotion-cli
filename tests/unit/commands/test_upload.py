@@ -1,5 +1,5 @@
 import pytest
-from encore_sdk import FileTypeError, RequestsError
+from anymotion_sdk import FileTypeError, RequestsError
 
 from anymotion_cli.commands.upload import cli
 

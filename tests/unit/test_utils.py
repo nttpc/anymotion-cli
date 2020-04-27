@@ -1,5 +1,5 @@
 import pytest
-from encore_sdk.client import Client
+from anymotion_sdk.client import Client
 
 from anymotion_cli.exceptions import ClickException, SettingsValueError
 from anymotion_cli.state import State

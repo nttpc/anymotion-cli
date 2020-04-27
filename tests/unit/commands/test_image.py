@@ -1,7 +1,7 @@
 from textwrap import dedent
 
 import pytest
-from encore_sdk import RequestsError
+from anymotion_sdk import RequestsError
 
 from anymotion_cli.commands.image import cli
 
