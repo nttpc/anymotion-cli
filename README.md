@@ -20,7 +20,7 @@ $ pip install anymotion-cli
 
 ## Getting Started
 
-Before using anymotion-cli, you need to tell it about your AnyMotion credentials.
+Before using anymotion-cli, you need to tell it about your credentials which issued by the [AnyMotion Portal](https://portal.anymotion.jp/).
 You can do this in several ways:
 
 - CLI command
@@ -156,15 +156,15 @@ See [CHANGELOG.md](CHANGELOG.md).
 - Docstring should follow [Google Style](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 - Install all development dependencies using:
 
-```sh
-$ poetry install
-```
+  ```sh
+  $ poetry install
+  ```
 
 - Before submitting pull requests, run tests with:
 
-```sh
-$ poetry run tox
-```
+  ```sh
+  $ poetry run tox
+  ```
 
 [ci]: https://circleci.com/gh/nttpc/anymotion-cli
 [ci-status]: https://circleci.com/gh/nttpc/anymotion-cli.svg?style=shield&circle-token=4f7564ae447f53ff1c6d3aadb2303b5d526c6fb8

@@ -696,8 +696,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "8b5854ef65ef279e4ec01693e23a1531c636d4ac2452ee190d42d276de0969d7"
-python-versions = ">=3.6, <4"
+content-hash = "592b5a124981561568b9bb5024cea28c9db1319f312cae02c5b24bb1d856243e"
+python-versions = "^3.6"
 
 [metadata.files]
 anymotion-sdk = [
