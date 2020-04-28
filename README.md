@@ -1,8 +1,12 @@
+<p align="center"><a href="https://anymotion.nttpc.co.jp/"><img src="assets/logo.png?raw=true"/></a></p>
+
 # AnyMotion CLI
 
-[![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
+[![PyPi][pypi-version]][pypi] [![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
 This package provides a command line interface to [AnyMotion](https://anymotion.nttpc.co.jp/).
+
+<p align="center"><img src="assets/terminal.gif?raw=true"/></p>
 
 It works on Python versions:
 
@@ -166,6 +170,8 @@ See [CHANGELOG.md](CHANGELOG.md).
   $ poetry run tox
   ```
 
+[pypi]: https://pypi.org/project/anymotion-cli
+[pypi-version]: https://img.shields.io/pypi/v/anymotion-cli
 [ci]: https://circleci.com/gh/nttpc/anymotion-cli
 [ci-status]: https://circleci.com/gh/nttpc/anymotion-cli.svg?style=shield&circle-token=4f7564ae447f53ff1c6d3aadb2303b5d526c6fb8
 [codecov]: https://codecov.io/gh/nttpc/anymotion-cli
