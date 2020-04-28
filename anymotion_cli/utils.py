@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
-from encore_sdk import Client, ClientValueError
+from anymotion_sdk import Client, ClientValueError
 
 from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response

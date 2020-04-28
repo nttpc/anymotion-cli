@@ -1,13 +1,13 @@
 from typing import Optional
 
 import click
+from anymotion_sdk import RequestsError
 from click_help_colors import HelpColorsGroup
-from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException
 from ..options import common_options
-from ..output import echo_json
+from ..output import echo_json, echo_warning
 from ..state import State, pass_state
 from ..utils import get_client
 
@@ -17,50 +17,53 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group(short_help="Show the extracted keypoints.")
+@cli.group(short_help="Show the analysis results.")
 @common_options
-def keypoint() -> None:
-    """Show the extracted keypoints."""
+def analysis() -> None:
+    """Show the analysis results."""
 
 
-@keypoint.command(short_help="Show extracted keypoint data.")
-@click.argument("keypoint_id", type=int)
+@analysis.command(short_help="Show the analysis result.")
+@click.argument("analysis_id", type=int)
 @click.option(
     "--only",
-    "--only-keypoint",
-    "only_keypoint",
+    "--only-result",
+    "only_result",
     is_flag=True,
-    help="Show only keypoint data.",
+    help="Show only result data.",
 )
-@click.option("--no-keypoint", is_flag=True, help="Do not show keypoint data.")
+@click.option("--no-result", is_flag=True, help="Do not show result data.")
 @common_options
 @pass_state
-def show(
-    state: State, keypoint_id: int, only_keypoint: bool, no_keypoint: bool
-) -> None:
-    """Show extracted keypoint data."""
-    if only_keypoint and no_keypoint:
+def show(state: State, analysis_id: int, only_result: bool, no_result: bool) -> None:
+    """Show the analysis result."""
+    if only_result and no_result:
         raise click.UsageError(
-            '"--only, --only-keypoint" and "--no-keypoint" options cannot be used '
+            '"--only, --only-result" and "--no-result" options cannot be used '
             "at the same time."
         )
 
     client = get_client(state)
 
     try:
-        response = client.get_keypoint(keypoint_id)
+        response = client.get_analysis(analysis_id)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):
         raise Exception("Response is invalid.")
 
-    data = response.get("keypoint") or []
-    pager = len(data) >= state.pager_length
+    data = response.get("result") or []
+    try:
+        count = sum([len(row["values"]) for row in data])
+    except Exception as e:
+        echo_warning(f"Response is invalid: {e}")
+        count = 0
+    pager = count >= state.pager_length
 
-    if no_keypoint:
-        response.pop("keypoint")
+    if no_result:
+        response.pop("result")
         echo_json(response)
-    elif only_keypoint:
+    elif only_result:
         status = response.get("execStatus", "FAILURE")
         if status == "SUCCESS":
             echo_json(data, pager=pager)
@@ -70,7 +73,7 @@ def show(
         echo_json(response, pager=pager)
 
 
-@keypoint.command(short_help="Show a list of information for all keypoints.")
+@analysis.command(short_help="Show the analysis list.")
 @click.option(
     "--status",
     type=click.Choice(
@@ -81,7 +84,7 @@ def show(
 @common_options
 @pass_state
 def list(state: State, status: Optional[str]) -> None:
-    """Show a list of information for all keypoints."""
+    """Show the analysis list."""
     client = get_client(state)
 
     params = {}
@@ -91,9 +94,9 @@ def list(state: State, status: Optional[str]) -> None:
     try:
         if state.use_spinner:
             with yaspin(text="Retrieving..."):
-                data = client.get_keypoints(params=params)
+                data = client.get_analyses(params=params)
         else:
-            data = client.get_keypoints(params=params)
+            data = client.get_analyses(params=params)
     except RequestsError as e:
         raise ClickException(str(e))
 

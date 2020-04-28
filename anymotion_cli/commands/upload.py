@@ -1,6 +1,6 @@
 import click
+from anymotion_sdk import FileTypeError, RequestsError
 from click_help_colors import HelpColorsGroup
-from encore_sdk import FileTypeError, RequestsError
 
 from ..exceptions import ClickException
 from ..options import common_options

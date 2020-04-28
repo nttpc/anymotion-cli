@@ -3,8 +3,8 @@ from textwrap import dedent
 
 import pytest
 
-from encore_api_cli.commands.configure import cli
-from encore_api_cli.exceptions import SettingsValueError
+from anymotion_cli.commands.configure import cli
+from anymotion_cli.exceptions import SettingsValueError
 
 
 @pytest.fixture()
@@ -118,7 +118,7 @@ class TestConfigure(object):
             write_config_mock.return_value = None
         settings_mock.return_value.write_credentials.return_value = None
 
-        mocker.patch("encore_api_cli.commands.configure.get_settings", settings_mock)
+        mocker.patch("anymotion_cli.commands.configure.get_settings", settings_mock)
         return settings_mock
 
 
@@ -146,7 +146,7 @@ def test_configure_list(mocker, runner, client_id, expected_client_id):
     settings_mock.return_value.client_secret = "client_secret"
     settings_mock.return_value.interval = 10
     settings_mock.return_value.timeout = 600
-    mocker.patch("encore_api_cli.commands.configure.get_settings", settings_mock)
+    mocker.patch("anymotion_cli.commands.configure.get_settings", settings_mock)
 
     result = runner.invoke(cli, ["configure", "list"])
 

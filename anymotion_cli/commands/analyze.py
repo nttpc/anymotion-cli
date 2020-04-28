@@ -2,8 +2,8 @@ import io
 from typing import Optional
 
 import click
+from anymotion_sdk import RequestsError
 from click_help_colors import HelpColorsGroup
-from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException

@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
-from encore_sdk import RequestsError
+from anymotion_sdk import RequestsError
 
-from encore_api_cli.commands.draw import cli
+from anymotion_cli.commands.draw import cli
 
 
 class TestDraw(object):
@@ -180,8 +180,8 @@ class TestDraw(object):
                 wait_mock.return_value.status = status
                 wait_mock.return_value.get.return_value = url
 
-            mocker.patch("encore_api_cli.commands.draw.get_client", client_mock)
-            mocker.patch("encore_api_cli.commands.draw.download", mocker.MagicMock())
+            mocker.patch("anymotion_cli.commands.draw.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.draw.download", mocker.MagicMock())
 
             return client_mock
 

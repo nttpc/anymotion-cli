@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
-from encore_sdk import RequestsError
+from anymotion_sdk import RequestsError
 
-from encore_api_cli.commands.extract import cli
+from anymotion_cli.commands.extract import cli
 
 
 class TestExtract(object):
@@ -148,9 +148,9 @@ class TestExtract(object):
                     wait_mock.return_value.failure_detail = "message"
 
             if with_drawing:
-                mocker.patch("encore_api_cli.commands.extract.draw", mocker.MagicMock())
+                mocker.patch("anymotion_cli.commands.extract.draw", mocker.MagicMock())
 
-            mocker.patch("encore_api_cli.commands.extract.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.extract.get_client", client_mock)
             return client_mock
 
         return _make_client

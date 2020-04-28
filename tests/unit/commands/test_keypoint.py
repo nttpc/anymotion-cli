@@ -1,9 +1,9 @@
 from textwrap import dedent
 
 import pytest
-from encore_sdk import RequestsError
+from anymotion_sdk import RequestsError
 
-from encore_api_cli.commands.keypoint import cli
+from anymotion_cli.commands.keypoint import cli
 
 
 def test_keypoint(runner):
@@ -220,7 +220,7 @@ class TestKeypointShow(object):
                     "keypoint": data,
                     "execStatus": status,
                 }
-            mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.keypoint.get_client", client_mock)
             return client_mock
 
         return _make_client
@@ -320,7 +320,7 @@ class TestKeypointList(object):
                     for i in range(num_data)
                 ]
                 client_mock.return_value.get_keypoints.return_value = data
-            mocker.patch("encore_api_cli.commands.keypoint.get_client", client_mock)
+            mocker.patch("anymotion_cli.commands.keypoint.get_client", client_mock)
             return client_mock
 
         return _make_client

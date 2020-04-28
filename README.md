@@ -1,10 +1,10 @@
-# Encore API CLI
+# AnyMotion CLI
 
 [![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
-This package provides a command line interface to AnyMotion.
+This package provides a command line interface to [AnyMotion](https://anymotion.nttpc.co.jp/).
 
-The encore-api-cli package works on Python versions:
+It works on Python versions:
 
 - Python 3.6
 - Python 3.7
@@ -12,24 +12,15 @@ The encore-api-cli package works on Python versions:
 
 ## Installation
 
-Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/) by pointing the `--extra-index-url`:
+Install using [pip](https://pip.pypa.io/en/stable/quickstart/):
 
 ```sh
-$ pip install -U encore-api-cli --extra-index-url https://pypi.anymotion.jp
+$ pip install anymotion-cli
 ```
-
-Alternatively, you can configure the index URL in `~/.pip/pip.conf`:
-
-```text
-[global]
-extra-index-url = https://pypi.anymotion.jp
-```
-
-**Notice**: You can only install from the internal network.
 
 ## Getting Started
 
-Before using encore-api-cli, you need to tell it about your AnyMotion credentials.
+Before using anymotion-cli, you need to tell it about your credentials which issued by the [AnyMotion Portal](https://portal.anymotion.jp/).
 You can do this in several ways:
 
 - CLI command
@@ -134,7 +125,7 @@ To save to a specific file or directory, use the `--out` option.
 
 ## Shell Complete
 
-The encore-api-cli supports Shell completion.
+The anymotion-cli supports Shell completion.
 
 For Bash, add this to `~/.bashrc`:
 
@@ -165,17 +156,17 @@ See [CHANGELOG.md](CHANGELOG.md).
 - Docstring should follow [Google Style](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 - Install all development dependencies using:
 
-```sh
-$ poetry install
-```
+  ```sh
+  $ poetry install
+  ```
 
 - Before submitting pull requests, run tests with:
 
-```sh
-$ poetry run tox
-```
+  ```sh
+  $ poetry run tox
+  ```
 
-[ci]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master
-[ci-status]: https://circleci.com/bb/nttpc-datascience/encore-api-cli/tree/master.svg?style=shield&circle-token=8efda4c7b7ec1fe9abff9fac5412bd9a59604c84
-[codecov]: https://codecov.io/bb/nttpc-datascience/encore-api-cli
-[codecov-status]: https://codecov.io/bb/nttpc-datascience/encore-api-cli/branch/master/graph/badge.svg?token=s4c1X9EhAN
+[ci]: https://circleci.com/gh/nttpc/anymotion-cli
+[ci-status]: https://circleci.com/gh/nttpc/anymotion-cli.svg?style=shield&circle-token=4f7564ae447f53ff1c6d3aadb2303b5d526c6fb8
+[codecov]: https://codecov.io/gh/nttpc/anymotion-cli
+[codecov-status]: https://codecov.io/gh/nttpc/anymotion-cli/branch/master/graph/badge.svg?token=6S0GIV4ZD9

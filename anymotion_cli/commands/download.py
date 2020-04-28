@@ -4,8 +4,8 @@ from typing import Callable, Optional
 from urllib.parse import urlparse
 
 import click
+from anymotion_sdk import RequestsError
 from click_help_colors import HelpColorsGroup
-from encore_sdk import RequestsError
 from yaspin import yaspin
 
 from ..exceptions import ClickException

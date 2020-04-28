@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from encore_api_cli.core import cli
+from anymotion_cli.core import cli
 
 
 class TestAnalysis(object):
