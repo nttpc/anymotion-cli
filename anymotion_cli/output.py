@@ -1,7 +1,6 @@
 import json
 import sys
 from typing import Optional
-from urllib.parse import urlencode, urlparse, urlunparse
 
 import click
 import requests
@@ -52,11 +51,7 @@ def echo_request(request: requests.Request) -> None:
             "key": "value"
         }
     """
-    parts = list(urlparse(request.url))
-    parts[4] = urlencode(request.params)
-    url = urlunparse(parts)
-
-    url = click.style(url, fg="cyan")
+    url = click.style(request.prepare().url, fg="cyan")
     method = click.style(request.method, fg="green")
     click.echo(f"{method} {url}")
 

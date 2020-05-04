@@ -100,7 +100,7 @@ def test_echo_request(mocker, capfd, monkeypatch, headers, json, expected):
     monkeypatch.setenv("ANYMOTION_STDOUT_ISSHOW", "True")
 
     request_mock = mocker.MagicMock()
-    request_mock.return_value.url = "http://example.com"
+    request_mock.return_value.prepare.return_value.url = "http://example.com"
     request_mock.return_value.method = "POST"
     request_mock.return_value.headers = headers
     request_mock.return_value.json = json
