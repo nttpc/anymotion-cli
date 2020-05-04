@@ -51,7 +51,7 @@ def echo_request(request: requests.Request) -> None:
             "key": "value"
         }
     """
-    url = click.style(request.prepare().url, fg="cyan")
+    url = click.style(str(request.prepare().url), fg="cyan")
     method = click.style(request.method, fg="green")
     click.echo(f"{method} {url}")
 
