@@ -26,12 +26,17 @@ def echo_warning(message: str) -> None:
     click.echo(f"{click.style('Warning', fg='yellow')}: {message}", err=True)
 
 
-def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> None:
+def echo_json(
+    data: object,
+    sort_keys: bool = False,
+    ensure_ascii: bool = False,
+    pager: bool = False,
+) -> None:
     """Output json data."""
     if is_show():
         click.echo()
 
-    body = json.dumps(data, sort_keys=sort_keys, indent=2)
+    body = json.dumps(data, sort_keys=sort_keys, ensure_ascii=ensure_ascii, indent=2)
     body = highlight(body, JsonLexer(), TerminalFormatter())
 
     if pager:
