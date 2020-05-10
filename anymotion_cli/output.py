@@ -1,7 +1,6 @@
 import json
 import sys
 from typing import Optional
-from urllib.parse import urlencode, urlparse, urlunparse
 
 import click
 import requests
@@ -27,12 +26,17 @@ def echo_warning(message: str) -> None:
     click.echo(f"{click.style('Warning', fg='yellow')}: {message}", err=True)
 
 
-def echo_json(data: object, sort_keys: bool = False, pager: bool = False) -> None:
+def echo_json(
+    data: object,
+    sort_keys: bool = False,
+    ensure_ascii: bool = False,
+    pager: bool = False,
+) -> None:
     """Output json data."""
     if is_show():
         click.echo()
 
-    body = json.dumps(data, sort_keys=sort_keys, indent=2)
+    body = json.dumps(data, sort_keys=sort_keys, ensure_ascii=ensure_ascii, indent=2)
     body = highlight(body, JsonLexer(), TerminalFormatter())
 
     if pager:
@@ -52,11 +56,7 @@ def echo_request(request: requests.Request) -> None:
             "key": "value"
         }
     """
-    parts = list(urlparse(request.url))
-    parts[4] = urlencode(request.params)
-    url = urlunparse(parts)
-
-    url = click.style(url, fg="cyan")
+    url = click.style(str(request.prepare().url), fg="cyan")
     method = click.style(request.method, fg="green")
     click.echo(f"{method} {url}")
 
