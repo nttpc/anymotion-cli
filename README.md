@@ -1,8 +1,13 @@
+<div align="center"><a href="https://anymotion.nttpc.co.jp/"><img src="https://user-images.githubusercontent.com/63082802/81498974-edf9a500-9302-11ea-8583-f8d6971a9b25.png"/></a></div>
+
 # AnyMotion CLI
 
-[![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
+[![PyPi][pypi-version]][pypi] [![CircleCI][ci-status]][ci] [![codecov][codecov-status]][codecov]
 
-This package provides a command line interface to [AnyMotion](https://anymotion.nttpc.co.jp/).
+This package provides a command line interface to [AnyMotion](https://anymotion.nttpc.co.jp/), which is a motion analysis API using pose estimation.
+It uses the [AnyMotion Python SDK](https://github.com/nttpc/anymotion-python-sdk).
+
+<div align="center"><img src="https://user-images.githubusercontent.com/63082802/81499044-7a0bcc80-9303-11ea-96b5-a779ae0adcf7.gif"/></div>
 
 It works on Python versions:
 
@@ -63,7 +68,7 @@ You can use `amcli`.
 amcli [OPTIONS] COMMAND [ARGS]...
 ```
 
-More information, see below tables or run with `--help` option.
+See the table below for more information, or run it with the `--help` option.
 
 ### Commands to process something (verb commands)
 
@@ -102,7 +107,7 @@ $ amcli upload image.jpg
 Success: Uploaded image.jpg to the cloud storage. (image id: 111)
 ```
 
-When the upload is complete, you get an `image id`.
+When the upload is complete, you will get an `image id`.
 Extract keypoints using this `image id`.
 
 ```sh
@@ -122,6 +127,73 @@ Downloaded the file to image.jpg.
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
 To save to a specific file or directory, use the `--out` option.
+
+#### Draw using rules
+
+You can use the rules to draw a variety of things.
+In the following example, draw the lines of stick picture in red.
+
+```sh
+$ amcli draw 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
+```
+
+You can also specify it in the JSON file.
+
+```sh
+$ amcli draw 222 --rule-file rule.json
+```
+
+For more information on the drawing rules, see the [documentation](https://docs.anymotion.jp/drawing.html).
+
+#### Show extracted keypoints
+
+You can use the `keypoint show` command to display the extracted keypoint data.
+
+```sh
+$ amcli keypoint show 1234
+{
+  "id": 1234,
+  "image": null,
+  "movie": 123,
+  "keypoint": [
+    {
+      "leftKnee": [
+        487,
+        730
+      ],
+      ...
+```
+
+The `--only` option allows you to display only the keypoint data.
+
+```sh
+$ amcli keypoint show 1234 --only
+[
+  {
+    "leftKnee": [
+      487,
+      730
+    ],
+    "rightKnee": [
+      1118,
+      703
+    ]
+    ...
+```
+
+With [jq](https://stedolan.github.io/jq/), it's also easy to take out only certain parts of the body.
+
+```sh
+$ amcli keypoint show 1234 --only | jq '[.[].leftKnee]'
+[
+  [
+    487,
+    730
+  ],
+  null,
+  null,
+  ...
+```
 
 ## Shell Complete
 
@@ -166,6 +238,8 @@ See [CHANGELOG.md](CHANGELOG.md).
   $ poetry run tox
   ```
 
+[pypi]: https://pypi.org/project/anymotion-cli
+[pypi-version]: https://img.shields.io/pypi/v/anymotion-cli
 [ci]: https://circleci.com/gh/nttpc/anymotion-cli
 [ci-status]: https://circleci.com/gh/nttpc/anymotion-cli.svg?style=shield&circle-token=4f7564ae447f53ff1c6d3aadb2303b5d526c6fb8
 [codecov]: https://codecov.io/gh/nttpc/anymotion-cli

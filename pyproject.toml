@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anymotion-cli"
-version = "1.0.0"
+version = "1.0.1"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
@@ -28,11 +28,11 @@ yaspin = "^0.16.0"
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"
 black = "^19.10b0"
-coverage = {version = "^5.0.3", extras = ["toml"]}
+coverage = "^5.0.3"
 flake8 = "^3.7.9"
 flake8-docstrings = "^1.5.0"
 isort = "^4.3.21"
-mypy = "^0.761"
+mypy = "^0.770"
 pytest = "^5.3.5"
 pytest-cov = "^2.8.1"
 pytest-mock = "^2.0.0"
@@ -41,15 +41,6 @@ tox = "^3.14.3"
 
 [tool.poetry.scripts]
 amcli = "anymotion_cli.core:cli"
-
-[tool.isort]
-include_trailing_comma = true
-line_length = 88
-multi_line_output = 3
-
-[tool.coverage.run]
-source = ["anymotion_cli"]
-branch = true
 
 [build-system]
 requires = ["poetry>=0.12"]
