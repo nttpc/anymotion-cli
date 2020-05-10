@@ -2,7 +2,7 @@
 
 ## 1.0.1
 
-Unreleased
+Released 2020-05-11
 
 - Changed the display of non-ASCII characters without escaping.
 - Fixed a bug in which the query parameters of some request URLs were not displayed.
