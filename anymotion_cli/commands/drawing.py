@@ -25,14 +25,15 @@ def drawing() -> None:
 
 @drawing.command(short_help="Show drawn files information.")
 @click.argument("drawing_id", type=int)
+@click.option("--join", is_flag=True, help="Join the related data.")
 @common_options
 @pass_state
-def show(state: State, drawing_id: int) -> None:
+def show(state: State, drawing_id: int, join: bool) -> None:
     """Show drawn files information."""
     client = get_client(state)
 
     try:
-        data = client.get_drawing(drawing_id)
+        data = client.get_drawing(drawing_id, join_data=join)
     except RequestsError as e:
         raise ClickException(str(e))
 

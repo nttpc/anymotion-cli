@@ -12,7 +12,10 @@ def test_drawing(runner):
 
 
 class TestDrawingShow(object):
-    def test_valid(self, runner, make_client):
+    @pytest.mark.parametrize(
+        "args", [["drawing", "show", "1"], ["drawing", "show", "1", "--join"]]
+    )
+    def test_valid(self, runner, make_client, args):
         expected = dedent(
             """\
 
@@ -25,7 +28,7 @@ class TestDrawingShow(object):
         )
 
         client_mock = make_client()
-        result = runner.invoke(cli, ["drawing", "show", "1"])
+        result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
         assert result.exit_code == 0

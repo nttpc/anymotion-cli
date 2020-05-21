@@ -36,7 +36,14 @@ def configure(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def set_requests_mock(requests_mock):
     oauth_url = "http://api.example.com/v1/oauth/accesstokens"
-    requests_mock.post(oauth_url, json={"accessToken": "token"})
+    requests_mock.post(
+        oauth_url,
+        json={
+            "accessToken": "token",
+            "issuedAt": "1580000000000",
+            "expiresIn": "86399",
+        },
+    )
 
 
 @pytest.fixture

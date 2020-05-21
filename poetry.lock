@@ -4,10 +4,13 @@ description = "AnyMotion SDK for Python"
 name = "anymotion-sdk"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "1.0.1"
+version = "1.1.0"
 
 [package.dependencies]
 requests = ">=2.22.0,<3.0.0"
+
+[package.extras]
+cv = ["opencv-python (>=4.2.0,<5.0.0)"]
 
 [[package]]
 category = "dev"
@@ -686,13 +689,13 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "d9f5bf6b759b4a1c6a418c6ba4a7295e2130da20cb9b735320a50b9a490d02f5"
+content-hash = "115cf7be27b19ac29fbae6947304e83c073afe98434717e880d56347cfc863ff"
 python-versions = "^3.6"
 
 [metadata.files]
 anymotion-sdk = [
-    {file = "anymotion-sdk-1.0.1.tar.gz", hash = "sha256:3aa0d246aedace82f44067d31b02574a7d124f2d4fe2116e8d705f2b3384037d"},
-    {file = "anymotion_sdk-1.0.1-py3-none-any.whl", hash = "sha256:bf7a43bb2ef6eda7c8ff69c8c1ad94e9abefa64ba85d4e2fe91ac23efd5c5d1e"},
+    {file = "anymotion-sdk-1.1.0.tar.gz", hash = "sha256:f9d1e3f79049cb1a0ebdb25e45ed0399a1e1ef12bc5b1dfacd2b0c51d6b0c73a"},
+    {file = "anymotion_sdk-1.1.0-py3-none-any.whl", hash = "sha256:51f43a185f350d8b9f03a2b7eede8cb5d10495f906b2dccd0e9a9fe066ca202b"},
 ]
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
