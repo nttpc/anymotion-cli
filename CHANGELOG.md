@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.0
+
+Unreleased
+
+- Removed setting API URL in `configure` command.
+
 ## 1.0.1
 
 Released 2020-05-11

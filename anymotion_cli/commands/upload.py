@@ -18,7 +18,7 @@ def cli() -> None:  # noqa: D103
 @click.argument("path", type=click.Path(exists=True, dir_okay=False))
 @click.option(
     "--text",
-    default="Created by encore-api-cli.",
+    default="Created by AnyMotion CLI.",
     help="Description of the upload file.",
 )
 @common_options
