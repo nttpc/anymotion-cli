@@ -32,41 +32,21 @@ class TestConfigure(object):
         [
             (
                 ["http://api.example.com/anymotion/v1/", None, None],
-                ["", "client_id", "client_secret"],
-                (
-                    "AnyMotion API URL [http://api.example.com/anymotion/v1/]: \n"
-                    "AnyMotion Client ID: \n"
-                    "AnyMotion Client Secret: \n"
-                ),
-            ),
-            (
-                ["http://api.example.com/anymotion/v1/", None, None],
-                [
-                    "http://dev-api.example.com/anymotion/v1/",
-                    "client_id",
-                    "client_secret",
-                ],
-                (
-                    "AnyMotion API URL [http://api.example.com/anymotion/v1/]: "
-                    "http://dev-api.example.com/anymotion/v1/\n"
-                    "AnyMotion Client ID: \n"
-                    "AnyMotion Client Secret: \n"
-                ),
+                ["client_id", "client_secret"],
+                ("AnyMotion Client ID: \n" "AnyMotion Client Secret: \n"),
             ),
             (
                 ["http://api.example.com/anymotion/v1/", "client_id", "client_secret"],
-                ["", "", ""],
+                ["", ""],
                 (
-                    "AnyMotion API URL [http://api.example.com/anymotion/v1/]: \n"
                     "AnyMotion Client ID [****************t_id]: \n"
                     "AnyMotion Client Secret [****************cret]: \n"
                 ),
             ),
             (
                 ["http://api.example.com/anymotion/v1/", "client_id", "client_secret"],
-                ["", "client_id2", "client_secre2"],
+                ["client_id2", "client_secre2"],
                 (
-                    "AnyMotion API URL [http://api.example.com/anymotion/v1/]: \n"
                     "AnyMotion Client ID [****************t_id]: \n"
                     "AnyMotion Client Secret [****************cret]: \n"
                 ),
@@ -81,18 +61,6 @@ class TestConfigure(object):
         assert settings_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == expected
-
-    def test_invalid(self, mocker, runner, home_mock):
-        api_url = "http://api.example.com/"
-        settings_mock = self._get_settings_mock(mocker, with_exception=True)
-
-        result = runner.invoke(
-            cli, ["configure"], input=f"{api_url}\nclient id\nclient secret\n"
-        )
-
-        assert settings_mock.call_count == 1
-        assert result.exit_code == 1
-        assert result.output.endswith("Error: api_url is invald.\n")
 
     @pytest.fixture
     def home_mock(self, mocker, tmpdir):

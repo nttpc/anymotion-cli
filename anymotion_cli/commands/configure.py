@@ -28,7 +28,6 @@ def configure(ctx: click.Context, state: State) -> None:
     if ctx.invoked_subcommand is None:
         settings = get_settings(state.profile, use_env=False)
 
-        api_url = click.prompt("AnyMotion API URL", default=settings.api_url)
         client_id = click.prompt(
             "AnyMotion Client ID",
             default=make_hidden(settings.client_id),
@@ -46,7 +45,6 @@ def configure(ctx: click.Context, state: State) -> None:
             client_secret = client_secret.value
 
         try:
-            settings.write_config(api_url)
             settings.write_credentials(client_id, client_secret)
         except SettingsValueError as e:
             raise ClickException(str(e))
