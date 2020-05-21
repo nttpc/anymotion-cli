@@ -43,7 +43,7 @@ class TestExtract(object):
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            f"""\
+            """\
             Keypoint extraction started. (keypoint id: 111)
             Success: Keypoint extraction is complete.
 

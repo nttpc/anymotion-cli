@@ -22,7 +22,7 @@ class TestDraw(object):
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            f"""\
+            """\
             Drawing started. (drawing id: 111)
             Success: Drawing is complete.
 
@@ -39,7 +39,7 @@ class TestDraw(object):
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            f"""\
+            """\
             Drawing started. (drawing id: 111)
             Success: Drawing is complete.
 
@@ -82,7 +82,7 @@ class TestDraw(object):
         assert client_mock.call_count == 1
         assert result.exit_code == 0
         assert result.output == dedent(
-            f"""\
+            """\
             Drawing started. (drawing id: 111)
             Success: Drawing is complete.
 

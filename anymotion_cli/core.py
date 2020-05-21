@@ -66,7 +66,7 @@ def cli(ctx: click.Context, state: State, interactive: bool) -> None:
 
 
 def _run_interactive_mode(state):
-    click.echo(f"Start interactive mode.")
+    click.echo("Start interactive mode.")
     click.echo(
         "You can use the internal {help} command to explain usage.".format(
             help=click.style(":help", fg="cyan")
