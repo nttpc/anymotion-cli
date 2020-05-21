@@ -195,6 +195,27 @@ $ amcli keypoint show 1234 --only | jq '[.[].leftKnee]'
   ...
 ```
 
+The `--join` option also allows you to display related data.
+
+```sh
+$ amcli keypoint show 1234 --join
+{
+  "id": 1234,
+  "image": null,
+  "movie": {
+    "id": 123,
+    "name": "movie",
+    "text": "Created by anymotion-cli.",
+    ...
+  "keypoint": [
+    {
+      "leftKnee": [
+        487,
+        730
+      ],
+      ...
+```
+
 ## Shell Complete
 
 The anymotion-cli supports Shell completion.

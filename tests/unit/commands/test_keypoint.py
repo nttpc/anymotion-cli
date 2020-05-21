@@ -38,6 +38,28 @@ class TestKeypointShow(object):
                 ),
             ),
             (
+                ["keypoint", "show", "111", "--join"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "keypoint": [
+                        {
+                          "1": [
+                            1,
+                            0
+                          ]
+                        }
+                      ],
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
                 ["keypoint", "show", "111"],
                 "FAILURE",
                 dedent(

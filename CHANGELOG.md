@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.0
+
+Unreleased
+
+- Added the `--join` option to display the data related to `keypoint show`, `analysis show` and `drawing show` commands at the same time.
+
 ## 1.0.1
 
 Released 2020-05-11

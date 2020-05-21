@@ -38,6 +38,28 @@ class TestAnalysisShow(object):
                 ),
             ),
             (
+                ["analysis", "show", "1", "--join"],
+                "SUCCESS",
+                dedent(
+                    """\
+
+                    {
+                      "id": 111,
+                      "result": [
+                        {
+                          "analysisType": "angle",
+                          "values": [
+                            180
+                          ]
+                        }
+                      ],
+                      "execStatus": "SUCCESS"
+                    }
+
+                    """
+                ),
+            ),
+            (
                 ["analysis", "show", "1"],
                 "FAILURE",
                 dedent(

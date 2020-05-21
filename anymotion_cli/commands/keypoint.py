@@ -33,10 +33,11 @@ def keypoint() -> None:
     help="Show only keypoint data.",
 )
 @click.option("--no-keypoint", is_flag=True, help="Do not show keypoint data.")
+@click.option("--join", is_flag=True, help="Join the related data.")
 @common_options
 @pass_state
 def show(
-    state: State, keypoint_id: int, only_keypoint: bool, no_keypoint: bool
+    state: State, keypoint_id: int, only_keypoint: bool, no_keypoint: bool, join: bool
 ) -> None:
     """Show extracted keypoint data."""
     if only_keypoint and no_keypoint:
@@ -48,7 +49,7 @@ def show(
     client = get_client(state)
 
     try:
-        response = client.get_keypoint(keypoint_id)
+        response = client.get_keypoint(keypoint_id, join_data=join)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):

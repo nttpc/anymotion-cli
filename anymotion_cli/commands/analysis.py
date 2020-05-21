@@ -33,9 +33,12 @@ def analysis() -> None:
     help="Show only result data.",
 )
 @click.option("--no-result", is_flag=True, help="Do not show result data.")
+@click.option("--join", is_flag=True, help="Join the related data.")
 @common_options
 @pass_state
-def show(state: State, analysis_id: int, only_result: bool, no_result: bool) -> None:
+def show(
+    state: State, analysis_id: int, only_result: bool, no_result: bool, join: bool
+) -> None:
     """Show the analysis result."""
     if only_result and no_result:
         raise click.UsageError(
@@ -46,7 +49,7 @@ def show(state: State, analysis_id: int, only_result: bool, no_result: bool) -> 
     client = get_client(state)
 
     try:
-        response = client.get_analysis(analysis_id)
+        response = client.get_analysis(analysis_id, join_data=join)
     except RequestsError as e:
         raise ClickException(str(e))
     if not isinstance(response, dict):
