@@ -51,7 +51,7 @@ def test_analyze(runner):
 
     assert result.exit_code == 0
     assert result.output == dedent(
-        f"""\
+        """\
         Analysis started. (analysis id: 444)
         Success: Analysis is complete.
         """
@@ -136,7 +136,7 @@ def test_extract(runner):
 
     assert result.exit_code == 0
     assert result.output == dedent(
-        f"""\
+        """\
         Keypoint extraction started. (keypoint id: 222)
         Success: Keypoint extraction is complete.
         """
