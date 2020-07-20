@@ -108,10 +108,13 @@ description = "Colorization of help messages in Click"
 name = "click-help-colors"
 optional = false
 python-versions = "*"
-version = "0.6"
+version = "0.8"
 
 [package.dependencies]
 click = ">=7.0"
+
+[package.extras]
+dev = ["pytest"]
 
 [[package]]
 category = "main"
@@ -687,7 +690,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "12f4b2101af7ac555490321fcf3ee9caaec0bbf4636996f3118faeeee14e1e67"
+content-hash = "641b466ccac4698ff45d25462ffe90a765f3ade43c2e8c37c2ae0b363f07829b"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -728,8 +731,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 click-help-colors = [
-    {file = "click-help-colors-0.6.tar.gz", hash = "sha256:258d5f4d79e54af8d017c07313456db22e636c964dd0808a2fb0aefc654ee30c"},
-    {file = "click_help_colors-0.6-py3-none-any.whl", hash = "sha256:979b3837da6c6cfccd59f4f20e28ff06c6fc4c240c7d2660b3a2c2b337ae5dcb"},
+    {file = "click-help-colors-0.8.tar.gz", hash = "sha256:119e5faf69cfc919c995c5962326ac8fd87f11e56a371af594e3dfd8458f4c6e"},
+    {file = "click_help_colors-0.8-py3-none-any.whl", hash = "sha256:0d841a4058ec88c47f93ff6f32547a055f8e0a0273f6bd6cb3e08430f195131d"},
 ]
 click-repl = [
     {file = "click-repl-0.1.6.tar.gz", hash = "sha256:b9f29d52abc4d6059f8e276132a111ab8d94980afe6a5432b9d996544afa95d5"},
