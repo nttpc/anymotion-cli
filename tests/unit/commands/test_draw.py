@@ -159,7 +159,7 @@ class TestDraw(object):
         assert client_mock.call_count == 0
         assert result.exit_code == 2
         assert (
-            '"rule" and "rule-file" options cannot be used at the same time.'
+            '"--rule" and "--rule-file" options cannot be used at the same time.'
             in result.output
         )
 

@@ -149,7 +149,7 @@ class TestAnalyze(object):
             (["analyze", "--show-result"], "Error: Missing argument 'KEYPOINT_ID'"),
             (["analyze", "--rule"], "Error: --rule option requires an argument"),
             (["analyze", "1", "--rule"], "Error: --rule option requires an argument"),
-            (["analyze", "1"], 'Either "rule" or "rule-file" options is required.'),
+            (["analyze", "1"], 'Either "--rule" or "--rule-file" options is required.'),
         ],
     )
     def test_invalid_params(self, mocker, runner, args, expected):
@@ -165,7 +165,7 @@ class TestAnalyze(object):
         [
             (
                 ["analyze", "1", "--rule", "[]", "--rule-file", "<RULE_FILE>"],
-                '"rule" and "rule-file" options cannot be used at the same time.',
+                '"--rule" and "--rule-file" options cannot be used at the same time.',
             ),
         ],
     )

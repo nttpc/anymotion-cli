@@ -40,10 +40,10 @@ def analyze(
     """Analyze the extracted keypoint data."""
     if rule_str is not None and rule_file is not None:
         raise click.UsageError(
-            '"rule" and "rule-file" options cannot be used at the same time.'
+            '"--rule" and "--rule-file" options cannot be used at the same time.'
         )
     if rule_str is None and rule_file is None:
-        raise click.UsageError('Either "rule" or "rule-file" options is required.')
+        raise click.UsageError('Either "--rule" or "--rule-file" options is required.')
 
     rule = None
     if rule_str is not None:

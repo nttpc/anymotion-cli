@@ -57,7 +57,7 @@ def draw(
     """Draw points and/or lines on uploaded movie or image."""
     if rule_str is not None and rule_file is not None:
         raise click.UsageError(
-            '"rule" and "rule-file" options cannot be used at the same time.'
+            '"--rule" and "--rule-file" options cannot be used at the same time.'
         )
 
     rule = None
