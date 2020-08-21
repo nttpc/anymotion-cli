@@ -77,10 +77,12 @@ def download(
 
     url_path = Path(str(urlparse(url).path))
     if path.is_dir():
-        try:
-            name = _get_name_from_keypoint_id(client, keypoint_id)
-        except RequestsError as e:
-            raise ClickException(str(e))
+        name = None
+        if keypoint_id:
+            try:
+                name = _get_name_from_keypoint_id(client, keypoint_id)
+            except RequestsError as e:
+                raise ClickException(str(e))
 
         if name:
             file_name = name + url_path.suffix

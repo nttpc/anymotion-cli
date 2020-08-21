@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.2
+
+Released 2020-08-21
+
+- Fixed a bug that prevented download without keypoint id.
+
 ## 1.0.1
 
 Released 2020-05-11
