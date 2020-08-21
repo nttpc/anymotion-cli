@@ -13,6 +13,8 @@ class TestDraw(object):
             ["draw", "1", "--download"],
             ["draw", "1", "--rule", "[]", "--download"],
             ["draw", "--rule", "[]", "1", "--download"],
+            ["draw", "1", "--bg-rule", "{}", "--download"],
+            ["draw", "1", "--rule", "[]", "--bg-rule", "{}", "--download"],
         ],
     )
     def test_valid(self, runner, make_client, args):
@@ -108,6 +110,14 @@ class TestDraw(object):
             ),
             (
                 ["draw", "1", "--rule", "1"],
+                "Error: Rule format is invalid. Must be in list or object format.\n",
+            ),
+            (
+                ["draw", "1", "--bg-rule", "[1: 2]"],
+                "Error: Rule format is invalid. Must be in JSON format.\n",
+            ),
+            (
+                ["draw", "1", "--bg-rule", "1"],
                 "Error: Rule format is invalid. Must be in list or object format.\n",
             ),
         ],

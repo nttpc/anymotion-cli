@@ -27,6 +27,9 @@ def draw_options(f: Callable) -> Callable:
         ),
     )(f)
     f = click.option(
+        "--bg-rule", "bg_rule_str", help="Drawing background rule in JSON format."
+    )(f)
+    f = click.option(
         "--rule-file", type=click.File(), help="Drawing rules file in JSON format."
     )(f)
     f = click.option("--rule", "rule_str", help="Drawing rules in JSON format.")(f)
@@ -51,6 +54,7 @@ def draw(
     keypoint_id: int,
     rule_str: Optional[str],
     rule_file: Optional[io.TextIOWrapper],
+    bg_rule_str: Optional[str],
     is_download: Optional[bool],
     **kwargs,
 ) -> None:
@@ -65,11 +69,30 @@ def draw(
         rule = parse_rule(rule_str)
     elif rule_file is not None:
         rule = parse_rule(rule_file.read())
+    background_rule = None
+    if bg_rule_str is not None:
+        background_rule = parse_rule(bg_rule_str)
+
+    # TODO: make the rules easy to use.
+    # if isinstance(rule, dict) and len(rule.keys() & {"rule", "backgroundRule"}) > 0:
+    #     if background_rule is not None and "backgroundRule" in rule:
+    #         raise click.UsageError(
+    #             'If you write a "backgroundRule" with the "--rule" or "--rule-file"'
+    #             ' option, you cannot use the "--bg-rule" option.'
+    #         )
+    #     if len(set(rule) - (rule.keys() & {"rule", "backgroundRule"})) > 0:
+    #         raise ClickException("Rule format is invalid.")
+
+    #     if background_rule is None:
+    #         background_rule = rule.get("backgroundRule")
+    #     rule = rule.get("rule")
 
     client = get_client(state)
 
     try:
-        drawing_id = client.draw_keypoint(keypoint_id, rule=rule)
+        drawing_id = client.draw_keypoint(
+            keypoint_id, rule=rule, background_rule=background_rule
+        )
         echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
 
         if state.use_spinner:
