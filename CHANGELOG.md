@@ -6,6 +6,7 @@ Unreleased
 
 - Added the `--join` option to display the data related to `keypoint show`, `analysis show` and `drawing show` commands at the same time.
 - Removed setting API URL in `configure` command.
+- Fixed a bug that prevented download without keypoint id.
 
 ## 1.0.1
 

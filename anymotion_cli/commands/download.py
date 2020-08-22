@@ -125,7 +125,10 @@ def download(
         echo(message)
 
 
-def _get_name_from_keypoint_id(client, keypoint_id: int) -> str:
+def _get_name_from_keypoint_id(client, keypoint_id: Optional[int]) -> str:
+    if keypoint_id is None:
+        return ""
+
     data = client.get_keypoint(keypoint_id)
     image_id = data.get("image")
     movie_id = data.get("movie")
