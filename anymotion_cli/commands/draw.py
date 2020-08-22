@@ -1,6 +1,6 @@
 import io
 from textwrap import dedent
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple, Union
 
 import click
 from anymotion_sdk import RequestsError
@@ -27,12 +27,22 @@ def draw_options(f: Callable) -> Callable:
         ),
     )(f)
     f = click.option(
-        "--bg-rule", "bg_rule_str", help="Drawing background rule in JSON format."
+        "--rule-file",
+        type=click.File(),
+        help=(
+            "The path of the JSON file containing the rules and/or background rule "
+            "for the drawing. "
+            "It cannot be used with --rule or --bg-rule at the same time."
+        ),
     )(f)
     f = click.option(
-        "--rule-file", type=click.File(), help="Drawing rules file in JSON format."
+        "--bg-rule",
+        "bg_rule_str",
+        help="The background rule written in JSON format for the drawing.",
     )(f)
-    f = click.option("--rule", "rule_str", help="Drawing rules in JSON format.")(f)
+    f = click.option(
+        "--rule", "rule_str", help="The rules written in JSON format for the drawing."
+    )(f)
     return f
 
 
@@ -58,35 +68,12 @@ def draw(
     is_download: Optional[bool],
     **kwargs,
 ) -> None:
-    """Draw points and/or lines on uploaded movie or image."""
-    if rule_str is not None and rule_file is not None:
-        raise click.UsageError(
-            '"--rule" and "--rule-file" options cannot be used at the same time.'
-        )
+    """Draw points and/or lines on uploaded movie or image.
 
-    rule = None
-    if rule_str is not None:
-        rule = parse_rule(rule_str)
-    elif rule_file is not None:
-        rule = parse_rule(rule_file.read())
-    background_rule = None
-    if bg_rule_str is not None:
-        background_rule = parse_rule(bg_rule_str)
-
-    # TODO: make the rules easy to use.
-    # if isinstance(rule, dict) and len(rule.keys() & {"rule", "backgroundRule"}) > 0:
-    #     if background_rule is not None and "backgroundRule" in rule:
-    #         raise click.UsageError(
-    #             'If you write a "backgroundRule" with the "--rule" or "--rule-file"'
-    #             ' option, you cannot use the "--bg-rule" option.'
-    #         )
-    #     if len(set(rule) - (rule.keys() & {"rule", "backgroundRule"})) > 0:
-    #         raise ClickException("Rule format is invalid.")
-
-    #     if background_rule is None:
-    #         background_rule = rule.get("backgroundRule")
-    #     rule = rule.get("rule")
-
+    See below for the format of the rule that can be specified with
+    --rule, --bg-rule, and --rule-file: https://docs.anymotion.jp/drawing.html
+    """
+    rule, background_rule = _parse_rule_and_bg_rule(rule_str, bg_rule_str, rule_file)
     client = get_client(state)
 
     try:
@@ -126,3 +113,40 @@ def draw(
             """
         )
         echo(message)
+
+
+def _parse_rule_and_bg_rule(
+    rule_str: Optional[str],
+    bg_rule_str: Optional[str],
+    rule_file: Optional[io.TextIOWrapper],
+) -> Tuple[Optional[Union[list, dict]], Optional[Union[list, dict]]]:
+    rule, bg_rule = None, None
+
+    if rule_file is not None:
+        if rule_str is not None:
+            raise click.UsageError(
+                '"--rule" and "--rule-file" options cannot be used at the same time.'
+            )
+        if bg_rule_str is not None:
+            raise click.UsageError(
+                '"--bg-rule" and "--rule-file" options cannot be used at the same time.'
+            )
+
+        rule = parse_rule(rule_file.read())
+
+        if isinstance(rule, dict):
+            rule_dict: dict = rule
+            rule_keys = rule_dict.keys() & {"rule", "backgroundRule"}
+            if len(rule_keys) > 0:
+                if len(set(rule) - rule_keys) > 0:
+                    raise ClickException("Rule format is invalid.")
+
+                rule = rule_dict.get("rule")
+                rule = rule_dict.get("backgroundRule")
+    else:
+        if rule_str is not None:
+            rule = parse_rule(rule_str)
+        if bg_rule_str is not None:
+            bg_rule = parse_rule(bg_rule_str)
+
+    return rule, bg_rule
