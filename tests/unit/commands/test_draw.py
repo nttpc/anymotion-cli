@@ -156,11 +156,19 @@ class TestDraw(object):
         [
             (
                 ["draw"],
-                "Error: Either '--keypoint-id' or '--comparison-id' is required.\n",
+                "Error: Either '--keypoint-id' or '--comparison-id' is required\n",
             ),
             (
                 ["draw", "--keypoint-id", "1", "--comparison-id", "1"],
-                "Error: Either '--keypoint-id' or '--comparison-id' is required.\n",
+                "Error: Either '--keypoint-id' or '--comparison-id' is required\n",
+            ),
+            (
+                ["draw", "--keypoint-id"],
+                "Error: --keypoint-id option requires an argument\n",
+            ),
+            (
+                ["draw", "--comparison-id"],
+                "Error: --comparison-id option requires an argument\n",
             ),
             (
                 ["draw", "--keypoint-id", "invalid_id"],
@@ -172,6 +180,14 @@ class TestDraw(object):
             (
                 ["draw", "--keypoint-id", "1", "--rule"],
                 "Error: --rule option requires an argument\n",
+            ),
+            (
+                ["draw", "--keypoint-id", "1", "--bg-rule"],
+                "Error: --bg-rule option requires an argument\n",
+            ),
+            (
+                ["draw", "--keypoint-id", "1", "--rule-file"],
+                "Error: --rule-file option requires an argument\n",
             ),
         ],
     )

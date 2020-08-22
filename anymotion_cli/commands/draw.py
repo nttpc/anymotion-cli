@@ -80,7 +80,7 @@ def draw(
     """
     if [keypoint_id, comparison_id].count(None) in [0, 2]:
         raise click.UsageError(
-            "Either '--keypoint-id' or '--comparison-id' is required."
+            "Either '--keypoint-id' or '--comparison-id' is required"
         )
 
     rule, background_rule = _parse_rule_and_bg_rule(rule_str, bg_rule_str, rule_file)

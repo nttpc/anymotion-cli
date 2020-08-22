@@ -91,26 +91,32 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["extract"], "Error: Either '--movie-id' or '--image-id' is required",),
+            (["extract"], "Error: Either '--movie-id' or '--image-id' is required\n",),
             (
                 ["extract", "--image-id", "1", "--movie-id", "1"],
-                "Error: Either '--movie-id' or '--image-id' is required",
+                "Error: Either '--movie-id' or '--image-id' is required\n",
             ),
             (
                 ["extract", "--image-id"],
-                "Error: --image-id option requires an argument",
+                "Error: --image-id option requires an argument\n",
             ),
             (
                 ["extract", "--movie-id"],
-                "Error: --movie-id option requires an argument",
+                "Error: --movie-id option requires an argument\n",
             ),
             (
                 ["extract", "--movie-id", "invalid_id"],
-                "Error: Invalid value for '--movie-id'",
+                (
+                    "Error: Invalid value for '--movie-id': "
+                    "invalid_id is not a valid integer\n"
+                ),
             ),
             (
                 ["extract", "--image-id", "invalid_id"],
-                "Error: Invalid value for '--image-id'",
+                (
+                    "Error: Invalid value for '--image-id': "
+                    "invalid_id is not a valid integer\n"
+                ),
             ),
         ],
     )
@@ -120,7 +126,7 @@ class TestExtract(object):
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert expected in result.output
+        assert result.output.endswith(expected)
 
     @pytest.fixture
     def make_client(self, mocker):
