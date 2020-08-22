@@ -222,11 +222,17 @@ class TestDownload(object):
 
 class TestGetNameFromKeypointId(object):
     @pytest.mark.parametrize(
-        "media_type, expected", [("image", "image"), ("movie", "movie"), ("None", "")],
+        "keypoint_id, media_type, expected",
+        [
+            (222, "image", "image"),
+            (222, "movie", "movie"),
+            (222, None, ""),
+            (None, None, ""),
+        ],
     )
-    def test_valid(self, make_client, media_type, expected):
+    def test_valid(self, make_client, keypoint_id, media_type, expected):
         client_mock = make_client(media_type=media_type)
-        name = _get_name_from_keypoint_id(client_mock(), 222)
+        name = _get_name_from_keypoint_id(client_mock(), keypoint_id)
 
         assert name == expected
 
