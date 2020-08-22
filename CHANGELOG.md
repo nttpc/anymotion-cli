@@ -5,8 +5,10 @@
 Unreleased
 
 - Added `compare` and `comparison` commands.
+- Added `--comparison-id` option to `draw` command.
 - Added the `--join` option to display the data related to `keypoint show`, `analysis show` and `drawing show` commands at the same time.
 - Added `--bg-rule` option in `draw` command.
+- Changed from `KEYPOINT_ID` argument to `--keypoint-id` option in `draw` command (**DISRUPTIVE CHANGE**).
 - Made it possible to draw background using `--rule-file`.
 - Improved the display of JSON data response and fixed to not display binary data response when using `-v` option.
 - Removed setting API URL in `configure` command.

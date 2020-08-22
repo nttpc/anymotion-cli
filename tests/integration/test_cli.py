@@ -79,7 +79,7 @@ def test_draw(tmp_path, runner):
 
     assert not path.exists()
 
-    result = runner.invoke(cli, ["draw", "222", "-o", str(tmp_path)])
+    result = runner.invoke(cli, ["draw", "--keypoint-id", "222", "-o", str(tmp_path)])
 
     assert result.exit_code == 0
     assert result.output == dedent(

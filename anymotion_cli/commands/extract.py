@@ -53,6 +53,8 @@ def extract(
     if [movie_id, image_id].count(None) in [0, 2]:
         raise click.UsageError(
             "Error: Either '--movie-id' or '--image-id' is required."
+            # TODO: typo
+            # "Either '--movie-id' or '--image-id' is required."
         )
 
     client = get_client(state)

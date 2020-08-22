@@ -49,4 +49,4 @@ def compare(state: State, source_id: int, target_id: int) -> None:
     # TODO: with drawing
     # if with_drawing:
     #     echo()
-    #     ctx.invoke(draw, keypoint_id=keypoint_id, **kwargs)
+    #     ctx.invoke(draw, comparison_id=comparison_id, **kwargs)

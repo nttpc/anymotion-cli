@@ -120,7 +120,7 @@ Success: Keypoint extraction is complete.
 Draw points/lines to image using `keypoint id`.
 
 ```sh
-$ amcli draw 222
+$ amcli draw --keypoint-id 222
 Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
 Downloaded the file to image.jpg.
@@ -135,19 +135,19 @@ You can use the rules to draw a variety of things.
 In the following example, draw the lines of stick picture in red.
 
 ```sh
-$ amcli draw 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
+$ amcli draw --keypoint-id 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
 ```
 
 In the following other example, draw only the skeleton.
 
 ```sh
-$ amcli draw 222 --bg-rule '{"skeletonOnly": true}'
+$ amcli draw --keypoint-id 222 --bg-rule '{"skeletonOnly": true}'
 ```
 
 You can also specify it in the JSON file.
 
 ```sh
-$ amcli draw 222 --rule-file rule.json
+$ amcli draw --keypoint-id 222 --rule-file rule.json
 ```
 
 ```json

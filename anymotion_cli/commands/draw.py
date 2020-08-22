@@ -52,7 +52,8 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.command(short_help="Draw points and/or lines on uploaded movie or image.")
-@click.argument("keypoint_id", type=int)
+@click.option("--keypoint-id", type=int)
+@click.option("--comparison-id", type=int)
 @draw_options
 @download_options
 @common_options
@@ -61,7 +62,8 @@ def cli() -> None:  # noqa: D103
 def draw(
     ctx: click.Context,
     state: State,
-    keypoint_id: int,
+    keypoint_id: Optional[int],
+    comparison_id: Optional[int],
     rule_str: Optional[str],
     rule_file: Optional[io.TextIOWrapper],
     bg_rule_str: Optional[str],
@@ -70,15 +72,26 @@ def draw(
 ) -> None:
     """Draw points and/or lines on uploaded movie or image.
 
+    Either "--keypoint-id" or "--comparison-id" is required.
+
     See below for the format of the rule that can be specified with
-    --rule, --bg-rule, and --rule-file: https://docs.anymotion.jp/drawing.html
+    "--rule", "--bg-rule", and "--rule-file":
+    https://docs.anymotion.jp/drawing.html
     """
+    if [keypoint_id, comparison_id].count(None) in [0, 2]:
+        raise click.UsageError(
+            "Either '--keypoint-id' or '--comparison-id' is required."
+        )
+
     rule, background_rule = _parse_rule_and_bg_rule(rule_str, bg_rule_str, rule_file)
     client = get_client(state)
 
     try:
         drawing_id = client.draw_keypoint(
-            keypoint_id, rule=rule, background_rule=background_rule
+            keypoint_id=keypoint_id,
+            comparison_id=comparison_id,
+            rule=rule,
+            background_rule=background_rule,
         )
         echo(f"Drawing started. (drawing id: {color_id(drawing_id)})")
 
