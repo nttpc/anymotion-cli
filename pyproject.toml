@@ -16,7 +16,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-anymotion-sdk = "~1.1"
+anymotion-sdk = "~1.2"
 click = "^7.1.1"
 click_help_colors = "^0.8"
 click_repl = "^0.1.6"

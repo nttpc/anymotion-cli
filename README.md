@@ -136,10 +136,39 @@ In the following example, draw the lines of stick picture in red.
 $ amcli draw 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
 ```
 
+In the following other example, draw only the skeleton.
+
+```sh
+$ amcli draw 222 --bg-rule '{"skeletonOnly": true}'
+```
+
 You can also specify it in the JSON file.
 
 ```sh
 $ amcli draw 222 --rule-file rule.json
+```
+
+```json
+{
+  "drawingType": "stickPicture",
+  "pattern": "all",
+  "color": "red"
+}
+```
+
+You can also write `rule` and `backgroundRule` at the same time when using `--rule-file`.
+
+```json
+{
+    "rule": {
+        "drawingType": "stickPicture",
+        "pattern": "all",
+        "color": "red"
+    },
+    "backgroundRule": {
+        "skeletonOnly": true
+    }
+}
 ```
 
 For more information on the drawing rules, see the [documentation](https://docs.anymotion.jp/drawing.html).

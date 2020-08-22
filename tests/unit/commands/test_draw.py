@@ -1,3 +1,4 @@
+import json
 from textwrap import dedent
 
 import pytest
@@ -13,6 +14,8 @@ class TestDraw(object):
             ["draw", "1", "--download"],
             ["draw", "1", "--rule", "[]", "--download"],
             ["draw", "--rule", "[]", "1", "--download"],
+            ["draw", "1", "--bg-rule", "{}", "--download"],
+            ["draw", "1", "--rule", "[]", "--bg-rule", "{}", "--download"],
         ],
     )
     def test_valid(self, runner, make_client, args):
@@ -70,13 +73,14 @@ class TestDraw(object):
             """
         )
 
-    def test_valid_rule_file(self, tmp_path, runner, make_client):
+    @pytest.mark.parametrize("rule", [[], {}, {"rule": []}])
+    def test_valid_rule_file(self, tmp_path, runner, make_client, rule):
         client_mock = make_client()
         rule_file = tmp_path / "rule.json"
-        rule_file.write_text("[]")
+        rule_file.write_text(json.dumps(rule))
 
         result = runner.invoke(
-            cli, ["draw", "1", "--rule-file", rule_file, "--download"]
+            cli, ["draw", "1", "--rule-file", rule_file, "--download"],
         )
 
         assert client_mock.call_count == 1
@@ -110,6 +114,14 @@ class TestDraw(object):
                 ["draw", "1", "--rule", "1"],
                 "Error: Rule format is invalid. Must be in list or object format.\n",
             ),
+            (
+                ["draw", "1", "--bg-rule", "[1: 2]"],
+                "Error: Rule format is invalid. Must be in JSON format.\n",
+            ),
+            (
+                ["draw", "1", "--bg-rule", "1"],
+                "Error: Rule format is invalid. Must be in list or object format.\n",
+            ),
         ],
     )
     def test_invalid_rule(self, runner, make_client, args, expected):
@@ -119,6 +131,19 @@ class TestDraw(object):
         assert client_mock.call_count == 0
         assert result.exit_code == 1
         assert result.output == expected
+
+    def test_invalid_rule_file(self, tmp_path, runner, make_client):
+        rule = {"rule": [], "invalid_key": True}
+
+        client_mock = make_client()
+        rule_file = tmp_path / "rule.json"
+        rule_file.write_text(json.dumps(rule))
+
+        result = runner.invoke(cli, ["draw", "1", "--rule-file", rule_file])
+
+        assert client_mock.call_count == 0
+        assert result.exit_code == 1
+        assert result.output == "Error: Rule format is invalid.\n"
 
     def test_with_error(self, runner, make_client):
         client_mock = make_client(with_exception=True)
@@ -147,21 +172,36 @@ class TestDraw(object):
         assert result.exit_code == 2
         assert expected in result.output
 
-    def test_invalid_params_both_rule(self, tmp_path, runner, make_client):
+    @pytest.mark.parametrize(
+        "option, expected",
+        [
+            (
+                "--rule",
+                '"--rule" and "--rule-file" options cannot be used at the same time.',
+            ),
+            (
+                "--bg-rule",
+                (
+                    '"--bg-rule" and "--rule-file" options cannot be used '
+                    "at the same time."
+                ),
+            ),
+        ],
+    )
+    def test_invalid_params_both_rule(
+        self, tmp_path, runner, make_client, option, expected
+    ):
         client_mock = make_client()
         rule_file = tmp_path / "rule.json"
         rule_file.write_text("[]")
 
         result = runner.invoke(
-            cli, ["draw", "1", "--rule", "[]", "--rule-file", rule_file]
+            cli, ["draw", "1", option, "[]", "--rule-file", rule_file]
         )
 
         assert client_mock.call_count == 0
         assert result.exit_code == 2
-        assert (
-            '"rule" and "rule-file" options cannot be used at the same time.'
-            in result.output
-        )
+        assert expected in result.output
 
     @pytest.fixture
     def make_client(self, mocker):
