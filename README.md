@@ -76,8 +76,9 @@ See the table below for more information, or run it with the `--help` option.
 | upload | Upload the local movie or image file to the cloud storage. |
 | download | Download the drawn file. |
 | extract | Extract keypoints from uploaded images or movies. |
-| draw | Draw points and/or lines on uploaded movie or image. |
 | analyze | Analyze the extracted keypoint data. |
+| compare | Compare the two extracted keypoint data |
+| draw | Draw points and/or lines on uploaded movie or image. |
 
 ### Commands to show something (noun commands)
 
@@ -86,8 +87,9 @@ See the table below for more information, or run it with the `--help` option.
 | image | Show the information of the uploaded images. |
 | movie | Show the information of the uploaded movies. |
 | keypoint | Show the extracted keypoints. |
-| drawing | Show the information of the drawn images or movies. |
 | analysis | Show the analysis results. |
+| comparison | Show the comparison results. |
+| drawing | Show the information of the drawn images or movies. |
 
 ### Other commands
 

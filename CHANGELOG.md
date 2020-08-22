@@ -4,6 +4,7 @@
 
 Unreleased
 
+- Added `compare` and `comparison` commands.
 - Added the `--join` option to display the data related to `keypoint show`, `analysis show` and `drawing show` commands at the same time.
 - Added `--bg-rule` option in `draw` command.
 - Made it possible to draw background using `--rule-file`.
