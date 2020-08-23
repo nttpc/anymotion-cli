@@ -8,6 +8,7 @@ from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
 from ..utils import color_id, get_client
+from .draw import draw
 
 
 @click.group(cls=HelpColorsGroup, help_options_color="cyan")
@@ -18,9 +19,19 @@ def cli() -> None:  # noqa: D103
 @cli.command(short_help="Compare the two extracted keypoint data.")
 @click.argument("source_id", type=int)
 @click.argument("target_id", type=int)
+@click.option(
+    "-d", "--with-drawing", is_flag=True, help="Drawing with comparison results.",
+)
 @common_options
 @pass_state
-def compare(state: State, source_id: int, target_id: int) -> None:
+@click.pass_context
+def compare(
+    ctx: click.Context,
+    state: State,
+    source_id: int,
+    target_id: int,
+    with_drawing: bool,
+) -> None:
     """Compare the two extracted keypoint data.
 
     SOURCE_ID and TARGET_ID are extracted keypoint ids.
@@ -46,7 +57,6 @@ def compare(state: State, source_id: int, target_id: int) -> None:
     else:
         raise ClickException(f"Comparison failed.\n{response.failure_detail}")
 
-    # TODO: with drawing
-    # if with_drawing:
-    #     echo()
-    #     ctx.invoke(draw, comparison_id=comparison_id, **kwargs)
+    if with_drawing:
+        echo()
+        ctx.invoke(draw, comparison_id=comparison_id)
