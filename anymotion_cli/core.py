@@ -7,6 +7,8 @@ from prompt_toolkit.styles import Style
 from . import __version__
 from .commands.analysis import cli as analysis
 from .commands.analyze import cli as analyze
+from .commands.compare import cli as compare
+from .commands.comparison import cli as comparison
 from .commands.configure import cli as configure
 from .commands.download import cli as download
 from .commands.draw import cli as draw
@@ -33,6 +35,8 @@ class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
     sources=[
         analysis,
         analyze,
+        compare,
+        comparison,
         configure,
         download,
         draw,

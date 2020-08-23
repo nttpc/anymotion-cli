@@ -76,8 +76,9 @@ See the table below for more information, or run it with the `--help` option.
 | upload | Upload the local movie or image file to the cloud storage. |
 | download | Download the drawn file. |
 | extract | Extract keypoints from uploaded images or movies. |
-| draw | Draw points and/or lines on uploaded movie or image. |
 | analyze | Analyze the extracted keypoint data. |
+| compare | Compare the two extracted keypoint data |
+| draw | Draw points and/or lines on uploaded movie or image. |
 
 ### Commands to show something (noun commands)
 
@@ -86,8 +87,9 @@ See the table below for more information, or run it with the `--help` option.
 | image | Show the information of the uploaded images. |
 | movie | Show the information of the uploaded movies. |
 | keypoint | Show the extracted keypoints. |
-| drawing | Show the information of the drawn images or movies. |
 | analysis | Show the analysis results. |
+| comparison | Show the comparison results. |
+| drawing | Show the information of the drawn images or movies. |
 
 ### Other commands
 
@@ -118,7 +120,7 @@ Success: Keypoint extraction is complete.
 Draw points/lines to image using `keypoint id`.
 
 ```sh
-$ amcli draw 222
+$ amcli draw --keypoint-id 222
 Drawing is started. (drawing id: 333)
 Success: Drawing is complete.
 Downloaded the file to image.jpg.
@@ -133,19 +135,19 @@ You can use the rules to draw a variety of things.
 In the following example, draw the lines of stick picture in red.
 
 ```sh
-$ amcli draw 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
+$ amcli draw --keypoint-id 222 --rule '{"drawingType": "stickPicture", "pattern": "all", "color": "red"}'
 ```
 
 In the following other example, draw only the skeleton.
 
 ```sh
-$ amcli draw 222 --bg-rule '{"skeletonOnly": true}'
+$ amcli draw --keypoint-id 222 --bg-rule '{"skeletonOnly": true}'
 ```
 
 You can also specify it in the JSON file.
 
 ```sh
-$ amcli draw 222 --rule-file rule.json
+$ amcli draw --keypoint-id 222 --rule-file rule.json
 ```
 
 ```json
