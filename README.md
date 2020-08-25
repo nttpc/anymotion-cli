@@ -23,6 +23,12 @@ Install using [pip](https://pip.pypa.io/en/stable/quickstart/):
 $ pip install anymotion-cli
 ```
 
+Alternatively, you can use [homebrew](https://brew.sh/) to install:
+
+```sh
+$ brew install nttpc/tap/anymotion-cli
+```
+
 ## Getting Started
 
 Before using anymotion-cli, you need to tell it about your credentials which issued by the [AnyMotion Portal](https://portal.anymotion.jp/).
