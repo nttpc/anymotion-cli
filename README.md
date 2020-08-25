@@ -289,6 +289,12 @@ See [CHANGELOG.md](CHANGELOG.md).
   $ poetry install
   ```
 
+- You can install a pre-commit hook to check:
+
+  ```sh
+  $ poetry run pre-commit install
+  ```
+
 - Before submitting pull requests, run tests with:
 
   ```sh
