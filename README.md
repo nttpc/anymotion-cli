@@ -84,7 +84,7 @@ See the table below for more information, or run it with the `--help` option.
 | extract | Extract keypoints from uploaded images or movies. |
 | analyze | Analyze the extracted keypoint data. |
 | compare | Compare the two extracted keypoint data |
-| draw | Draw points and/or lines on uploaded movie or image. |
+| draw | Draw based on the extracted keypoints or comparison results. |
 
 ### Commands to show something (noun commands)
 
