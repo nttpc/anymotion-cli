@@ -67,12 +67,7 @@ class TestConfigure(object):
         tmpdir = Path(tmpdir)
         mocker.patch("pathlib.Path.home", mocker.MagicMock(return_value=tmpdir))
 
-    def _get_settings_mock(
-        self,
-        mocker,
-        defaults=["http://api.example.com/anymotion/v1/", None, None],
-        with_exception=False,
-    ):
+    def _get_settings_mock(self, mocker, defaults, with_exception=False):
         settings_mock = mocker.MagicMock()
 
         settings_mock.return_value.api_url = defaults[0]
