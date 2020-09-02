@@ -51,7 +51,7 @@ def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command(short_help="Draw points and/or lines on uploaded movie or image.")
+@cli.command(short_help="Draw based on the extracted keypoints or comparison results.")
 @click.option("--keypoint-id", type=int)
 @click.option("--comparison-id", type=int)
 @draw_options
@@ -70,7 +70,7 @@ def draw(
     is_download: Optional[bool],
     **kwargs,
 ) -> None:
-    """Draw points and/or lines on uploaded movie or image.
+    """Draw points and/or lines based on the extracted keypoints or comparison results.
 
     Either "--keypoint-id" or "--comparison-id" is required.
 
