@@ -20,22 +20,12 @@ def cli() -> None:  # noqa: D103
 
 
 @cli.command(short_help="Extract keypoints from uploaded images or movies.")
+@click.option("--movie-id", type=int)
+@click.option("--image-id", type=int)
 @click.option(
-    "--movie-id",
-    type=int,
-    help='ID of movie to extrat, either "--movie-id" or "--image-id" is required.',
+    "-d", "--with-drawing", is_flag=True, help="Drawing with the extracted keypoints.",
 )
-@click.option(
-    "--image-id",
-    type=int,
-    help='ID of image to extrat, either "--movie-id" or "--image-id" is required.',
-)
-@click.option(
-    "-d",
-    "--with-drawing",
-    is_flag=True,
-    help="Flag for whether to draw at the same time.",
-)
+# TODO: remove download and draw option
 @draw_options
 @download_options
 @common_options
@@ -49,11 +39,12 @@ def extract(
     with_drawing: bool,
     **kwargs,
 ) -> None:
-    """Extract keypoints from uploaded images or movies."""
+    """Extract keypoints from uploaded images or movies.
+
+    Either "--image-id" or "--movie-id" is required.
+    """
     if [movie_id, image_id].count(None) in [0, 2]:
-        raise click.UsageError(
-            "Error: Either '--movie-id' or '--image-id' is required."
-        )
+        raise click.UsageError("Either '--movie-id' or '--image-id' is required")
 
     client = get_client(state)
     try:

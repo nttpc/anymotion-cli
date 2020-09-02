@@ -5,7 +5,12 @@ from textwrap import dedent
 import pytest
 from anymotion_sdk import RequestsError
 
-from anymotion_cli.commands.download import _get_name_from_keypoint_id, _is_skip, cli
+from anymotion_cli.commands.download import (
+    _get_name_from_comparison_id,
+    _get_name_from_keypoint_id,
+    _is_skip,
+    cli,
+)
 
 
 class TestDownload(object):
@@ -222,12 +227,19 @@ class TestDownload(object):
 
 class TestGetNameFromKeypointId(object):
     @pytest.mark.parametrize(
-        "media_type, expected", [("image", "image"), ("movie", "movie"), ("None", "")],
+        "keypoint_id, media_type, expected",
+        [
+            (222, "image", "image"),
+            (222, "movie", "movie"),
+            (222, None, ""),
+            (None, None, ""),
+        ],
     )
-    def test_valid(self, make_client, media_type, expected):
+    def test_valid(self, make_client, keypoint_id, media_type, expected):
         client_mock = make_client(media_type=media_type)
-        name = _get_name_from_keypoint_id(client_mock(), 222)
+        name = _get_name_from_keypoint_id(client_mock(), keypoint_id)
 
+        assert client_mock.call_count == 1
         assert name == expected
 
     @pytest.fixture
@@ -246,6 +258,53 @@ class TestGetNameFromKeypointId(object):
 
             client_mock.return_value.get_keypoint.return_value = data
 
+            return client_mock
+
+        return _make_client
+
+
+class TestGetNameFromComparisonId(object):
+    @pytest.mark.parametrize(
+        "comparison_id, target_name, source_name, expected",
+        [
+            (333, "image1", "image2", "image1_image2"),
+            (333, "image1", "", ""),
+            (333, "", "image2", ""),
+            (333, "", "", ""),
+            (None, "", "", ""),
+        ],
+    )
+    def test_valid(
+        self, make_client, comparison_id, target_name, source_name, expected
+    ):
+        client_mock = make_client(target_name=target_name, source_name=source_name)
+        name = _get_name_from_comparison_id(client_mock(), comparison_id)
+
+        assert client_mock.call_count == 1
+        assert name == expected
+
+    @pytest.fixture
+    def make_client(self, mocker):
+        def _make_client(target_name="image1", source_name="image2"):
+            def _return_value(client, keypoint_id):
+                if keypoint_id == 111:
+                    return target_name
+                elif keypoint_id == 222:
+                    return source_name
+                else:
+                    return ""
+
+            get_name_from_keypoint_id_mock = mocker.MagicMock(side_effect=_return_value)
+            mocker.patch(
+                "anymotion_cli.commands.download._get_name_from_keypoint_id",
+                get_name_from_keypoint_id_mock,
+            )
+
+            client_mock = mocker.MagicMock()
+            client_mock.return_value.get_comparison.return_value = {
+                "target": 111,
+                "source": 222,
+            }
             return client_mock
 
         return _make_client

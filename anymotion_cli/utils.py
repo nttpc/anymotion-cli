@@ -56,8 +56,8 @@ def get_settings(profile: str, use_env: bool = True) -> Settings:
     return settings
 
 
-def parse_rule(rule: Optional[str]) -> Optional[list]:
-    """Convert string type analysis and drawing rules to list type."""
+def parse_rule(rule: Optional[str]) -> Optional[Union[list, dict]]:
+    """Convert string type analysis and drawing rules to list or dict type."""
     if rule is None:
         return rule
 

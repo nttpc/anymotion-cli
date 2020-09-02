@@ -1,6 +1,6 @@
 import json
 import sys
-from typing import Optional
+from typing import Optional, Union
 
 import click
 import requests
@@ -86,30 +86,20 @@ def echo_response(response: requests.Response) -> None:
     reason = ""
     if response.reason:
         reason = click.style(response.reason, fg="cyan")
-    http_version = "HTTP"
-    if response.raw.version == 10:
-        http_version = "HTTP/1.0"
-    elif response.raw.version == 11:
-        http_version = "HTTP/1.1"
-    http_version = click.style(http_version, fg="blue")
-    click.echo(f"{http_version} {status} {reason}")
+    version = click.style(_parse_version(response.raw.version), fg="blue")
+    click.echo(f"{version} {status} {reason}")
 
-    content_type = None
     if isinstance(response.headers, dict):
         for key, value in response.headers.items():
             key = click.style(key, fg="cyan")
             click.echo(f"{key}: {value}")
-        content_type = response.headers.get("Content-Type")
 
-    if content_type == "application/json":
-        json = response.json()
-        if json is not None:
-            echo_json(json)
-    else:
-        text = response.text
-        if text:
-            click.echo()
-            click.echo(text)
+    content = _parse_content(response.content)
+    if isinstance(content, str) and content:
+        click.echo()
+        click.echo(content)
+    elif isinstance(content, (list, dict)):
+        echo_json(content)
 
     click.echo()
     click.echo()
@@ -124,3 +114,30 @@ def is_show() -> bool:
     from anymotion_cli.utils import get_bool_env
 
     return get_bool_env("ANYMOTION_STDOUT_ISSHOW", sys.stdout.isatty())
+
+
+def _parse_version(version: Optional[int]) -> str:
+    if version == 10:
+        return "HTTP/1.0"
+    elif version == 11:
+        return "HTTP/1.1"
+    else:
+        return "HTTP"
+
+
+def _parse_content(content: bytes) -> Optional[Union[str, list, dict]]:
+    if not isinstance(content, bytes):
+        return None
+
+    if b"\0" in content:
+        return "NOTE: binary data not shown"
+
+    try:
+        text = content.decode()
+    except UnicodeDecodeError:
+        return None
+
+    try:
+        return json.loads(text)
+    except ValueError:
+        return text

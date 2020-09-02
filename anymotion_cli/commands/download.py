@@ -38,7 +38,7 @@ def download_options(f: Callable) -> Callable:
         "-o",
         "--out",
         "path",
-        default=".",
+        default=Path(),
         callback=validate_path,
         show_default=True,
         metavar="PATH",
@@ -71,6 +71,7 @@ def download(
     status = data.get("execStatus")
     url = data.get("drawingUrl")
     keypoint_id = data.get("keypoint")
+    comparison_id = data.get("comparison")
 
     if status != "SUCCESS" or url is None:
         raise ClickException("Unable to download because drawing failed.")
@@ -78,7 +79,12 @@ def download(
     url_path = Path(str(urlparse(url).path))
     if path.is_dir():
         try:
-            name = _get_name_from_keypoint_id(client, keypoint_id)
+            if keypoint_id:
+                name = _get_name_from_keypoint_id(client, keypoint_id)
+            elif comparison_id:
+                name = _get_name_from_comparison_id(client, comparison_id)
+            else:
+                name = ""
         except RequestsError as e:
             raise ClickException(str(e))
 
@@ -125,7 +131,10 @@ def download(
         echo(message)
 
 
-def _get_name_from_keypoint_id(client, keypoint_id: int) -> str:
+def _get_name_from_keypoint_id(client, keypoint_id: Optional[int]) -> str:
+    if keypoint_id is None:
+        return ""
+
     data = client.get_keypoint(keypoint_id)
     image_id = data.get("image")
     movie_id = data.get("movie")
@@ -138,6 +147,23 @@ def _get_name_from_keypoint_id(client, keypoint_id: int) -> str:
         return ""
 
     return data.get("name", "")
+
+
+def _get_name_from_comparison_id(client, comparison_id: Optional[int]) -> str:
+    if comparison_id is None:
+        return ""
+
+    data = client.get_comparison(comparison_id)
+    target_id = data.get("target")
+    source_id = data.get("source")
+
+    target_name = _get_name_from_keypoint_id(client, target_id)
+    source_name = _get_name_from_keypoint_id(client, source_id)
+
+    if target_name and source_name:
+        return f"{target_name}_{source_name}"
+    else:
+        return ""
 
 
 def _is_skip(path: Path):
