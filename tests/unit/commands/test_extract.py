@@ -8,22 +8,43 @@ from anymotion_cli.commands.extract import cli
 
 class TestExtract(object):
     @pytest.mark.parametrize(
-        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
+        "args, use_path",
+        [
+            (["extract", "--movie-id", "111"], False),
+            (["extract", "--image-id", "111"], False),
+            (["extract", "--path", "<path>"], True),
+        ],
     )
     @pytest.mark.parametrize(
-        "status, expected", [("SUCCESS", "Success: Keypoint extraction is complete.",)],
+        "status, exit_code, message",
+        [
+            ("SUCCESS", 0, "Success: Keypoint extraction is complete.",),
+            ("TIMEOUT", 1, "Error: Keypoint extraction is timed out.",),
+            ("FAILURE", 1, "Error: Keypoint extraction failed.\nmessage",),
+        ],
     )
-    def test_valid(self, runner, make_client, args, status, expected):
+    def test_valid(
+        self, runner, make_path, make_client, args, use_path, status, exit_code, message
+    ):
         keypoint_id = 111
-        client_mock = make_client(status=status, keypoint_id=keypoint_id)
+        expected = (
+            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{message}\n"
+        )
+
+        if use_path:
+            path = make_path("image.jpg", is_file=True)
+            args = [arg.replace("<path>", str(path)) for arg in args]
+            expected = "\n" + expected
+
+        client_mock = make_client(
+            status=status, keypoint_id=keypoint_id, with_upload=use_path
+        )
 
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 1
-        assert result.exit_code == 0
-        assert result.output == dedent(
-            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
-        )
+        assert result.exit_code == exit_code
+        assert result.output == expected
 
     def test_with_spinner(self, monkeypatch, runner, make_client):
         monkeypatch.setenv("ANYMOTION_USE_SPINNER", "true")
@@ -51,28 +72,6 @@ class TestExtract(object):
         )
 
     @pytest.mark.parametrize(
-        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
-    )
-    @pytest.mark.parametrize(
-        "status, expected",
-        [
-            ("TIMEOUT", "Error: Keypoint extraction is timed out.",),
-            ("FAILURE", "Error: Keypoint extraction failed.\nmessage",),
-        ],
-    )
-    def test_with_extract_error(self, runner, make_client, args, status, expected):
-        keypoint_id = 111
-        client_mock = make_client(status=status, keypoint_id=keypoint_id)
-
-        result = runner.invoke(cli, args)
-
-        assert client_mock.call_count == 1
-        assert result.exit_code == 1
-        assert result.output == dedent(
-            f"Keypoint extraction started. (keypoint id: {keypoint_id})\n{expected}\n"
-        )
-
-    @pytest.mark.parametrize(
         "with_extract_exception, with_wait_exception", [(True, True), (False, True)]
     )
     def test_with_requests_error(
@@ -89,23 +88,51 @@ class TestExtract(object):
         assert "Error" in result.output
 
     @pytest.mark.parametrize(
-        "args, expected",
+        "args, use_path, expected",
         [
-            (["extract"], "Error: Either '--movie-id' or '--image-id' is required\n",),
+            (
+                ["extract"],
+                False,
+                "Error: Either '--image-id' or '--movie-id' or '--path' is required\n",
+            ),
             (
                 ["extract", "--image-id", "1", "--movie-id", "1"],
-                "Error: Either '--movie-id' or '--image-id' is required\n",
+                False,
+                "Error: Either '--image-id' or '--movie-id' or '--path' is required\n",
+            ),
+            (
+                ["extract", "--image-id", "1", "--path", "<path>"],
+                True,
+                "Error: Either '--image-id' or '--movie-id' or '--path' is required\n",
+            ),
+            (
+                ["extract", "--movie-id", "1", "--path", "<path>"],
+                True,
+                "Error: Either '--image-id' or '--movie-id' or '--path' is required\n",
+            ),
+            (
+                ["extract", "--image-id", "1", "--movie-id", "1", "--path", "<path>"],
+                True,
+                "Error: Either '--image-id' or '--movie-id' or '--path' is required\n",
             ),
             (
                 ["extract", "--image-id"],
+                False,
                 "Error: --image-id option requires an argument\n",
             ),
             (
                 ["extract", "--movie-id"],
+                False,
                 "Error: --movie-id option requires an argument\n",
             ),
             (
+                ["extract", "--path"],
+                True,
+                "Error: --path option requires an argument\n",
+            ),
+            (
                 ["extract", "--movie-id", "invalid_id"],
+                False,
                 (
                     "Error: Invalid value for '--movie-id': "
                     "invalid_id is not a valid integer\n"
@@ -113,15 +140,33 @@ class TestExtract(object):
             ),
             (
                 ["extract", "--image-id", "invalid_id"],
+                False,
                 (
                     "Error: Invalid value for '--image-id': "
                     "invalid_id is not a valid integer\n"
                 ),
             ),
+            (
+                ["extract", "--path", "not_exist"],
+                False,
+                (
+                    "Error: Invalid value for '--path': "
+                    "File 'not_exist' does not exist.\n"
+                ),
+            ),
         ],
     )
-    def test_invalid_params(self, runner, make_client, args, expected):
-        client_mock = make_client()
+    def test_invalid_params(
+        self, runner, make_path, make_client, args, use_path, expected
+    ):
+        keypoint_id = 111
+
+        if use_path:
+            path = make_path("image.jpg", is_file=True)
+            args = [arg.replace("<path>", str(path)) for arg in args]
+
+        client_mock = make_client(keypoint_id=keypoint_id, with_upload=True)
+
         result = runner.invoke(cli, args)
 
         assert client_mock.call_count == 0
@@ -136,6 +181,7 @@ class TestExtract(object):
             with_extract_exception=False,
             with_wait_exception=False,
             with_drawing=False,
+            with_upload=False,
         ):
             client_mock = mocker.MagicMock()
 
@@ -155,6 +201,11 @@ class TestExtract(object):
 
             if with_drawing:
                 mocker.patch("anymotion_cli.commands.extract.draw", mocker.MagicMock())
+
+            if with_upload:
+                mocker.patch(
+                    "anymotion_cli.commands.extract.upload", mocker.MagicMock()
+                )
 
             mocker.patch("anymotion_cli.commands.extract.get_client", client_mock)
             return client_mock
