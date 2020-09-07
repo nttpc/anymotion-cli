@@ -28,6 +28,7 @@ def draw_options(f: Callable) -> Callable:
     )(f)
     f = click.option(
         "--rule-file",
+        # TODO: change to click.Path
         type=click.File(),
         help=(
             "The path of the JSON file containing the rules and/or background rule "

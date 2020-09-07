@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anymotion-cli"
-version = "1.1.0"
+version = "1.2.0-dev"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
@@ -32,7 +32,7 @@ coverage = "^5.2.1"
 flake8 = "^3.8.3"
 flake8-bugbear = "^20.1.4"
 flake8-docstrings = "^1.5.0"
-isort = "^5.4.2"
+isort = "^5.5.1"
 mypy = "^0.782"
 pytest = "^6.0.1"
 pytest-cov = "^2.8.1"
