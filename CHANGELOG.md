@@ -1,6 +1,7 @@
 # Change Log
 
 - Added "Did you mean ...?" suggestions for missing commands error.
+- Added `-h` option as an alias to `--help`.
 
 ## 1.1.0
 

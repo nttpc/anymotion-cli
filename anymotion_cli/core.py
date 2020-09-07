@@ -42,6 +42,7 @@ from .state import State, pass_state
     ],  # type: ignore
     help_options_color="cyan",
     invoke_without_command=True,
+    context_settings=dict(help_option_names=["-h", "--help"]),
     short_help="Command Line Interface for AnyMotion API.",
 )
 @click.option("--interactive", is_flag=True, help="Start interactive mode.")
