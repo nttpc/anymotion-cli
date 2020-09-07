@@ -76,7 +76,8 @@ class TestDraw(object):
         rule_file.write_text(json.dumps(rule))
 
         result = runner.invoke(
-            cli, ["draw", "--keypoint-id", "1", "--rule-file", rule_file, "--download"],
+            cli,
+            ["draw", "--keypoint-id", "1", "--rule-file", rule_file, "--download"],
         )
 
         assert client_mock.call_count == 1

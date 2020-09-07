@@ -23,7 +23,10 @@ def cli() -> None:  # noqa: D103
 @click.option("--movie-id", type=int)
 @click.option("--image-id", type=int)
 @click.option(
-    "-d", "--with-drawing", is_flag=True, help="Drawing with the extracted keypoints.",
+    "-d",
+    "--with-drawing",
+    is_flag=True,
+    help="Drawing with the extracted keypoints.",
 )
 # TODO: remove download and draw option
 @draw_options

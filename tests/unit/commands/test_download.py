@@ -161,7 +161,10 @@ class TestDownload(object):
                 ),
             ),
             (["download", "111", "-o"], "Error: -o option requires an argument\n"),
-            (["download", "--out"], "Error: --out option requires an argument\n",),
+            (
+                ["download", "--out"],
+                "Error: --out option requires an argument\n",
+            ),
             (
                 ["download", "111", "-o", "not_exist_dir/file_name"],
                 (

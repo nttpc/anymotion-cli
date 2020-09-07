@@ -8,10 +8,17 @@ from anymotion_cli.commands.extract import cli
 
 class TestExtract(object):
     @pytest.mark.parametrize(
-        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
+        "args",
+        [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
     )
     @pytest.mark.parametrize(
-        "status, expected", [("SUCCESS", "Success: Keypoint extraction is complete.",)],
+        "status, expected",
+        [
+            (
+                "SUCCESS",
+                "Success: Keypoint extraction is complete.",
+            )
+        ],
     )
     def test_valid(self, runner, make_client, args, status, expected):
         keypoint_id = 111
@@ -51,13 +58,20 @@ class TestExtract(object):
         )
 
     @pytest.mark.parametrize(
-        "args", [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
+        "args",
+        [["extract", "--movie-id", "111"], ["extract", "--image-id", "111"]],
     )
     @pytest.mark.parametrize(
         "status, expected",
         [
-            ("TIMEOUT", "Error: Keypoint extraction is timed out.",),
-            ("FAILURE", "Error: Keypoint extraction failed.\nmessage",),
+            (
+                "TIMEOUT",
+                "Error: Keypoint extraction is timed out.",
+            ),
+            (
+                "FAILURE",
+                "Error: Keypoint extraction failed.\nmessage",
+            ),
         ],
     )
     def test_with_extract_error(self, runner, make_client, args, status, expected):
@@ -91,7 +105,10 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["extract"], "Error: Either '--movie-id' or '--image-id' is required\n",),
+            (
+                ["extract"],
+                "Error: Either '--movie-id' or '--image-id' is required\n",
+            ),
             (
                 ["extract", "--image-id", "1", "--movie-id", "1"],
                 "Error: Either '--movie-id' or '--image-id' is required\n",
