@@ -5,9 +5,9 @@ from urllib.parse import urlparse
 
 import click
 from anymotion_sdk import RequestsError
-from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..click_custom import CustomCommand
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_warning
@@ -47,12 +47,14 @@ def download_options(f: Callable) -> Callable:
     return f
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command(short_help="Download the drawn file.")
+@cli.command(
+    cls=CustomCommand, help_options_color="cyan", short_help="Download the drawn file."
+)
 @click.argument("drawing_id", type=int)
 @download_options
 @common_options

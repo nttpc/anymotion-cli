@@ -2,9 +2,9 @@ from typing import Optional
 
 import click
 from anymotion_sdk import RequestsError
-from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..click_custom import CustomCommand
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_success
@@ -14,12 +14,16 @@ from .download import download_options
 from .draw import draw, draw_options
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command(short_help="Extract keypoints from uploaded images or movies.")
+@cli.command(
+    cls=CustomCommand,
+    help_options_color="cyan",
+    short_help="Extract keypoints from uploaded images or movies.",
+)
 @click.option("--movie-id", type=int)
 @click.option("--image-id", type=int)
 @click.option(

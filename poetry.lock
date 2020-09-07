@@ -110,6 +110,17 @@ version = "7.1.2"
 
 [[package]]
 category = "main"
+description = "Enable git-like did-you-mean feature in click."
+name = "click-didyoumean"
+optional = false
+python-versions = "*"
+version = "0.0.3"
+
+[package.dependencies]
+click = "*"
+
+[[package]]
+category = "main"
 description = "Colorization of help messages in Click"
 name = "click-help-colors"
 optional = false
@@ -728,7 +739,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "dc574488fc845f04df89e4251f3607b20d5376b91e06f82777565fdc1f25e258"
+content-hash = "7f691b59f17ac35ed97e5b0818bb8e140031b81e2dc2bb09bf0e8feada0c768c"
 lock-version = "1.1"
 python-versions = "^3.6"
 
@@ -772,6 +783,9 @@ chardet = [
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
+]
+click-didyoumean = [
+    {file = "click-didyoumean-0.0.3.tar.gz", hash = "sha256:112229485c9704ff51362fe34b2d4f0b12fc71cc20f6d2b3afabed4b8bfa6aeb"},
 ]
 click-help-colors = [
     {file = "click-help-colors-0.8.tar.gz", hash = "sha256:119e5faf69cfc919c995c5962326ac8fd87f11e56a371af594e3dfd8458f4c6e"},

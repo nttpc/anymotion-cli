@@ -1,9 +1,9 @@
 from typing import Any, Optional, Union
 
 import click
-from click_help_colors import HelpColorsGroup
 from tabulate import tabulate
 
+from ..click_custom import CustomGroup
 from ..exceptions import ClickException, SettingsValueError
 from ..options import common_options
 from ..output import echo, echo_warning
@@ -12,13 +12,16 @@ from ..state import State, pass_state
 from ..utils import get_settings
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
 @cli.group(
-    invoke_without_command=True, short_help="Configure your AnyMotion Credentials."
+    cls=CustomGroup,
+    invoke_without_command=True,
+    help_options_color="cyan",
+    short_help="Configure your AnyMotion Credentials.",
 )
 @common_options
 @pass_state

@@ -1,10 +1,10 @@
 import click
-from click_help_colors import HelpColorsMixin
 from click_repl import repl
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
 
 from . import __version__
+from .click_custom import CustomCommandCollection
 from .commands.analysis import cli as analysis
 from .commands.analyze import cli as analyze
 from .commands.compare import cli as compare
@@ -23,15 +23,8 @@ from .options import profile_option
 from .state import State, pass_state
 
 
-class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
-    """A class that mixes HelpColorsMixin and CommandCollection."""
-
-    def __init__(self, *args, **kwargs):
-        super(ColorsCommandCollection, self).__init__(*args, **kwargs)
-
-
 @click.group(
-    cls=ColorsCommandCollection,
+    cls=CustomCommandCollection,
     sources=[
         analysis,
         analyze,
