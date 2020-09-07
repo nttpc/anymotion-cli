@@ -72,19 +72,18 @@ def cli(ctx: click.Context, state: State, interactive: bool) -> None:
 def _run_interactive_mode(state):
     click.echo("Start interactive mode.")
     click.echo(
-        "You can use the internal {help} command to explain usage.".format(
+        "You can use {help} command to explain usage.".format(
             help=click.style(":help", fg="cyan")
         )
     )
     click.echo()
 
     style = Style.from_dict({"profile": "gray"})
-    message = [
-        ("class:cli_name", state.cli_name),
-        ("class:separator", " "),
-        ("class:profile", state.profile),
-        ("class:pound", "> "),
-    ]
+    message = [("class:cli_name", state.cli_name)]
+    if state.profile != "default":
+        message.append(("class:separator", " "))
+        message.append(("class:profile", state.profile))
+    message.append(("class:pound", "> "))
 
     repl(
         click.get_current_context(),
