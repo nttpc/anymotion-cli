@@ -1,5 +1,9 @@
 # Change Log
 
+Unreleased
+
+- Added `--path` option to `extract` command to extract keypoints directly from a file.
+
 ## 1.1.0
 
 Released 2020-09-02

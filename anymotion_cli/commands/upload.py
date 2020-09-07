@@ -43,3 +43,5 @@ def upload(state: State, path: str, text: str) -> None:
         cid = color_id(result.movie_id)
         media_type = "movie"
     echo_success(f"Uploaded {cpath} to the cloud storage. ({media_type} id: {cid})")
+
+    return result
