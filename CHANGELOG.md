@@ -1,5 +1,7 @@
 # Change Log
 
+- Added "Did you mean ...?" suggestions for missing commands error.
+
 ## 1.1.0
 
 Released 2020-09-02

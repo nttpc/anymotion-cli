@@ -110,31 +110,6 @@ version = "7.1.2"
 
 [[package]]
 category = "main"
-description = "Enable git-like did-you-mean feature in click."
-name = "click-didyoumean"
-optional = false
-python-versions = "*"
-version = "0.0.3"
-
-[package.dependencies]
-click = "*"
-
-[[package]]
-category = "main"
-description = "Colorization of help messages in Click"
-name = "click-help-colors"
-optional = false
-python-versions = "*"
-version = "0.8"
-
-[package.dependencies]
-click = ">=7.0"
-
-[package.extras]
-dev = ["pytest"]
-
-[[package]]
-category = "main"
 description = "REPL plugin for Click"
 name = "click-repl"
 optional = false
@@ -739,7 +714,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "7f691b59f17ac35ed97e5b0818bb8e140031b81e2dc2bb09bf0e8feada0c768c"
+content-hash = "6af970aa9ae6fe1547543f27c990e77f968a2ff5792335c07fe755a431f790a3"
 lock-version = "1.1"
 python-versions = "^3.6"
 
@@ -783,13 +758,6 @@ chardet = [
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
-]
-click-didyoumean = [
-    {file = "click-didyoumean-0.0.3.tar.gz", hash = "sha256:112229485c9704ff51362fe34b2d4f0b12fc71cc20f6d2b3afabed4b8bfa6aeb"},
-]
-click-help-colors = [
-    {file = "click-help-colors-0.8.tar.gz", hash = "sha256:119e5faf69cfc919c995c5962326ac8fd87f11e56a371af594e3dfd8458f4c6e"},
-    {file = "click_help_colors-0.8-py3-none-any.whl", hash = "sha256:0d841a4058ec88c47f93ff6f32547a055f8e0a0273f6bd6cb3e08430f195131d"},
 ]
 click-repl = [
     {file = "click-repl-0.1.6.tar.gz", hash = "sha256:b9f29d52abc4d6059f8e276132a111ab8d94980afe6a5432b9d996544afa95d5"},

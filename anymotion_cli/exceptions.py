@@ -21,3 +21,7 @@ class SettingsException(Exception):
 
 class SettingsValueError(SettingsException):
     """Raised when settings value is invalid."""
+
+
+class HelpColorsException(Exception):
+    """Raised when unknown color is given."""
