@@ -45,8 +45,16 @@ def test_show_version(runner):
     )
 
 
-def test_interactive(runner):
-    result = runner.invoke(cli, ["--interactive"])
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["-i"],
+        ["--interactive"],
+        ["-i", "--profile", "test"],
+    ],
+)
+def test_interactive(runner, args):
+    result = runner.invoke(cli, args)
 
     assert result.exit_code == 0
     assert result.output.startswith("Start interactive mode.")

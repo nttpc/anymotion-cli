@@ -39,18 +39,18 @@ def run_interactive_mode(ctx: click.Context, state: State) -> None:
     )
 
 
-def _search_option_index(ctx: click.Context, target: str) -> int:
-    for i, param in enumerate(ctx.command.params):
-        if not isinstance(param, click.Option):
-            continue
-        for options in (param.opts, param.secondary_opts):
-            for o in options:
-                if o == target:
-                    return i
-    return -1
+# def _search_option_index(ctx: click.Context, target: str) -> int:
+#     for i, param in enumerate(ctx.command.params):
+#         if not isinstance(param, click.Option):
+#             continue
+#         for options in (param.opts, param.secondary_opts):
+#             for o in options:
+#                 if o == target:
+#                     return i
+#     return -1
 
 
-def _remove_option(ctx: click.Context, option: str) -> None:
-    index = _search_option_index(ctx, option)
-    if index != -1:
-        ctx.command.params.pop(index)
+# def _remove_option(ctx: click.Context, option: str) -> None:
+#     index = _search_option_index(ctx, option)
+#     if index != -1:
+#         ctx.command.params.pop(index)
