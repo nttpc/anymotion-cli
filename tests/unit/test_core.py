@@ -48,9 +48,8 @@ def test_show_version(runner):
 @pytest.mark.parametrize(
     "args",
     [
-        ["-i"],
         ["--interactive"],
-        ["-i", "--profile", "test"],
+        ["--interactive", "--profile", "test"],
     ],
 )
 def test_interactive(runner, args):

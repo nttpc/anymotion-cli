@@ -48,7 +48,7 @@ class ColorsCommandCollection(HelpColorsMixin, click.CommandCollection):
     invoke_without_command=True,
     short_help="Command Line Interface for AnyMotion API.",
 )
-@click.option("-i", "--interactive", is_flag=True, help="Start interactive mode.")
+@click.option("--interactive", is_flag=True, help="Start interactive mode.")
 @profile_option
 @click.version_option(
     version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
