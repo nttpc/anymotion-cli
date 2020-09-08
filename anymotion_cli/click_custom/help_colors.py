@@ -1,10 +1,14 @@
+# TODO: add Copyright
+
+from typing import Tuple
+
 import click
 
 
 class HelpColorsFormatter(click.HelpFormatter):
     """Colorize help formatter."""
 
-    def __init__(self, headers_color, options_color, *args, **kwargs):
+    def __init__(self, headers_color: str, options_color: str, *args, **kwargs):
         self.headers_color = headers_color
         self.options_color = options_color
         super(HelpColorsFormatter, self).__init__(*args, **kwargs)
@@ -20,14 +24,18 @@ class HelpColorsFormatter(click.HelpFormatter):
         super(HelpColorsFormatter, self).write_heading(colorized_heading)
 
     def write_dl(self, rows, **kwargs):  # noqa: D102
-        colorized_rows = [
-            (click.style(row[0], fg=self.options_color), row[1]) for row in rows
-        ]
+        colorized_rows = []
+        for row in rows:
+            option, metavar = _split_option(row[0])
+            colorized_option = click.style(option, fg=self.options_color)
+            if metavar:
+                colorized_option += " " + metavar
+            colorized_rows.append((colorized_option, row[1]))
         super(HelpColorsFormatter, self).write_dl(colorized_rows, **kwargs)
 
 
 class HelpColorsMixin(object):
-    """Mixin class to provide colored help."""
+    """Mixin class to provide colorized help."""
 
     def __init__(
         self, help_headers_color=None, help_options_color=None, *args, **kwargs
@@ -45,3 +53,12 @@ class HelpColorsMixin(object):
         )
         self.format_help(ctx, formatter)
         return formatter.getvalue().rstrip("\n")
+
+
+def _split_option(option: str) -> Tuple[str, str]:
+    splited = option.split(" ")
+    if len(splited) > 0 and splited[-1].isupper():
+        metavar = splited.pop()
+        return " ".join(splited), metavar
+    else:
+        return option, ""

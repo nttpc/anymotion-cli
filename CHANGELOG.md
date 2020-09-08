@@ -8,6 +8,7 @@ Unreleased
 - Added "Did you mean ...?" suggestions for missing commands error.
 - Added auto suggestion from history in interactive mode.
 - Added `-h` option as an alias to `--help`.
+- Changed the color of option metadata.
 - Removed the display of default profile in interactive mode.
 
 ## 1.1.0

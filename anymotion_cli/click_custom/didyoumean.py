@@ -1,3 +1,5 @@
+# TODO: add Copyright
+
 import difflib
 
 import click
@@ -16,16 +18,22 @@ class DYMMixin(object):
         try:
             return super(DYMMixin, self).resolve_command(ctx, args)
         except UsageError as error:
-            error_msg = str(error)
-            original_cmd_name = click.utils.make_str(args[0])
-            matches = difflib.get_close_matches(
-                original_cmd_name,
-                self.list_commands(ctx),
-                self.max_suggestions,
-                self.cutoff,
-            )
-            if matches:
-                error_msg += "\n\nDid you mean one of these?\n\t"
-                error_msg += "\n\t".join(matches)
-
+            cmd_name = click.utils.make_str(args[0])
+            cmd_list = self.list_commands(ctx)
+            error_msg = self._create_error_msg(str(error), cmd_name, cmd_list)
             raise UsageError(error_msg, error.ctx)
+
+    def _create_error_msg(self, error_msg: str, cmd_name: str, cmd_list: list) -> str:
+        matches = difflib.get_close_matches(
+            cmd_name,
+            cmd_list,
+            self.max_suggestions,
+            self.cutoff,
+        )
+        if len(matches) > 1:
+            error_msg += "\n\nDid you mean one of these?\n\t"
+            error_msg += "\n\t".join(matches)
+        elif len(matches) > 0:
+            error_msg += f"\n\nDid you mean this?\n\t{matches[0]}"
+
+        return error_msg
