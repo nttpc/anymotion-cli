@@ -10,6 +10,8 @@ Unreleased
 - Added `-h` option as an alias to `--help`.
 - Changed the color of option metadata.
 - Removed the display of default profile in interactive mode.
+- Removed `--interactive` and `--profile` options in interactive mode.
+- Fixed the required Python version to 3.6.1 or higher.
 
 ## 1.1.0
 

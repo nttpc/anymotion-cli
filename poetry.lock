@@ -95,7 +95,6 @@ version = "2020.6.20"
 [[package]]
 category = "dev"
 description = "Validate configuration and produce human readable error messages."
-marker = "python_version >= \"3.6.1\" and python_version < \"4.0.0\""
 name = "cfgv"
 optional = false
 python-versions = ">=3.6.1"
@@ -116,19 +115,6 @@ name = "click"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "7.1.2"
-
-[[package]]
-category = "main"
-description = "REPL plugin for Click"
-name = "click-repl"
-optional = false
-python-versions = "*"
-version = "0.1.6"
-
-[package.dependencies]
-click = "*"
-prompt-toolkit = "*"
-six = "*"
 
 [[package]]
 category = "dev"
@@ -241,7 +227,6 @@ gitdb = ">=4.0.1,<5"
 [[package]]
 category = "dev"
 description = "File identification library for Python"
-marker = "python_version >= \"3.6.1\" and python_version < \"4.0.0\""
 name = "identify"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
@@ -261,7 +246,7 @@ version = "2.10"
 [[package]]
 category = "dev"
 description = "Read metadata from Python packages"
-marker = "python_version >= \"3.6.1\" and python_version < \"3.8\" or python_version < \"3.8\""
+marker = "python_version < \"3.8\""
 name = "importlib-metadata"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
@@ -277,7 +262,7 @@ testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
 [[package]]
 category = "dev"
 description = "Read resources from Python packages"
-marker = "python_version >= \"3.6.1\" and python_version < \"3.7\" or python_version < \"3.7\""
+marker = "python_version < \"3.7\""
 name = "importlib-resources"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
@@ -355,7 +340,6 @@ version = "0.4.3"
 [[package]]
 category = "dev"
 description = "Node.js virtual environment builder"
-marker = "python_version >= \"3.6.1\" and python_version < \"4.0.0\""
 name = "nodeenv"
 optional = false
 python-versions = "*"
@@ -408,7 +392,6 @@ dev = ["pre-commit", "tox"]
 [[package]]
 category = "dev"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
-marker = "python_version >= \"3.6.1\" and python_version < \"4.0.0\""
 name = "pre-commit"
 optional = false
 python-versions = ">=3.6.1"
@@ -435,8 +418,8 @@ category = "main"
 description = "Library for building powerful interactive command lines in Python"
 name = "prompt-toolkit"
 optional = false
-python-versions = ">=3.6"
-version = "3.0.3"
+python-versions = ">=3.6.1"
+version = "3.0.7"
 
 [package.dependencies]
 wcwidth = "*"
@@ -599,7 +582,7 @@ fixture = ["fixtures"]
 test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.18)", "testtools"]
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -756,7 +739,7 @@ version = "1.0.0"
 [[package]]
 category = "dev"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version >= \"3.6.1\" and python_version < \"3.7\" or python_version >= \"3.6.1\" and python_version < \"3.8\" or python_version < \"3.8\""
+marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=3.6"
@@ -767,9 +750,9 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "068143dc5adc5cb7f20ec9c308510ba773efc2f01fa22ebeda6b346eb5567109"
+content-hash = "d29bc169e478eb715847d1f8331695478bdf0d115e2520a7555c2f59354c95e4"
 lock-version = "1.0"
-python-versions = "^3.6"
+python-versions = "^3.6.1"
 
 [metadata.files]
 anymotion-sdk = [
@@ -811,10 +794,6 @@ chardet = [
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
-]
-click-repl = [
-    {file = "click-repl-0.1.6.tar.gz", hash = "sha256:b9f29d52abc4d6059f8e276132a111ab8d94980afe6a5432b9d996544afa95d5"},
-    {file = "click_repl-0.1.6-py3-none-any.whl", hash = "sha256:9c4c3d022789cae912aad8a3f5e1d7c2cdd016ee1225b5212ad3e8691563cda5"},
 ]
 colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
@@ -965,8 +944,8 @@ pre-commit = [
     {file = "pre_commit-2.7.1.tar.gz", hash = "sha256:c54fd3e574565fe128ecc5e7d2f91279772ddb03f8729645fa812fe809084a70"},
 ]
 prompt-toolkit = [
-    {file = "prompt_toolkit-3.0.3-py3-none-any.whl", hash = "sha256:c93e53af97f630f12f5f62a3274e79527936ed466f038953dfa379d4941f651a"},
-    {file = "prompt_toolkit-3.0.3.tar.gz", hash = "sha256:a402e9bf468b63314e37460b68ba68243d55b2f8c4d0192f85a019af3945050e"},
+    {file = "prompt_toolkit-3.0.7-py3-none-any.whl", hash = "sha256:83074ee28ad4ba6af190593d4d4c607ff525272a504eb159199b6dd9f950c950"},
+    {file = "prompt_toolkit-3.0.7.tar.gz", hash = "sha256:822f4605f28f7d2ba6b0b09a31e25e140871e96364d1d377667b547bb3bf4489"},
 ]
 py = [
     {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},

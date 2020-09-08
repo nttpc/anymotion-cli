@@ -25,3 +25,11 @@ class SettingsValueError(SettingsException):
 
 class HelpColorsException(Exception):
     """Raised when unknown color is given."""
+
+
+class InternalCommandException(Exception):
+    """Base class for exceptions in the internal exception."""
+
+
+class ExitReplException(InternalCommandException):
+    """Exit repl."""

@@ -52,7 +52,7 @@ class HelpColorsMixin(object):
             options_color=self.help_options_color,
         )
         self.format_help(ctx, formatter)
-        return formatter.getvalue().rstrip("\n")
+        return formatter.getvalue()
 
 
 def _split_option(option: str) -> Tuple[str, str]:

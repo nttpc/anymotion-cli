@@ -9,11 +9,7 @@ It uses the [AnyMotion Python SDK](https://github.com/nttpc/anymotion-python-sdk
 
 <div align="center"><img src="https://user-images.githubusercontent.com/63082802/81499044-7a0bcc80-9303-11ea-96b5-a779ae0adcf7.gif"/></div>
 
-It works on Python versions:
-
-- Python 3.6
-- Python 3.7
-- Python 3.8
+It works on Python 3.6.1 or higher.
 
 ## Installation
 
@@ -257,7 +253,7 @@ $ amcli keypoint show 1234 --join
 You can use interactive mode using `--interactive` option.
 
 ```sh
-amcli --interactive
+$ amcli --interactive
 ```
 
 <div align="center"><img src="https://user-images.githubusercontent.com/63082802/92422453-722c3e00-f1b8-11ea-9235-3210fe8f275f.png"/></div>
