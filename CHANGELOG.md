@@ -1,7 +1,14 @@
 # Change Log
 
+## 1.2.0
+
+Unreleased
+
+- Added `--path` option to `extract` command to extract keypoints directly from a file.
 - Added "Did you mean ...?" suggestions for missing commands error.
+- Added auto suggestion from history in interactive mode.
 - Added `-h` option as an alias to `--help`.
+- Removed the display of default profile in interactive mode.
 
 ## 1.1.0
 

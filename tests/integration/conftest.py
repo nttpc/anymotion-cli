@@ -138,7 +138,8 @@ def api_requests_mock(requests_mock):
 
     # POST keypoints
     requests_mock.post(
-        f"{api_url}keypoints/", json={"id": 222},
+        f"{api_url}keypoints/",
+        json={"id": 222},
     )
 
     # GET drawings
@@ -165,7 +166,8 @@ def api_requests_mock(requests_mock):
 
     # POST drawings
     requests_mock.post(
-        f"{api_url}drawings/", json={"id": 333},
+        f"{api_url}drawings/",
+        json={"id": 333},
     )
 
     # GET analyses
@@ -197,12 +199,14 @@ def api_requests_mock(requests_mock):
 
     # POST analyses
     requests_mock.post(
-        f"{api_url}analyses/", json={"id": 444},
+        f"{api_url}analyses/",
+        json={"id": 444},
     )
 
     # GET S3
     requests_mock.get(
-        "http://s3.example.com/user/images/drawings/image.jpg", content=b"dummy data",
+        "http://s3.example.com/user/images/drawings/image.jpg",
+        content=b"dummy data",
     )
 
     # PUT S3

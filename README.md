@@ -81,7 +81,7 @@ See the table below for more information, or run it with the `--help` option.
 | -- | -- |
 | upload | Upload the local movie or image file to the cloud storage. |
 | download | Download the drawn file. |
-| extract | Extract keypoints from uploaded images or movies. |
+| extract | Extract keypoints from image or movie. |
 | analyze | Analyze the extracted keypoint data. |
 | compare | Compare the two extracted keypoint data |
 | draw | Draw based on the extracted keypoints or comparison results. |
@@ -251,6 +251,16 @@ $ amcli keypoint show 1234 --join
       ],
       ...
 ```
+
+## Interactive Mode
+
+You can use interactive mode using `--interactive` option.
+
+```sh
+amcli --interactive
+```
+
+<div align="center"><img src="https://user-images.githubusercontent.com/63082802/92422453-722c3e00-f1b8-11ea-9235-3210fe8f275f.png"/></div>
 
 ## Shell Complete
 

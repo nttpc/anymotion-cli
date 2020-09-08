@@ -24,7 +24,10 @@ def cli() -> None:  # noqa: D103
 @click.argument("source_id", type=int)
 @click.argument("target_id", type=int)
 @click.option(
-    "-d", "--with-drawing", is_flag=True, help="Drawing with comparison results.",
+    "-d",
+    "--with-drawing",
+    is_flag=True,
+    help="Drawing with comparison results.",
 )
 @common_options
 @pass_state

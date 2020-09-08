@@ -6,7 +6,8 @@ from anymotion_cli.commands.upload import cli
 
 class TestUpload(object):
     @pytest.mark.parametrize(
-        "file_name, media_type", [("image.jpg", "image"), ("movie.mp4", "movie")],
+        "file_name, media_type",
+        [("image.jpg", "image"), ("movie.mp4", "movie")],
     )
     def test_valid(self, runner, make_path, make_client, file_name, media_type):
         path = make_path(file_name, is_file=True)

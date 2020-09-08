@@ -18,6 +18,11 @@ commands:
         type: string
         default: "3.8"
     steps:
+      - run:
+          name: Show poetry and python version
+          command: |
+            poetry --version
+            poetry run python --version
       - restore_cache:
           keys:
             - deps-<< parameters.version >>-{{ checksum "poetry.lock" }}
