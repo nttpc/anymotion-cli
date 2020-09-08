@@ -1,8 +1,12 @@
 # Change Log
 
+## 1.2.0
+
 Unreleased
 
 - Added `--path` option to `extract` command to extract keypoints directly from a file.
+- Added auto suggestion from history in interactive mode.
+- Removed the display of default profile in interactive mode.
 
 ## 1.1.0
 

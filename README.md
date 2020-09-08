@@ -252,6 +252,16 @@ $ amcli keypoint show 1234 --join
       ...
 ```
 
+## Interactive Mode
+
+You can use interactive mode using `--interactive` option.
+
+```sh
+amcli --interactive
+```
+
+<div align="center"><img src="https://user-images.githubusercontent.com/63082802/92422453-722c3e00-f1b8-11ea-9235-3210fe8f275f.png"/></div>
+
 ## Shell Complete
 
 The anymotion-cli supports Shell completion.

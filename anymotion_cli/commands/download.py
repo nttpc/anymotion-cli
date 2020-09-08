@@ -32,7 +32,9 @@ def download_options(f: Callable) -> Callable:
         help="Whether to open downloaded the file.",
     )(f)
     f = click.option(
-        "--force", is_flag=True, help="If the file exists, download it by overwriting.",
+        "--force",
+        is_flag=True,
+        help="If the file exists, download it by overwriting.",
     )(f)
     f = click.option(
         "-o",

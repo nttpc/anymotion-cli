@@ -157,7 +157,8 @@ class TestKeypointShow(object):
         ],
     )
     @pytest.mark.parametrize(
-        "status, expected", [("FAILURE", "Error: Status is not SUCCESS.\n")],
+        "status, expected",
+        [("FAILURE", "Error: Status is not SUCCESS.\n")],
     )
     def test_with_only_not_success(self, runner, make_client, args, status, expected):
         client_mock = make_client(status)
@@ -170,7 +171,10 @@ class TestKeypointShow(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["keypoint", "show"], "Error: Missing argument 'KEYPOINT_ID'.\n",),
+            (
+                ["keypoint", "show"],
+                "Error: Missing argument 'KEYPOINT_ID'.\n",
+            ),
             (
                 ["keypoint", "show", "invalid_id"],
                 (

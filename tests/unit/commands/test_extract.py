@@ -18,9 +18,21 @@ class TestExtract(object):
     @pytest.mark.parametrize(
         "status, exit_code, message",
         [
-            ("SUCCESS", 0, "Success: Keypoint extraction is complete.",),
-            ("TIMEOUT", 1, "Error: Keypoint extraction is timed out.",),
-            ("FAILURE", 1, "Error: Keypoint extraction failed.\nmessage",),
+            (
+                "SUCCESS",
+                0,
+                "Success: Keypoint extraction is complete.",
+            ),
+            (
+                "TIMEOUT",
+                1,
+                "Error: Keypoint extraction is timed out.",
+            ),
+            (
+                "FAILURE",
+                1,
+                "Error: Keypoint extraction failed.\nmessage",
+            ),
         ],
     )
     def test_valid(
