@@ -2,6 +2,7 @@ from typing import Any, Callable, Optional
 
 import click
 
+from .click_custom import custom_option
 from .state import State
 
 
@@ -13,13 +14,14 @@ def verbose_option(f: Callable) -> Callable:
         state.verbose = value
         return value
 
-    return click.option(
+    return custom_option(
         "-v",
         "--verbose",
         is_flag=True,
         expose_value=False,
         help="Enables verbosity.",
         callback=callback,
+        is_global=True,
     )(f)
 
 
@@ -32,16 +34,17 @@ def profile_option(f: Callable) -> Callable:
             state.profile = value
         return value
 
-    return click.option(
+    return custom_option(
         "--profile",
         expose_value=False,
         help="Use a specific profile from your config file.",
         callback=callback,
+        is_global=True,
     )(f)
 
 
 def common_options(f: Callable) -> Callable:
     """Set common options."""
-    f = profile_option(f)
     f = verbose_option(f)
+    f = profile_option(f)
     return f
