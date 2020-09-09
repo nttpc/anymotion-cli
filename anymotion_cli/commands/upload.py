@@ -1,7 +1,7 @@
 import click
 from anymotion_sdk import FileTypeError, RequestsError
-from click_help_colors import HelpColorsGroup
 
+from ..click_custom import CustomCommand
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_success
@@ -9,12 +9,16 @@ from ..state import State, pass_state
 from ..utils import color_id, color_path, get_client
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command(short_help="Upload the local movie or image file to the cloud storage.")
+@cli.command(
+    cls=CustomCommand,
+    help_options_color="cyan",
+    short_help="Upload the local movie or image file to the cloud storage.",
+)
 @click.argument("path", type=click.Path(exists=True, dir_okay=False))
 @click.option(
     "--text",

@@ -5,7 +5,7 @@ import pytest
 from anymotion_cli.core import cli
 
 
-@pytest.mark.parametrize("args", [None, ["--help"]])
+@pytest.mark.parametrize("args", [None, ["-h"], ["--help"]])
 def test_show_help_message(runner, args):
     result = runner.invoke(cli, args)
 
@@ -29,8 +29,9 @@ def test_show_help_message(runner, args):
         "upload",
     ],
 )
-def test_show_command_help_message(runner, command):
-    result = runner.invoke(cli, [command, "--help"])
+@pytest.mark.parametrize("option", ["-h", "--help"])
+def test_show_command_help_message(runner, command, option):
+    result = runner.invoke(cli, [command, option])
 
     assert result.exit_code == 0
     assert re.match(rf"^Usage: \w+ {command}", result.output)
