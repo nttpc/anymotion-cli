@@ -20,7 +20,6 @@ def cli() -> None:  # noqa: D103
     help_options_color="cyan",
     short_help="Show the information of the uploaded images.",
 )
-@common_options
 def image() -> None:
     """Show the information of the uploaded images."""
 
