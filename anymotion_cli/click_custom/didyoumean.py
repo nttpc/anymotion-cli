@@ -1,4 +1,11 @@
-# TODO: add Copyright
+# Copyright (c) 2020 NTTPC Communications, Inc.
+# See https://github.com/nttpc/anymotion-cli/blob/master/LICENSE.
+
+# Classes under this library were originally taken from click-didyoumean,
+# Copyright (c) 2016 Timo Furrer.
+# These Classes are licensed under the MIT license.
+# See https://github.com/click-contrib/click-didyoumean/blob/master/LICENSE.
+
 
 import difflib
 

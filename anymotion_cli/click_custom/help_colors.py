@@ -1,4 +1,11 @@
-# TODO: add Copyright
+# Copyright (c) 2020 NTTPC Communications, Inc.
+# See https://github.com/nttpc/anymotion-cli/blob/master/LICENSE.
+
+# Classes under this library were originally taken from click-help-colors,
+# Copyright (c) 2016 Roman Tonkonozhko.
+# These Classes are licensed under the MIT license.
+# See https://github.com/click-contrib/click-help-colors/blob/master/LICENSE.txt.
+
 
 from typing import Tuple
 

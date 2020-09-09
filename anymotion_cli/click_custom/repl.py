@@ -1,4 +1,11 @@
-# TODO: add Copyright
+# Copyright (c) 2020 NTTPC Communications, Inc.
+# See https://github.com/nttpc/anymotion-cli/blob/master/LICENSE.
+
+# Classes under this library were originally taken from click-repl,
+# Copyright (c) 2014-2015 Markus Unterwaditzer & contributors.
+# These Classes are licensed under the MIT license.
+# See https://github.com/click-contrib/click-repl/blob/master/LICENSE.
+
 
 import os
 import shlex
