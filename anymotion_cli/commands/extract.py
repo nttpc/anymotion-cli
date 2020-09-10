@@ -31,7 +31,8 @@ def cli() -> None:  # noqa: D103
 @click.option(
     "--path",
     type=click.Path(exists=True, dir_okay=False),
-    help="The path of the movie or image file to extract.",
+    metavar="PATH",
+    help="Path of the movie or image file to extract.",
 )
 @click.option(
     "-d",
