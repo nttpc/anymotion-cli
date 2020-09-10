@@ -7,6 +7,7 @@ Unreleased
 - Added `--path` option to `extract` command to extract keypoints directly from a file.
 - Added "Did you mean ...?" suggestions for missing commands error.
 - Added `-h` option as an alias to `--help`.
+- Added `-V` option as an alias to `--version` and `-VV` option to show details.
 - Improved interactive mode.
   - Added auto suggestion from history.
   - Made `--interactive` and `--profile` options unavailable.
