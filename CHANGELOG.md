@@ -15,6 +15,7 @@ Unreleased
 - Improved the display of help messages.
   - Added global option separated from options.
   - Changed the color of option metadata.
+  - Changed max width to 100 to display to reduce line breaks.
 - Removed the unavailable options.
 - Fixed the required Python version to 3.6.1 or higher.
 
