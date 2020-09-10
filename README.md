@@ -71,7 +71,7 @@ amcli [OPTIONS] COMMAND [ARGS]...
 
 See the table below for more information, or run it with the `--help` option.
 
-### Commands to process something (verb commands)
+### Processing commands
 
 | command name | description |
 | -- | -- |
@@ -82,7 +82,9 @@ See the table below for more information, or run it with the `--help` option.
 | compare | Compare the two extracted keypoint data |
 | draw | Draw based on the extracted keypoints or comparison results. |
 
-### Commands to show something (noun commands)
+The command name is represented by a verb.
+
+### Display commands
 
 | command name | description |
 | -- | -- |
@@ -93,11 +95,14 @@ See the table below for more information, or run it with the `--help` option.
 | comparison | Show the comparison results. |
 | drawing | Show the information of the drawn images or movies. |
 
+The command name is represented by a noun.
+
 ### Other commands
 
 | command name | description |
 | -- | -- |
 | configure | Configure your AnyMotion Credentials. |
+| interactive | Start interactive mode. |
 
 ### Examples
 
@@ -250,13 +255,13 @@ $ amcli keypoint show 1234 --join
 
 ## Interactive Mode
 
-You can use interactive mode using `--interactive` option.
+You can use interactive mode using `interactive` command.
 
 ```sh
-$ amcli --interactive
+$ amcli interactive
 ```
 
-<div align="center"><img src="https://user-images.githubusercontent.com/63082802/92422453-722c3e00-f1b8-11ea-9235-3210fe8f275f.png"/></div>
+<div align="center"><img src="https://user-images.githubusercontent.com/63082802/92619134-1a96eb00-f2fc-11ea-92a2-2f36e9f652a4.png"/></div>
 
 ## Shell Complete
 

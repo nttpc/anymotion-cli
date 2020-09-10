@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.0
+
+Unreleased
+
+- Removed deprecated options.
+
 ## 1.2.0
 
 Unreleased
@@ -9,6 +15,7 @@ Unreleased
 - Added auto suggestion from history in interactive mode.
 - Added `-h` option as an alias to `--help`.
 - Changed the color of option metadata.
+- Changed from `--interactive` option to `interactive` command. `--interactive` option is deprecated.
 - Removed the display of default profile in interactive mode.
 - Removed `--interactive` and `--profile` options in interactive mode.
 - Fixed the required Python version to 3.6.1 or higher.

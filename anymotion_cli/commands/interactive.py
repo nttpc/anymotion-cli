@@ -3,9 +3,29 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
 
-from .click_custom.repl import repl
-from .config import get_app_dir
-from .state import State
+from ..click_custom import CustomCommand
+from ..click_custom.repl import repl
+from ..config import get_app_dir
+from ..options import common_options
+from ..state import State, pass_state
+
+
+@click.group()
+def cli() -> None:  # noqa: D103
+    pass
+
+
+@cli.command(
+    cls=CustomCommand,
+    help_options_color="cyan",
+    short_help="Start interactive mode.",
+)
+@common_options
+@pass_state
+@click.pass_context
+def interactive(ctx: click.Context, state: State) -> None:
+    """Start interactive mode."""
+    run_interactive_mode(ctx, state)
 
 
 def run_interactive_mode(ctx: click.Context, state: State) -> None:
