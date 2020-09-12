@@ -51,7 +51,7 @@ def extract(
     state: State,
     image_id: Optional[int],
     movie_id: Optional[int],
-    path: Path,
+    path: Optional[Path],
     with_drawing: bool,
     **kwargs,
 ) -> None:
@@ -60,9 +60,7 @@ def extract(
     Either '--image-id' or '--movie-id' or '--path' is required.
     """
     # Because path defaults to the current directory, not to None.
-    is_path = not path.is_dir()
-
-    if [bool(image_id), bool(movie_id), is_path].count(True) != 1:
+    if [image_id, movie_id, path].count(None) != 2:
         raise click.UsageError(
             "Either '--image-id' or '--movie-id' or '--path' is required"
         )
@@ -70,7 +68,7 @@ def extract(
     client = get_client(state)
 
     result = None
-    if is_path:
+    if path is not None:
         result = ctx.invoke(upload, path=path)._asdict()
         echo()
     data = result or {"image_id": image_id, "movie_id": movie_id}

@@ -83,7 +83,7 @@ def draw(
     "--rule", "--bg-rule", and "--rule-file":
     https://docs.anymotion.jp/drawing.html
     """
-    if [keypoint_id, comparison_id].count(None) in [0, 2]:
+    if [keypoint_id, comparison_id].count(None) != 1:
         raise click.UsageError(
             "Either '--keypoint-id' or '--comparison-id' is required"
         )
