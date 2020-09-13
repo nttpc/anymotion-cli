@@ -95,7 +95,8 @@ def draw(
     "--rule", "--bg-rule", and "--rule-file":
     https://docs.anymotion.jp/drawing.html
     """
-    if [keypoint_id, comparison_id].count(None) != 1:
+    required_options = [keypoint_id, comparison_id]
+    if required_options.count(None) != len(required_options) - 1:
         raise click.UsageError(
             "Either '--keypoint-id' or '--comparison-id' is required"
         )

@@ -6,6 +6,7 @@ Unreleased
 
 - Added `--path` option to `extract` command to extract keypoints directly from a file.
 - Added "Did you mean ...?" suggestions for missing commands error.
+- Added support for the drawing/download options in the `compare` command.
 - Added `-h` option as an alias to `--help`.
 - Added `-V` option as an alias to `--version` and `-VV` option to show details.
 - Improved interactive mode.

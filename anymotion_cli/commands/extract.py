@@ -57,8 +57,14 @@ def extract(
     """Extract keypoints from image or movie.
 
     Either '--image-id' or '--movie-id' or '--path' is required.
+
+    When using the '--with-drawing' option, you can use drawing options such as
+    '--rule', '--bg-rule', and '--rule-file', and '--download / --no-download'.
+    In addition, when downloading the drawn file, you can use download options
+    such as '-o, --out', '--force' and '--open / --no-open'.
     """
-    if [image_id, movie_id, path].count(None) != 2:
+    required_options = [image_id, movie_id, path]
+    if required_options.count(None) != len(required_options) - 1:
         raise click.UsageError(
             "Either '--image-id' or '--movie-id' or '--path' is required"
         )
