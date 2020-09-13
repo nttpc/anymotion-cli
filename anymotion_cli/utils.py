@@ -2,13 +2,13 @@ import json
 import os
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import click
 from anymotion_sdk import Client, ClientValueError
 
 from .exceptions import ClickException, SettingsValueError
-from .output import echo_request, echo_response
+from .output import echo_request, echo_response, echo_warning
 from .settings import Settings
 from .state import State
 
@@ -71,6 +71,22 @@ def parse_rule(rule: Optional[str]) -> Optional[Union[list, dict]]:
         raise ClickException(message)
 
     return rule
+
+
+def echo_invalid_option_warning(condition: str, target_options: List[str]) -> None:
+    """Output warning message."""
+    if len(target_options) == 0:
+        return
+    elif len(target_options) == 1:
+        be, pronoun, s = "is", "This", ""
+    else:
+        be, pronoun, s = "are", "These", "s"
+    opt_str = ", ".join([f"'{option}'" for option in target_options])
+    message = (
+        f"{opt_str} {be} only available when {condition}. "
+        f"{pronoun} option{s} {be} ignored.\n"
+    )
+    echo_warning(message)
 
 
 def color_id(number: int) -> str:

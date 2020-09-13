@@ -1,6 +1,6 @@
 from pathlib import Path
 from textwrap import dedent
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 from urllib.parse import urlparse
 
 import click
@@ -46,6 +46,16 @@ def download_options(f: Callable) -> Callable:
         help="Path of file or directory to output drawn file.",
     )(f)
     return f
+
+
+def check_download_options(args: List[str]) -> List[str]:
+    """Check to see if download options are being used.
+
+    Returns:
+        A list of using option names.
+    """
+    used_options = set(args) & set(["-o", "--out", "--force", "--open", "--no-open"])
+    return list(used_options)
 
 
 @click.group()

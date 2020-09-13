@@ -10,9 +10,9 @@ from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
-from ..utils import color_id, get_client
-from .download import download_options
-from .draw import draw, draw_options
+from ..utils import color_id, echo_invalid_option_warning, get_client
+from .download import check_download_options, download_options
+from .draw import check_draw_options, draw, draw_options
 from .upload import upload
 
 
@@ -40,7 +40,6 @@ def cli() -> None:  # noqa: D103
     is_flag=True,
     help="Drawing with the extracted keypoints.",
 )
-# TODO: remove download and draw option
 @draw_options
 @download_options
 @common_options
@@ -59,11 +58,14 @@ def extract(
 
     Either '--image-id' or '--movie-id' or '--path' is required.
     """
-    # Because path defaults to the current directory, not to None.
     if [image_id, movie_id, path].count(None) != 2:
         raise click.UsageError(
             "Either '--image-id' or '--movie-id' or '--path' is required"
         )
+    if not with_drawing:
+        args = click.get_os_args()
+        options = check_draw_options(args) + check_download_options(args)
+        echo_invalid_option_warning("using '--with-drawing'", options)
 
     client = get_client(state)
 
