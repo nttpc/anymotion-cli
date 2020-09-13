@@ -1,6 +1,6 @@
 from pathlib import Path
 from textwrap import dedent
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 from urllib.parse import urlparse
 
 import click
@@ -39,7 +39,6 @@ def download_options(f: Callable) -> Callable:
     f = click.option(
         "-o",
         "--out",
-        "path",
         default=Path(),
         callback=validate_path,
         show_default=True,
@@ -47,6 +46,16 @@ def download_options(f: Callable) -> Callable:
         help="Path of file or directory to output drawn file.",
     )(f)
     return f
+
+
+def check_download_options(args: List[str]) -> List[str]:
+    """Check to see if download options are being used.
+
+    Returns:
+        A list of using option names.
+    """
+    used_options = set(args) & set(["-o", "--out", "--force", "--open", "--no-open"])
+    return list(used_options)
 
 
 @click.group()
@@ -62,7 +71,7 @@ def cli() -> None:  # noqa: D103
 @common_options
 @pass_state
 def download(
-    state: State, drawing_id: int, path: Path, force: bool, is_open: Optional[bool]
+    state: State, drawing_id: int, out: Path, force: bool, is_open: Optional[bool]
 ) -> None:
     """Download the drawn file."""
     client = get_client(state)
@@ -81,7 +90,7 @@ def download(
         raise ClickException("Unable to download because drawing failed.")
 
     url_path = Path(str(urlparse(url).path))
-    if path.is_dir():
+    if out.is_dir():
         try:
             if keypoint_id:
                 name = _get_name_from_keypoint_id(client, keypoint_id)
@@ -96,34 +105,32 @@ def download(
             file_name = name + url_path.suffix
         else:
             file_name = url_path.name
-        path /= file_name
+        out /= file_name
 
-    if path.suffix.lower() != url_path.suffix.lower():
-        echo_warning(f'"{path.suffix}" is not a valid extension.')
-        expected_name = path.with_suffix(url_path.suffix).name
-        if click.confirm(
-            f'Change output path from "{path.name}" to "{expected_name}"?'
-        ):
-            path = path.with_suffix(url_path.suffix)
+    if out.suffix.lower() != url_path.suffix.lower():
+        echo_warning(f'"{out.suffix}" is not a valid extension.')
+        expected_name = out.with_suffix(url_path.suffix).name
+        if click.confirm(f'Change output path from "{out.name}" to "{expected_name}"?'):
+            out = out.with_suffix(url_path.suffix)
 
-    if force or not _is_skip(path):
+    if force or not _is_skip(out):
         try:
             if state.use_spinner:
                 with yaspin(text="Downloading..."):
-                    client.download(drawing_id, path, exist_ok=True)
+                    client.download(drawing_id, out, exist_ok=True)
             else:
-                client.download(drawing_id, path, exist_ok=True)
+                client.download(drawing_id, out, exist_ok=True)
         except RequestsError as e:
             raise ClickException(str(e))
 
-        echo(f"Downloaded the file to {color_path(path)}.")
+        echo(f"Downloaded the file to {color_path(out)}.")
 
         if is_open is None:
             is_open = state.is_open
         if is_open is None:
             is_open = click.confirm("Open the Downloaded file?")
         if is_open:
-            click.launch(str(path))
+            click.launch(str(out))
     else:
         message = dedent(
             f"""\

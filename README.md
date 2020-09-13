@@ -131,6 +131,21 @@ Downloaded the file to image.jpg.
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
 To save to a specific file or directory, use the `--out` option.
 
+As shown below, you can also use `--path` option and `--with-drawing` in `extract` command to upload, extract keypoints, drawing at the same time.
+
+```sh
+$ amcli extract --path image.jpg --with-drawing
+Success: Uploaded image.jpg to the cloud storage. (image id: 111)
+
+Keypoint extraction started. (keypoint id: 222)
+Success: Keypoint extraction is complete.
+
+Drawing started. (drawing id: 333)
+Success: Drawing is complete.
+
+Downloaded the file to image.jpg.
+```
+
 #### Draw using rules
 
 You can use the rules to draw a variety of things.

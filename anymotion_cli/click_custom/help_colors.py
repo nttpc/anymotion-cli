@@ -11,8 +11,10 @@ from typing import Tuple
 
 import click
 
+from .formatting import SeparateHelpFormatter
 
-class HelpColorsFormatter(click.HelpFormatter):
+
+class HelpColorsFormatter(SeparateHelpFormatter):
     """Colorize help formatter."""
 
     def __init__(self, headers_color: str, options_color: str, *args, **kwargs):
@@ -53,8 +55,6 @@ class HelpColorsMixin(object):
 
     def get_help(self, ctx):  # noqa: D102
         formatter = HelpColorsFormatter(
-            width=ctx.terminal_width,
-            max_width=ctx.max_content_width,
             headers_color=self.help_headers_color,
             options_color=self.help_options_color,
         )

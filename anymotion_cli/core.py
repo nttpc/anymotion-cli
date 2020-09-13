@@ -16,7 +16,7 @@ from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
 from .interactive import run_interactive_mode
-from .options import profile_option
+from .options import profile_option, version_option
 from .state import State, pass_state
 
 
@@ -44,9 +44,7 @@ from .state import State, pass_state
 )
 @click.option("--interactive", is_flag=True, help="Start interactive mode.")
 @profile_option
-@click.version_option(
-    version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
-)
+@version_option(__version__, "--version", "-V")
 @pass_state
 @click.pass_context
 def cli(ctx: click.Context, state: State, interactive: bool) -> None:

@@ -3,7 +3,12 @@ from anymotion_sdk.client import Client
 
 from anymotion_cli.exceptions import ClickException, SettingsValueError
 from anymotion_cli.state import State
-from anymotion_cli.utils import get_client, get_settings, parse_rule
+from anymotion_cli.utils import (
+    echo_invalid_option_warning,
+    get_client,
+    get_settings,
+    parse_rule,
+)
 
 
 class TestGetClient(object):
@@ -82,3 +87,31 @@ class TestParseRule(object):
     def test_invalid(self, rule):
         with pytest.raises(ClickException):
             parse_rule(rule)
+
+
+@pytest.mark.parametrize(
+    "options, expected",
+    [
+        ([], ""),
+        (
+            ["--rule"],
+            (
+                "Warning: '--rule' is only available when condition. "
+                "This option is ignored.\n\n"
+            ),
+        ),
+        (
+            ["--rule", "--bg-rule"],
+            (
+                "Warning: '--rule', '--bg-rule' are only available when condition. "
+                "These options are ignored.\n\n"
+            ),
+        ),
+    ],
+)
+def test_echo_invalid_option_warning(capfd, options, expected):
+    echo_invalid_option_warning("condition", options)
+
+    out, err = capfd.readouterr()
+    assert out == ""
+    assert err == expected
