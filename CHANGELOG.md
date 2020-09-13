@@ -12,12 +12,20 @@ Unreleased
 
 - Added `--path` option to `extract` command to extract keypoints directly from a file.
 - Added "Did you mean ...?" suggestions for missing commands error.
-- Added auto suggestion from history in interactive mode.
+- Added support for the drawing/download options in the `compare` command.
 - Added `-h` option as an alias to `--help`.
-- Changed the color of option metadata.
-- Changed from `--interactive` option to `interactive` command. `--interactive` option is deprecated.
-- Removed the display of default profile in interactive mode.
-- Removed `--interactive` and `--profile` options in interactive mode.
+- Added `-V` option as an alias to `--version` and `-VV` option to show details.
+- Changed from `--interactive` option to `interactive` command.
+  `--interactive` option is deprecated.
+- Improved interactive mode.
+  - Added auto suggestion from history.
+  - Made `--interactive` and `--profile` options unavailable.
+  - Removed the display of default profile.
+- Improved the display of help messages.
+  - Added global option separated from options.
+  - Changed max width to 100 to display to reduce line breaks.
+  - Removed the color of option type.
+- Removed the unavailable options.
 - Fixed the required Python version to 3.6.1 or higher.
 
 ## 1.1.0

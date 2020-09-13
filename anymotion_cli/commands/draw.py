@@ -1,6 +1,6 @@
 import io
 from textwrap import dedent
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 import click
 from anymotion_sdk import RequestsError
@@ -11,8 +11,8 @@ from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
-from ..utils import color_id, get_client, parse_rule
-from .download import download, download_options
+from ..utils import color_id, echo_invalid_option_warning, get_client, parse_rule
+from .download import check_download_options, download, download_options
 
 
 def draw_options(f: Callable) -> Callable:
@@ -28,10 +28,10 @@ def draw_options(f: Callable) -> Callable:
     )(f)
     f = click.option(
         "--rule-file",
-        # TODO: change to click.Path
         type=click.File(),
+        metavar="PATH",
         help=(
-            "The path of the JSON file containing the rules and/or background rule "
+            "Path of the JSON file containing the rules and/or background rule "
             "for the drawing. "
             "It cannot be used with --rule or --bg-rule at the same time."
         ),
@@ -45,6 +45,18 @@ def draw_options(f: Callable) -> Callable:
         "--rule", "rule_str", help="The rules written in JSON format for the drawing."
     )(f)
     return f
+
+
+def check_draw_options(args: List[str]) -> List[str]:
+    """Check to see if draw options are being used.
+
+    Returns:
+        A list of using option names.
+    """
+    used_options = set(args) & set(
+        ["--rule", "--bg-rule", "--rule-file", "--download", "--no-download"]
+    )
+    return list(used_options)
 
 
 @click.group()
@@ -83,13 +95,23 @@ def draw(
     "--rule", "--bg-rule", and "--rule-file":
     https://docs.anymotion.jp/drawing.html
     """
-    if [keypoint_id, comparison_id].count(None) in [0, 2]:
+    required_options = [keypoint_id, comparison_id]
+    if required_options.count(None) != len(required_options) - 1:
         raise click.UsageError(
             "Either '--keypoint-id' or '--comparison-id' is required"
         )
 
     rule, background_rule = _parse_rule_and_bg_rule(rule_str, bg_rule_str, rule_file)
     client = get_client(state)
+
+    if is_download is None:
+        is_download = state.is_download
+    if is_download is None:
+        is_download = click.confirm("Download the drawn file?")
+    if not is_download:
+        args = click.get_os_args()
+        options = check_download_options(args)
+        echo_invalid_option_warning("downloading the file", options)
 
     try:
         drawing_id = client.draw_keypoint(
@@ -116,10 +138,6 @@ def draw(
         raise ClickException("Drawing failed.")
 
     echo()
-    if is_download is None:
-        is_download = state.is_download
-    if is_download is None:
-        is_download = click.confirm("Download the drawn file?")
     if is_download:
         ctx.invoke(download, drawing_id=drawing_id, **kwargs)
     else:

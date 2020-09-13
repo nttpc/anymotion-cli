@@ -27,10 +27,10 @@ def cli() -> None:  # noqa: D103
 @click.argument("keypoint_id", type=int)
 @click.option("--rule", "rule_str", help="Analysis rules in JSON format.")
 @click.option(
-    # TODO: change to click.Path
     "--rule-file",
     type=click.File(),
-    help="Analysis rules file in JSON format.",
+    metavar="PATH",
+    help="Path of analysis rules file in JSON format.",
 )
 @click.option("--show-result", is_flag=True)
 @common_options

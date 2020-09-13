@@ -38,12 +38,30 @@ def test_show_command_help_message(runner, command, option):
     assert re.match(rf"^Usage: \w+ {command}", result.output)
 
 
-def test_show_version(runner):
-    result = runner.invoke(cli, ["--version"])
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["-V"],
+        ["--version"],
+    ],
+)
+def test_show_version(runner, args):
+    result = runner.invoke(cli, args)
 
     assert result.exit_code == 0
     assert re.match(
         r"^\w+ version \d+\.\d+(\.\d+)?((a|b|rc|\.dev)\d+)?$", result.output
+    )
+
+
+def test_show_more_version(runner):
+    pattern = r"\d+\.\d+(\.\d+)?((a|b|rc|\.dev)\d+)?"
+    result = runner.invoke(cli, ["-VV"])
+
+    assert result.exit_code == 0
+    assert re.match(
+        fr"^\w+ version {pattern} \(anymotion-sdk {pattern}, Python {pattern}\)$",
+        result.output,
     )
 
 

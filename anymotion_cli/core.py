@@ -17,7 +17,7 @@ from .commands.interactive import run_interactive_mode
 from .commands.keypoint import cli as keypoint
 from .commands.movie import cli as movie
 from .commands.upload import cli as upload
-from .options import profile_option
+from .options import profile_option, version_option
 from .output import echo_warning
 from .state import State, pass_state
 
@@ -56,9 +56,7 @@ from .state import State, pass_state
     ),
 )
 @profile_option
-@click.version_option(
-    version=click.style(__version__, fg="cyan"), message="%(prog)s version %(version)s"
-)
+@version_option(__version__, "--version", "-V")
 @pass_state
 @click.pass_context
 def cli(ctx: click.Context, state: State, is_interactive: bool) -> None:
