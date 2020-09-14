@@ -8,7 +8,7 @@ Unreleased
 
 ## 1.2.0
 
-Unreleased
+Released 2020-09-14
 
 - Added `--path` option to `extract` command to extract keypoints directly from a file.
 - Added "Did you mean ...?" suggestions for missing commands error.
