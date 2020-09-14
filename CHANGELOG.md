@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.0
+
+Unreleased
+
+- Removed deprecated options.
+
 ## 1.2.0
 
 Unreleased
@@ -9,6 +15,8 @@ Unreleased
 - Added support for the drawing/download options in the `compare` command.
 - Added `-h` option as an alias to `--help`.
 - Added `-V` option as an alias to `--version` and `-VV` option to show details.
+- Changed from `--interactive` option to `interactive` command.
+  `--interactive` option is deprecated.
 - Improved interactive mode.
   - Added auto suggestion from history.
   - Made `--interactive` and `--profile` options unavailable.

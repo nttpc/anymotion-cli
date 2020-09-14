@@ -24,6 +24,7 @@ def test_show_help_message(runner, args):
         "drawing",
         "extract",
         "image",
+        "interactive",
         "keypoint",
         "movie",
         "upload",
@@ -75,4 +76,4 @@ def test_interactive(runner, args):
     result = runner.invoke(cli, args)
 
     assert result.exit_code == 0
-    assert result.output.startswith("Start interactive mode.")
+    assert "Start interactive mode." in result.output
