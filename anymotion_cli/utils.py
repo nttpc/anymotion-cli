@@ -6,7 +6,9 @@ from typing import List, Optional, Union
 
 import click
 from anymotion_sdk import Client, ClientValueError
+from anymotion_sdk.session import HttpSession
 
+from . import __version__
 from .exceptions import ClickException, SettingsValueError
 from .output import echo_request, echo_response, echo_warning
 from .settings import Settings
@@ -24,6 +26,10 @@ def get_client(state: State) -> Client:
         )
         raise ClickException(message)
 
+    session = HttpSession()
+    if hasattr(session, "user_agent"):
+        session.user_agent = f"{state.cli_name}/{__version__}"
+
     try:
         client = Client(
             client_id=str(settings.client_id),
@@ -31,6 +37,7 @@ def get_client(state: State) -> Client:
             api_url=settings.api_url,
             interval=settings.interval,
             timeout=settings.timeout,
+            session=session,
         )
     except ClientValueError as e:
         raise ClickException(str(e))
