@@ -159,7 +159,8 @@ class TestAnalysisShow(object):
         ],
     )
     @pytest.mark.parametrize(
-        "status, expected", [("FAILURE", "Error: Status is not SUCCESS.\n")],
+        "status, expected",
+        [("FAILURE", "Error: Status is not SUCCESS.\n")],
     )
     def test_with_only_with_error(self, runner, make_client, args, status, expected):
         client_mock = make_client(status)

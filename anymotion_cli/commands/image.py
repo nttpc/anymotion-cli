@@ -1,8 +1,8 @@
 import click
 from anymotion_sdk import RequestsError
-from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..click_custom import CustomGroup
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo_json
@@ -10,13 +10,16 @@ from ..state import State, pass_state
 from ..utils import get_client
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.group(short_help="Show the information of the uploaded images.")
-@common_options
+@cli.group(
+    cls=CustomGroup,
+    help_options_color="cyan",
+    short_help="Show the information of the uploaded images.",
+)
 def image() -> None:
     """Show the information of the uploaded images."""
 

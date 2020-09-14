@@ -56,8 +56,14 @@ class TestCompare(object):
     @pytest.mark.parametrize(
         "args, expected",
         [
-            (["compare"], "Error: Missing argument 'SOURCE_ID'.\n",),
-            (["compare", "111"], "Error: Missing argument 'TARGET_ID'.\n",),
+            (
+                ["compare"],
+                "Error: Missing argument 'SOURCE_ID'.\n",
+            ),
+            (
+                ["compare", "111"],
+                "Error: Missing argument 'TARGET_ID'.\n",
+            ),
         ],
     )
     def test_invalid_params(self, runner, make_client, args, expected):

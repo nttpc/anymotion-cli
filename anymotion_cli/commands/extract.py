@@ -1,31 +1,45 @@
+from pathlib import Path
 from typing import Optional
 
 import click
 from anymotion_sdk import RequestsError
-from click_help_colors import HelpColorsGroup
 from yaspin import yaspin
 
+from ..click_custom import CustomCommand
 from ..exceptions import ClickException
 from ..options import common_options
 from ..output import echo, echo_success
 from ..state import State, pass_state
-from ..utils import color_id, get_client
-from .download import download_options
-from .draw import draw, draw_options
+from ..utils import color_id, echo_invalid_option_warning, get_client
+from .download import check_download_options, download_options
+from .draw import check_draw_options, draw, draw_options
+from .upload import upload
 
 
-@click.group(cls=HelpColorsGroup, help_options_color="cyan")
+@click.group()
 def cli() -> None:  # noqa: D103
     pass
 
 
-@cli.command(short_help="Extract keypoints from uploaded images or movies.")
-@click.option("--movie-id", type=int)
-@click.option("--image-id", type=int)
-@click.option(
-    "-d", "--with-drawing", is_flag=True, help="Drawing with the extracted keypoints.",
+@cli.command(
+    cls=CustomCommand,
+    help_options_color="cyan",
+    short_help="Extract keypoints from uploaded images or movies.",
 )
-# TODO: remove download and draw option
+@click.option("--image-id", type=int, help="Uploaded image ID.")
+@click.option("--movie-id", type=int, help="Uploaded movie ID.")
+@click.option(
+    "--path",
+    type=click.Path(exists=True, dir_okay=False),
+    metavar="PATH",
+    help="Path of the movie or image file to extract.",
+)
+@click.option(
+    "-d",
+    "--with-drawing",
+    is_flag=True,
+    help="Drawing with the extracted keypoints.",
+)
 @draw_options
 @download_options
 @common_options
@@ -34,23 +48,41 @@ def cli() -> None:  # noqa: D103
 def extract(
     ctx: click.Context,
     state: State,
-    movie_id: Optional[int],
     image_id: Optional[int],
+    movie_id: Optional[int],
+    path: Optional[Path],
     with_drawing: bool,
     **kwargs,
 ) -> None:
-    """Extract keypoints from uploaded images or movies.
+    """Extract keypoints from image or movie.
 
-    Either "--image-id" or "--movie-id" is required.
+    Either '--image-id' or '--movie-id' or '--path' is required.
+
+    When using the '--with-drawing' option, you can use drawing options such as
+    '--rule', '--bg-rule', and '--rule-file', and '--download / --no-download'.
+    In addition, when downloading the drawn file, you can use download options
+    such as '-o, --out', '--force' and '--open / --no-open'.
     """
-    if [movie_id, image_id].count(None) in [0, 2]:
-        raise click.UsageError("Either '--movie-id' or '--image-id' is required")
+    required_options = [image_id, movie_id, path]
+    if required_options.count(None) != len(required_options) - 1:
+        raise click.UsageError(
+            "Either '--image-id' or '--movie-id' or '--path' is required"
+        )
+    if not with_drawing:
+        args = click.get_os_args()
+        options = check_draw_options(args) + check_download_options(args)
+        echo_invalid_option_warning("using '--with-drawing'", options)
 
     client = get_client(state)
+
+    result = None
+    if path is not None:
+        result = ctx.invoke(upload, path=path)._asdict()
+        echo()
+    data = result or {"image_id": image_id, "movie_id": movie_id}
+
     try:
-        keypoint_id = client.extract_keypoint(
-            data={"image_id": image_id, "movie_id": movie_id}
-        )
+        keypoint_id = client.extract_keypoint(data=data)
         echo(f"Keypoint extraction started. (keypoint id: {color_id(keypoint_id)})")
 
         if state.use_spinner:

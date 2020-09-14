@@ -9,11 +9,7 @@ It uses the [AnyMotion Python SDK](https://github.com/nttpc/anymotion-python-sdk
 
 <div align="center"><img src="https://user-images.githubusercontent.com/63082802/81499044-7a0bcc80-9303-11ea-96b5-a779ae0adcf7.gif"/></div>
 
-It works on Python versions:
-
-- Python 3.6
-- Python 3.7
-- Python 3.8
+It works on Python 3.6.1 or higher.
 
 ## Installation
 
@@ -75,18 +71,20 @@ amcli [OPTIONS] COMMAND [ARGS]...
 
 See the table below for more information, or run it with the `--help` option.
 
-### Commands to process something (verb commands)
+### Processing commands
 
 | command name | description |
 | -- | -- |
 | upload | Upload the local movie or image file to the cloud storage. |
 | download | Download the drawn file. |
-| extract | Extract keypoints from uploaded images or movies. |
+| extract | Extract keypoints from image or movie. |
 | analyze | Analyze the extracted keypoint data. |
 | compare | Compare the two extracted keypoint data |
 | draw | Draw based on the extracted keypoints or comparison results. |
 
-### Commands to show something (noun commands)
+The command name is represented by a verb.
+
+### Display commands
 
 | command name | description |
 | -- | -- |
@@ -97,11 +95,14 @@ See the table below for more information, or run it with the `--help` option.
 | comparison | Show the comparison results. |
 | drawing | Show the information of the drawn images or movies. |
 
+The command name is represented by a noun.
+
 ### Other commands
 
 | command name | description |
 | -- | -- |
 | configure | Configure your AnyMotion Credentials. |
+| interactive | Start interactive mode. |
 
 ### Examples
 
@@ -134,6 +135,21 @@ Downloaded the file to image.jpg.
 
 When the drawing is complete, the drawing file is downloaded (by default, to the current directory).
 To save to a specific file or directory, use the `--out` option.
+
+As shown below, you can also use `--path` option and `--with-drawing` in `extract` command to upload, extract keypoints, drawing at the same time.
+
+```sh
+$ amcli extract --path image.jpg --with-drawing
+Success: Uploaded image.jpg to the cloud storage. (image id: 111)
+
+Keypoint extraction started. (keypoint id: 222)
+Success: Keypoint extraction is complete.
+
+Drawing started. (drawing id: 333)
+Success: Drawing is complete.
+
+Downloaded the file to image.jpg.
+```
 
 #### Draw using rules
 
@@ -251,6 +267,16 @@ $ amcli keypoint show 1234 --join
       ],
       ...
 ```
+
+## Interactive Mode
+
+You can use interactive mode using `interactive` command.
+
+```sh
+$ amcli interactive
+```
+
+<div align="center"><img src="https://user-images.githubusercontent.com/63082802/92619134-1a96eb00-f2fc-11ea-92a2-2f36e9f652a4.png"/></div>
 
 ## Shell Complete
 
