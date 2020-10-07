@@ -137,14 +137,14 @@ workflows:
       - setup:
           matrix:
             parameters:
-              version: ["3.6", "3.7", "3.8"]
+              version: ["3.6", "3.7", "3.8", "3.9"]
           filters:
             tags:
               only: /.*/
       - test:
           matrix:
             parameters:
-              version: ["3.6", "3.7", "3.8"]
+              version: ["3.6", "3.7", "3.8", "3.9"]
               test-type: [unit, integration]
           filters:
             tags:

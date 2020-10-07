@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anymotion-cli"
-version = "1.2.0"
+version = "1.2.1-dev"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
@@ -11,7 +11,8 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8"
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
 ]
 
 [tool.poetry.dependencies]
