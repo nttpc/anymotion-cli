@@ -7,7 +7,7 @@ executors:
     parameters:
       version:
         type: string
-        default: "3.8"
+        default: "3.9"
     docker:
       - image: circleci/python:<< parameters.version >>
 
@@ -16,7 +16,7 @@ commands:
     parameters:
       version:
         type: string
-        default: "3.8"
+        default: "3.9"
     steps:
       - run:
           name: Show poetry and python version
@@ -39,7 +39,7 @@ jobs:
     parameters:
       version:
         type: string
-        default: "3.8"
+        default: "3.9"
     executor:
       name: python
       version: << parameters.version >>
@@ -51,7 +51,7 @@ jobs:
     parameters:
       version:
         type: string
-        default: "3.8"
+        default: "3.9"
       test-type:
         type: enum
         enum: ["unit", "integration"]
