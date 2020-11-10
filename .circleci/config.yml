@@ -118,6 +118,19 @@ jobs:
           name: Check security with bandit
           command: poetry run bandit -r anymotion_cli
 
+  check-version:
+    executor:
+      name: python
+    steps:
+      - checkout
+      - setup_python
+      - run:
+          name: Check version and git tag value
+          command: |
+            export SDK_VERSION=$(poetry run python -c "from anymotion_sdk import __version__; print(__version__, end='')")
+            echo "SDK_VERSION = $SDK_VERSION, CIRCLE_TAG = $CIRCLE_TAG"
+            test $CIRCLE_TAG = $SDK_VERSION
+
   release:
     executor:
       name: python
@@ -137,14 +150,14 @@ workflows:
       - setup:
           matrix:
             parameters:
-              version: ["3.6", "3.7", "3.8"]
+              version: ["3.6", "3.7", "3.8", "3.9"]
           filters:
             tags:
               only: /.*/
       - test:
           matrix:
             parameters:
-              version: ["3.6", "3.7", "3.8"]
+              version: ["3.6", "3.7", "3.8", "3.9"]
               test-type: [unit, integration]
           filters:
             tags:
@@ -156,20 +169,28 @@ workflows:
             tags:
               only: /.*/
           requires:
-            - test-unit-3.8
-            - test-integration-3.8
+            - test-unit-3.9
+            - test-integration-3.9
       - check-lint:
           filters:
             tags:
               only: /.*/
           requires:
-            - setup-3.8
+            - setup-3.9
       - check-security:
           filters:
             tags:
               only: /.*/
           requires:
-            - setup-3.8
+            - setup-3.9
+      - check-version:
+          filters:
+            tags:
+              only: /^\d+\.\d+(\.\d+)?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - setup-3.9
       - approval-release:
           type: approval
           filters:
@@ -182,6 +203,7 @@ workflows:
             - measure-coverage
             - check-lint
             - check-security
+            - check-version
       - release:
           filters:
             tags:
