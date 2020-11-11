@@ -6,6 +6,12 @@ Unreleased
 
 - Removed deprecated options.
 
+## 1.2.1
+
+Released 2020-11-11
+
+- Added support for Python 3.9.
+
 ## 1.2.0
 
 Released 2020-09-14
