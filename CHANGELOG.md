@@ -8,7 +8,7 @@ Unreleased
 
 ## 1.2.1
 
-Unreleased
+Released 2020-11-11
 
 - Added support for Python 3.9.
 
