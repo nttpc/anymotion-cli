@@ -127,9 +127,9 @@ jobs:
       - run:
           name: Check version and git tag value
           command: |
-            export SDK_VERSION=$(poetry run python -c "from anymotion_sdk import __version__; print(__version__, end='')")
-            echo "SDK_VERSION = $SDK_VERSION, CIRCLE_TAG = $CIRCLE_TAG"
-            test $CIRCLE_TAG = $SDK_VERSION
+            export CLI_VERSION=$(poetry run python -c "from anymotion_cli import __version__; print(__version__, end='')")
+            echo "CLI_VERSION = $CLI_VERSION, CIRCLE_TAG = $CIRCLE_TAG"
+            test $CIRCLE_TAG = $CLI_VERSION
 
   release:
     executor:
