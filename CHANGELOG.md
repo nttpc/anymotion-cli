@@ -11,6 +11,7 @@ Unreleased
 Released 2020-11-16
 
 - Added support for Python 3.9.
+- Changed the build system to poetry-core.
 
 ## 1.2.0
 
