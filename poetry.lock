@@ -663,7 +663,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-tabulate"
-version = "0.1.1"
+version = "0.8.0"
 description = "Typing stubs for tabulate"
 category = "dev"
 optional = false
@@ -741,7 +741,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "30682e106b483aa03b60ef0bb7dee08b8aab964ffe21113a7a95f61da1b95e1c"
+content-hash = "9bb4634e582b093542b45a19ae430d6fb8766da0d8dc28524d2241e3a392252f"
 
 [metadata.files]
 anymotion-sdk = [
@@ -1145,8 +1145,8 @@ types-setuptools = [
     {file = "types_setuptools-57.0.0-py3-none-any.whl", hash = "sha256:71ed0f4c71d8fb5f3026a90ae82d163c13749b110e157d82126725ac8f714360"},
 ]
 types-tabulate = [
-    {file = "types-tabulate-0.1.1.tar.gz", hash = "sha256:d1a415a8601391bc8450a669402ad57a1b620acf8d8d206fcbb3accc1440b106"},
-    {file = "types_tabulate-0.1.1-py2.py3-none-any.whl", hash = "sha256:34a4900c32a56db8c7e5a1c8857332e8d02fe45077ea0ed53a3a12a10cbdbd0c"},
+    {file = "types-tabulate-0.8.0.tar.gz", hash = "sha256:c63e90bec13837c46e0b3d91f89fd19d858f21b3df51ff32577a8efa70628a64"},
+    {file = "types_tabulate-0.8.0-py3-none-any.whl", hash = "sha256:65efaf2b7b895fc0c0881f1e54b534ce9a215afac3bd34f81c6de8f6f9993710"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},
