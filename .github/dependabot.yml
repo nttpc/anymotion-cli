@@ -1,0 +1,41 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "20:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pre-commit
+    versions:
+    - 2.10.0
+    - 2.10.1
+    - 2.11.0
+    - 2.11.1
+    - 2.12.0
+    - 2.9.3
+  - dependency-name: urllib3
+    versions:
+    - 1.26.3
+  - dependency-name: flake8-bugbear
+    versions:
+    - 20.11.1
+    - 21.3.2
+  - dependency-name: pygments
+    versions:
+    - 2.7.4
+    - 2.8.0
+  - dependency-name: coverage
+    versions:
+    - 5.3.1
+    - "5.4"
+  - dependency-name: pytest
+    versions:
+    - 6.2.2
+  - dependency-name: pytest-mock
+    versions:
+    - 3.5.1
+  - dependency-name: isort
+    versions:
+    - 5.7.0
