@@ -4,6 +4,7 @@
 
 Unreleased
 - Updated AnyMotion SDK and other packages
+- Changed oauth url for token access
 - Removed deprecated options.
 
 ## 1.2.1
