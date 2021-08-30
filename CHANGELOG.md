@@ -3,7 +3,7 @@
 ## 1.3.0
 
 Unreleased
-
+- Updated AnyMotion SDK and other packages
 - Removed deprecated options.
 
 ## 1.2.1
