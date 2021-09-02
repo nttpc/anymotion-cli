@@ -2,7 +2,8 @@
 
 ## 1.3.0
 
-Unreleased
+Released 2021-09-02
+
 - Updated AnyMotion SDK and other packages
 - Changed oauth url for token access
 - Removed deprecated options.
