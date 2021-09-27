@@ -43,7 +43,7 @@ requests-mock = "^1.9"
 tox = "^3.24"
 types-setuptools = "^57.0.0"
 types-tabulate = "^0.8.0"
-types-requests = "^2.25.2"
+types-requests = "^2.25.9"
 
 [tool.poetry.scripts]
 amcli = "anymotion_cli.core:cli"
