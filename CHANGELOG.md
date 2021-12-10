@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.1
+
+Released 2021-12-10
+
+- Updated AnyMotion SDK and other packages
+
 ## 1.3.0
 
 Released 2021-09-02
