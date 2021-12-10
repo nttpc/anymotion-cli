@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anymotion-cli"
-version = "1.3.0"
+version = "1.3.1"
 description = "Command Line Interface for AnyMotion API"
 authors = ["Yusuke Kumihashi <y_kumiha@nttpc.co.jp>"]
 readme = "README.md"
