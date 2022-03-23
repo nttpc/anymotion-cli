@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.2
+
+Released 2022-3-23
+
+- Updated packages
+
 ## 1.3.1
 
 Released 2021-12-10
