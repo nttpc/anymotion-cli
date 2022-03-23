@@ -1,6 +1,6 @@
 [[package]]
 name = "anymotion-sdk"
-version = "1.2.7"
+version = "1.2.8"
 description = "AnyMotion SDK for Python"
 category = "main"
 optional = false
@@ -799,8 +799,8 @@ content-hash = "6f8ea1ea69283be8f572b82029337c1ec0cf8e0a65f1f48daad66fd12ca19085
 
 [metadata.files]
 anymotion-sdk = [
-    {file = "anymotion-sdk-1.2.7.tar.gz", hash = "sha256:f634b92922338cc333402ef66db8544d7717a5743370a98c5a6c5466bc98c65e"},
-    {file = "anymotion_sdk-1.2.7-py3-none-any.whl", hash = "sha256:c3a6623a69b64ed9ab635825b68461150e9813045536f59fb1a89d5ebcdfd26e"},
+    {file = "anymotion-sdk-1.2.8.tar.gz", hash = "sha256:8f3c00655598151db7f5fdd0853df745252a33bb777d9563ebae33e581eb7c78"},
+    {file = "anymotion_sdk-1.2.8-py3-none-any.whl", hash = "sha256:0f897d32eb4d1e7c3f471475a64719623c5f39cffbb358798496025b80accf11"},
 ]
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
