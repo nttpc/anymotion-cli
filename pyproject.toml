@@ -42,7 +42,7 @@ pre-commit = "^2.17"
 requests-mock = "^1.9"
 tox = "^3.24"
 types-setuptools = "^57.4.11"
-types-tabulate = "^0.8.6"
+types-tabulate = "^0.8.8"
 types-requests = "^2.27.14"
 
 [tool.poetry.scripts]
