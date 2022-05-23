@@ -701,7 +701,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-setuptools"
-version = "57.4.11"
+version = "57.4.15"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -795,7 +795,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "6f8ea1ea69283be8f572b82029337c1ec0cf8e0a65f1f48daad66fd12ca19085"
+content-hash = "48a106591a0eca94cb69d36411968968ab5ad8e136d9dd513b48cab8b782d479"
 
 [metadata.files]
 anymotion-sdk = [
@@ -1265,8 +1265,8 @@ types-requests = [
     {file = "types_requests-2.27.14-py3-none-any.whl", hash = "sha256:c01838abfe3e8a83ba68346cd373afff97594c19c15c922ddee4a0e80ba7e329"},
 ]
 types-setuptools = [
-    {file = "types-setuptools-57.4.11.tar.gz", hash = "sha256:262f7406e0c7d705ad6bb4526b5b761fa500bf99eab74de85ac3592187d62935"},
-    {file = "types_setuptools-57.4.11-py3-none-any.whl", hash = "sha256:fbb0647569d6fb2f6bc472402265250c0ffa53e60180d2cbfee9e84f085921f0"},
+    {file = "types-setuptools-57.4.15.tar.gz", hash = "sha256:650528ce803586029d7f153f32aed2dbaa6bb2888b233334af80d7ba63ed3c87"},
+    {file = "types_setuptools-57.4.15-py3-none-any.whl", hash = "sha256:f8f19876f714a440c4badef1b91b0648604ed443e703d29d44cd36ac93b01a77"},
 ]
 types-tabulate = [
     {file = "types-tabulate-0.8.6.tar.gz", hash = "sha256:3f4dfb795449c2178ed5c214ec5114c044b1eedd71ad0a1003bc670f09d8710a"},
