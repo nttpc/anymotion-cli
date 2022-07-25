@@ -41,7 +41,7 @@ pytest-mock = "^3.6"
 pre-commit = "^2.17"
 requests-mock = "^1.9"
 tox = "^3.24"
-types-setuptools = "^57.4.11"
+types-setuptools = "^63.2.1"
 types-tabulate = "^0.8.6"
 types-requests = "^2.27.14"
 
